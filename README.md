@@ -244,3 +244,392 @@ export { translate };
 4.  将生成的 `.zip` 文件重命名为 `YourPluginName.swiftbiux`。
 
 祝您编码愉快！
+
+---
+
+## 插件示例
+
+为了帮助您更好地理解插件的开发过程，我们提供了几个功能各异的示例插件。您可以直接在 `SwiftBiuX-Template` 项目中找到它们的完整源代码。
+
+### 示例一：CNY - 人民币大写转换
+
+这是一个简单但非常实用的工具，它演示了：
+- 如何读取用户选择的文本 (`context.selectedText`)。
+- 如何进行数据处理（数字转大写）。
+- 如何将结果写入剪贴板 (`SwiftBiu.writeToClipboard`)。
+- 如何显示操作反馈 (`SwiftBiu.showNotification`)。
+
+#### `cny/manifest.json`
+
+```json
+{
+  "identifier": "com.SwiftBiu.rmbconverter",
+  "name": "CNY",
+  "author": "SwiftBiu",
+  "description": "将选中的数字金额转换为大写人民币并复制到剪贴板。",
+  "version": "1.0",
+  "actions": [
+    {
+      "title": "CNY",
+      "script": "script.js",
+      "icon": "dollarsign.circle"
+    }
+  ],
+  "iconType": "sfSymbol",
+  "permissions": [
+    "clipboardWrite",
+    "notifications"
+  ]
+}
+```
+
+#### `cny/script.js`
+
+```javascript
+/**
+ * @param {object} context - 包含有关当前选择的所有信息的上下文对象。
+ */
+function performAction(context) {
+    const selectedText = context.selectedText;
+
+    if (!selectedText || isNaN(parseFloat(selectedText))) {
+        SwiftBiu.showNotification("操作失败", "请选择有效的数字。");
+        return;
+    }
+
+    const rmb = convertToRMB(selectedText);
+    if (rmb) {
+        SwiftBiu.writeToClipboard(rmb);
+        SwiftBiu.showNotification("转换成功", `${selectedText} 已转换为大写人民币并复制到剪贴板。`);
+    } else {
+        SwiftBiu.showNotification("操作失败", "无法转换该数字。");
+    }
+}
+
+/**
+ * 将数字金额转换为大写人民币。
+ * @param {string} money - 数字字符串.
+ * @returns {string} - 大写人民币字符串.
+ */
+function convertToRMB(money) {
+    var numberValue = new String(Math.round(money * 100)); // 数字金额
+    var chineseValue = ""; // 转换后的汉字金额
+    var String1 = "零壹贰叁肆伍陆柒捌玖"; // 汉字数字
+    var String2 = "万仟佰拾亿仟佰拾万仟佰拾元角分"; // 对应单位
+    var len = numberValue.length; // numberValue 的字符串长度
+    var Ch1; // 数字的汉语读法
+    var Ch2; // 数字位的汉字读法
+    var nZero = 0; // 用来计算连续的零值的个数
+    var String3; // 指定位置的数值
+    if (len > 15) {
+        return "超出计算范围";
+    }
+    if (numberValue == 0) {
+        chineseValue = "零元整";
+        return chineseValue;
+    }
+    String2 = String2.substr(String2.length - len, len); // 取出对应位数的STRING2的值
+    for (var i = 0; i < len; i++) {
+        String3 = parseInt(numberValue.substr(i, 1), 10); // 取出需转换的某一位的值
+        if (i != (len - 3) && i != (len - 7) && i != (len - 11) && i != (len - 15)) {
+            if (String3 == 0) {
+                Ch1 = "";
+                Ch2 = "";
+                nZero = nZero + 1;
+            } else if (String3 != 0 && nZero != 0) {
+                Ch1 = "零" + String1.substr(String3, 1);
+                Ch2 = String2.substr(i, 1);
+                nZero = 0;
+            } else {
+                Ch1 = String1.substr(String3, 1);
+                Ch2 = String2.substr(i, 1);
+                nZero = 0;
+            }
+        } else { // 该位是万亿，亿，万，元位等关键位
+            if (String3 != 0 && nZero != 0) {
+                Ch1 = "零" + String1.substr(String3, 1);
+                Ch2 = String2.substr(i, 1);
+                nZero = 0;
+            } else if (String3 != 0 && nZero == 0) {
+                Ch1 = String1.substr(String3, 1);
+                Ch2 = String2.substr(i, 1);
+                nZero = 0;
+            } else if (String3 == 0 && nZero >= 3) {
+                Ch1 = "";
+                Ch2 = "";
+                nZero = nZero + 1;
+            } else {
+                Ch1 = "";
+                Ch2 = String2.substr(i, 1);
+                nZero = nZero + 1;
+            }
+            if (i == (len - 11) || i == (len - 3)) { // 如果该位是亿位或元位，则必须写上
+                Ch2 = String2.substr(i, 1);
+            }
+        }
+        chineseValue = chineseValue + Ch1 + Ch2;
+    }
+    if (String3 == 0) { // 最后一位（分）为0时，加上“整”
+        chineseValue = chineseValue + "整";
+    }
+    return chineseValue;
+}
+```
+
+### 示例二：Gemini - AI 聊天助手
+
+这个插件展示了更复杂的场景，是学习高级功能的绝佳范例：
+- **用户配置**: 通过 `configuration` 字段让用户输入 API Key 等敏感信息。
+- **API 调用**: 使用 `SwiftBiu.fetch` 与 Google Gemini API 进行交互。
+- **状态管理**: 在内存中维护一个 `messages` 数组来保存对话历史，实现连续对话。
+- **加载指示**: 通过 `SwiftBiu.showLoadingIndicator` 和 `SwiftBiu.hideLoadingIndicator` 提供即时的视觉反馈。
+- **自定义图标**: 使用插件包内的 `.svg` 文件作为图标。
+
+#### `Gemini/manifest.json`
+
+```json
+{
+  "identifier": "com.SwiftBiu.gemini",
+  "name": "Gemini",
+  "author": "SwiftBiu",
+  "description": "Send the selected text to Google Gemini and get the response.",
+  "version": "1.0",
+  "actions": [
+    {
+      "title": "Gemini",
+      "script": "script.js",
+      "icon": "gemini-icon.svg"
+    }
+  ],
+  "icon": "gemini-icon.svg",
+  "iconType": "file",
+  "permissions": [
+    "network",
+    "paste",
+    "notifications"
+  ],
+  "configuration": [
+    {
+      "key": "apikey",
+      "label": "Gemini API Key",
+      "placeholder": "Enter your Gemini API key",
+      "description": "Obtain an API key from Google AI Studio.",
+      "isSecure": true
+    },
+    {
+      "key": "resetMinutes",
+      "label": "Reset Timer (minutes)",
+      "placeholder": "e.g., 15",
+      "description": "Reset the conversation if idle for this many minutes. Set blank to disable.",
+      "isSecure": false
+    }
+  ]
+}
+```
+
+#### `Gemini/script.js` (核心逻辑)
+
+```javascript
+// 用于保存对话历史的数组
+const messages = [];
+// 上次交互的时间戳
+let lastChatDate = new Date();
+
+/**
+ * 主函数入口
+ * @param {object} context - 上下文对象
+ */
+function performAction(context) {
+    // 1. 读取用户配置
+    const apiKey = SwiftBiu.getConfig("apikey");
+    const resetMinutes = parseInt(SwiftBiu.getConfig("resetMinutes"), 10);
+
+    if (!apiKey) {
+        SwiftBiu.showNotification("Configuration Error", "Please set your Gemini API Key in the plugin settings.");
+        return;
+    }
+
+    // 2. 处理手动重置命令
+    if (context.selectedText.trim().toLowerCase() === "reset chat") {
+        messages.length = 0;
+        SwiftBiu.showNotification("Gemini Conversation Reset", "The chat history has been cleared.");
+        return;
+    }
+
+    // 3. 处理自动超时重置
+    if (!isNaN(resetMinutes) && resetMinutes > 0) {
+        const resetInterval = resetMinutes * 60 * 1000;
+        if (new Date().getTime() - lastChatDate.getTime() > resetInterval) {
+            messages.length = 0; // 静默重置
+        }
+    }
+
+    // 4. 将用户输入添加到历史记录
+    messages.push({ role: "user", content: context.selectedText });
+
+    // 5. 准备并发送 API 请求
+    const requestBody = convertMessagesToGeminiFormat(); // 将消息转换为 Gemini 格式
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    SwiftBiu.showLoadingIndicator();
+    SwiftBiu.fetch(
+        apiUrl,
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody)
+        },
+        (response) => { // 成功回调
+            SwiftBiu.hideLoadingIndicator();
+            try {
+                const responseData = JSON.parse(response.data);
+                const assistantText = responseData.candidates.at(0).content.parts.at(0).text;
+                
+                // 将助手的回复添加到历史记录
+                messages.push({ role: "model", content: assistantText });
+                lastChatDate = new Date();
+
+                // 将结果粘贴并通知用户
+                const newContent = context.selectedText + "\n\n" + assistantText;
+                SwiftBiu.pasteText(newContent);
+                SwiftBiu.showNotification("Gemini Response Pasted", "The assistant's reply has been pasted.");
+            } catch (e) {
+                SwiftBiu.showNotification("API Error", `Failed to parse response: ${e.message}`);
+                messages.pop(); // 请求失败时，移除最后一条用户消息以便重试
+            }
+        },
+        (error) => { // 失败回调
+            SwiftBiu.hideLoadingIndicator();
+            SwiftBiu.showNotification("API Request Failed", `Error: ${error.error}`);
+            messages.pop();
+        }
+    );
+}
+
+/**
+ * 将消息历史转换为 Gemini API 所需的格式。
+ * @returns {object} The contents object for the Gemini API request.
+ */
+function convertMessagesToGeminiFormat() {
+    return {
+        contents: messages.map(msg => ({
+            role: msg.role === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.content }]
+        }))
+    };
+}
+```
+
+### 示例三：GeminiImage - AI 绘图
+
+这个插件进一步展示了如何与更专业的 API 端点交互，特别是处理非文本数据：
+- **调用图像生成 API**: 向 Gemini 的图像生成模型发送请求。
+- **处理 Base64 数据**: 解析 API 返回的流式 JSON 数据，提取出 Base64 编码的图像信息。
+- **调用原生 UI**: 使用 `SwiftBiu.openImageInPreview(base64Image)` 这个特殊的 API，直接调用 SwiftBiu 的原生功能来显示一个图片预览窗口，提供了比网页更原生的用户体验。
+
+#### `GeminiImage/manifest.json`
+
+```json
+{
+    "identifier": "com.swiftbiu.gemini-image",
+    "name": "AI Drawing New",
+    "author": "SwiftBiu",
+    "description": "Generates an image based on the selected text using the Gemini API.",
+    "version": "1.0",
+    "actions": [
+        {
+            "title": "AI Drawing",
+            "script": "script.js",
+            "icon": "nano-banana.svg"
+        }
+    ],
+    "permissions": [
+        "network",
+        "ui",
+        "notifications"
+    ],
+    "icon": "nano-banana.svg",
+    "iconType": "file",
+    "configuration": [
+        {
+            "key": "apiKey",
+            "label": "Gemini API Key",
+            "placeholder": "Enter your Google AI Studio API Key",
+            "description": "Required for generating images.",
+            "isSecure": true
+        }
+    ]
+}
+```
+
+#### `GeminiImage/script.js` (核心逻辑)
+
+```javascript
+/**
+ * @param {object} context - 上下文对象
+ */
+function performAction(context) {
+    const apiKey = SwiftBiu.getConfig("apiKey");
+    if (!apiKey) {
+        SwiftBiu.showNotification("Configuration Error", "Gemini API Key is not set.");
+        return;
+    }
+
+    const prompt = context.selectedText;
+    if (!prompt) {
+        SwiftBiu.showNotification("Input Error", "Please select some text to generate an image.");
+        return;
+    }
+
+    const modelId = "gemini-1.5-flash-preview-image-generation";
+    const apiMethod = "streamGenerateContent";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:${apiMethod}?key=${apiKey}`;
+
+    const requestBody = {
+        "contents": [{"role": "user", "parts": [{"text": `A high-quality, detailed image of: ${prompt}`}]}],
+        "generationConfig": {"responseModalities": ["IMAGE", "TEXT"]}
+    };
+
+    const options = {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(requestBody)
+    };
+
+    SwiftBiu.showLoadingIndicator();
+
+    SwiftBiu.fetch(url, options,
+        (response) => { // 成功回调
+            try {
+                const chunks = JSON.parse(response.data);
+                let base64Image = null;
+
+                // 从流式响应中找到并提取图片数据
+                for (const chunk of chunks) {
+                    const part = chunk.candidates?.at(0)?.content?.parts?.at(0);
+                    if (part && part.inlineData && part.inlineData.data) {
+                        base64Image = part.inlineData.data;
+                        break;
+                    }
+                }
+
+                if (base64Image) {
+                    SwiftBiu.hideLoadingIndicator();
+                    // 调用原生 API 在预览窗口中打开图片
+                    SwiftBiu.openImageInPreview(base64Image);
+                } else {
+                    SwiftBiu.hideLoadingIndicator();
+                    SwiftBiu.showNotification("API Error", "No image data found in response.");
+                }
+            } catch (e) {
+                SwiftBiu.hideLoadingIndicator();
+                SwiftBiu.showNotification("API Error", "Could not process image data from the server.");
+            }
+        },
+        (error) => { // 失败回调
+            SwiftBiu.hideLoadingIndicator();
+            SwiftBiu.showNotification("Network Error", "Failed to connect to the Gemini API.");
+        }
+    );
+}
+```
