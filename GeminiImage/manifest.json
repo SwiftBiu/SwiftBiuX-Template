@@ -7,8 +7,7 @@
     "actions": [
         {
             "title": "AI Drawing",
-            "script": "script.js",
-            "icon": "nano-banana.svg"
+            "script": "script.js"
         }
     ],
     "permissions": [
@@ -16,7 +15,7 @@
         "ui",
         "notifications"
     ],
-    "icon": "nano-banana.svg",
+    "icon": "nano-banana.png",
     "iconType": "file",
     "configuration": [
         {

@@ -7,11 +7,10 @@
   "actions": [
     {
       "title": "Gemini",
-      "script": "script.js",
-      "icon": "gemini-icon.svg"
+      "script": "script.js"
     }
   ],
-  "icon": "gemini-icon.svg",
+  "icon": "gemini.png",
   "iconType": "file",
   "permissions": [
     "network",

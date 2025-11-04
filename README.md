@@ -20,7 +20,7 @@ All SwiftBiu plugins consist of a core file, `manifest.json`, and one or more sc
 | `actions`       | Array   | Yes      | An array defining one or more actions provided by the plugin.                                  |
 | `author`        | String  | No       | The name of the plugin author.                                                                 |
 | `description`   | String  | No       | A brief description of the plugin's functionality.                                             |
-| `icon`          | String  | No       | The default icon name for the plugin. Can be an SF Symbol (e.g., `swift`) or a filename within the plugin package (e.g., `icon.png`). |
+| `icon`          | String  | No       | The default icon name for the plugin. Can be an SF Symbol (e.g., `swift`) or a filename within the plugin package. PNG format is recommended, with a suggested size of 32x32 pixels. |
 | `iconType`      | String  | No       | Defines the type of the `icon` field. Possible values are `"sfSymbol"` or `"file"`.            |
 | `permissions`   | Array   | No       | Declares the system permissions required by the plugin (see "Sandbox & Permissions" section).  |
 | `configuration` | Array   | No       | An array defining parameters that require user configuration, used to auto-generate a settings UI. |
@@ -384,7 +384,7 @@ This plugin demonstrates a more complex scenario and is an excellent example for
 - **API Calls**: Interacts with the Google Gemini API using `SwiftBiu.fetch`.
 - **State Management**: Maintains a `messages` array in memory to save conversation history, enabling continuous dialogue.
 - **Loading Indicators**: Provides immediate visual feedback with `SwiftBiu.showLoadingIndicator` and `SwiftBiu.hideLoadingIndicator`.
-- **Custom Icons**: Uses an `.svg` file within the plugin package as an icon.
+- **Custom Icons**: Uses a `.png` file within the plugin package as an icon.
 
 #### `Gemini/manifest.json`
 
@@ -398,11 +398,10 @@ This plugin demonstrates a more complex scenario and is an excellent example for
   "actions": [
     {
       "title": "Gemini",
-      "script": "script.js",
-      "icon": "gemini-icon.svg"
+      "script": "script.js"
     }
   ],
-  "icon": "gemini-icon.svg",
+  "icon": "gemini.png",
   "iconType": "file",
   "permissions": [
     "network",
@@ -541,7 +540,6 @@ This plugin further demonstrates how to interact with more specialized API endpo
         {
             "title": "AI Drawing",
             "script": "script.js",
-            "icon": "nano-banana.svg"
         }
     ],
     "permissions": [
@@ -549,7 +547,7 @@ This plugin further demonstrates how to interact with more specialized API endpo
         "ui",
         "notifications"
     ],
-    "icon": "nano-banana.svg",
+    "icon": "nano-banana.png",
     "iconType": "file",
     "configuration": [
         {

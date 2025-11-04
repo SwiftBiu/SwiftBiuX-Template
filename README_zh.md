@@ -20,7 +20,7 @@
 | `actions`       | Array  | 是       | 定义插件提供的一个或多个动作的数组。                                                   |
 | `author`        | String | 否       | 插件作者的名字。                                                                       |
 | `description`   | String | 否       | 插件功能的简短描述。                                                                   |
-| `icon`          | String | 否       | 插件的默认图标名称。可以是 SF Symbol (如 `swift`) 或插件包内的文件名 (如 `icon.png`)。 |
+| `icon`          | String | 否       | 插件的默认图标名称。可以是 SF Symbol (如 `swift`) 或插件包内的文件名。推荐使用 PNG 格式，建议尺寸为 32x32 像素。 |
 | `iconType`      | String | 否       | 定义 `icon` 字段的类型。可选值为 `"sfSymbol"` 或 `"file"`。                            |
 | `permissions`   | Array  | 否       | 声明插件需要的系统权限 (详见“沙盒与权限”章节)。                                        |
 | `configuration` | Array  | 否       | 定义插件需要用户配置的参数数组，用于自动生成设置界面。                                 |
@@ -385,7 +385,7 @@ function convertToRMB(money) {
 - **API 调用**: 使用 `SwiftBiu.fetch` 与 Google Gemini API 进行交互。
 - **状态管理**: 在内存中维护一个 `messages` 数组来保存对话历史，实现连续对话。
 - **加载指示**: 通过 `SwiftBiu.showLoadingIndicator` 和 `SwiftBiu.hideLoadingIndicator` 提供即时的视觉反馈。
-- **自定义图标**: 使用插件包内的 `.svg` 文件作为图标。
+- **自定义图标**: 使用插件包内的 `.png` 文件作为图标。
 
 #### `Gemini/manifest.json`
 
@@ -400,10 +400,10 @@ function convertToRMB(money) {
     {
       "title": "Gemini",
       "script": "script.js",
-      "icon": "gemini-icon.svg"
+      "icon": "gemini-icon.png"
     }
   ],
-  "icon": "gemini-icon.svg",
+  "icon": "gemini-icon.png",
   "iconType": "file",
   "permissions": [
     "network",
