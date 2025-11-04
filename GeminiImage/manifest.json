@@ -1,0 +1,30 @@
+{
+    "identifier": "com.swiftbiu.gemini-image",
+    "name": "AI Drawing New",
+    "author": "SwiftBiu",
+    "description": "Generates an image based on the selected text using the Gemini API.",
+    "version": "1.0",
+    "actions": [
+        {
+            "title": "AI Drawing",
+            "script": "script.js",
+            "icon": "nano-banana.svg"
+        }
+    ],
+    "permissions": [
+        "network",
+        "ui",
+        "notifications"
+    ],
+    "icon": "nano-banana.svg",
+    "iconType": "file",
+    "configuration": [
+        {
+            "key": "apiKey",
+            "label": "Gemini API Key",
+            "placeholder": "Enter your Google AI Studio API Key",
+            "description": "Required for generating images.",
+            "isSecure": true
+        }
+    ]
+}

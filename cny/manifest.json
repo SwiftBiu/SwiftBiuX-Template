@@ -1,0 +1,20 @@
+{
+  "identifier": "com.SwiftBiu.rmbconverter",
+  "name": "CNY",
+  "author": "SwiftBiu",
+  "description": "将选中的数字金额转换为大写人民币并复制到剪贴板。",
+  "version": "1.0",
+  "actions": [
+    {
+      "title": "CNY",
+      "script": "script.js",
+      "icon": "dollarsign.circle"
+    }
+  ],
+  "iconType": "sfSymbol",
+  "permissions": [
+    "clipboardWrite",
+    "notifications"
+  ],
+  "configuration": []
+}
