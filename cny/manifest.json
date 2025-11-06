@@ -14,7 +14,8 @@
   "iconType": "sfSymbol",
   "permissions": [
     "clipboardWrite",
-    "notifications"
+    "notifications",
+    "paste"
   ],
   "configuration": []
 }

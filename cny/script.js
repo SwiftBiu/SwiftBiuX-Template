@@ -14,8 +14,9 @@ function performAction(context) {
     const rmb = convertToRMB(selectedText);
     if (rmb) {
         console.log(`Successfully converted "${selectedText}" to "${rmb}"`);
-        SwiftBiu.writeToClipboard(rmb);
-        SwiftBiu.showNotification("转换成功", `${selectedText} 已转换为大写人民币并复制到剪贴板。`);
+        const newContent = selectedText + "\n\n" + rmb;
+        SwiftBiu.pasteText(newContent);
+
     } else {
         SwiftBiu.showNotification("操作失败", "无法转换该数字。");
     }

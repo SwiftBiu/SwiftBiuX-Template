@@ -100,7 +100,7 @@ function performAction(context) {
                     // Paste response and notify user
                     const newContent = context.selectedText + "\n\n" + assistantText;
                     SwiftBiu.pasteText(newContent);
-                    SwiftBiu.showNotification("Gemini Response Pasted", "The assistant's reply has been pasted.");
+                    // SwiftBiu.showNotification("Gemini Response Pasted", "The assistant's reply has been pasted.");
                 } else {
                     throw new Error("Invalid response structure from API.");
                 }
