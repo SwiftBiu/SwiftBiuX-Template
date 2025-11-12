@@ -23,11 +23,12 @@
       "label": "Gemini API Key",
       "placeholder": "Enter your Gemini API key",
       "description": "Obtain an API key from Google AI Studio.",
-      "isSecure": true
+      "type": "secure"
     },
     {
       "key": "apiurl",
       "label": "API URL",
+      "type": "string",
       "placeholder": "e.g., https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
       "description": "Custom Gemini API endpoint. Leave blank for default.",
       "isSecure": false
@@ -35,16 +36,28 @@
     {
       "key": "model",
       "label": "Model",
-      "placeholder": "e.g., gemini-1.5-flash",
-      "description": "The model to use. Defaults to gemini-1.5-flash.",
-      "isSecure": false
+      "type": "option",
+      "description": "The model to use.",
+      "options": [
+        { "label": "Gemini 1.5 Flash", "value": "gemini-1.5-flash" },
+        { "label": "Gemini 1.5 Pro", "value": "gemini-1.5-pro" }
+      ]
     },
     {
-      "key": "resetMinutes",
-      "label": "Reset Timer (minutes)",
-      "placeholder": "e.g., 15",
-      "description": "Reset the conversation if idle for this many minutes. Set blank to disable.",
-      "isSecure": false
+      "key": "enableReset",
+      "label": "Enable Conversation Reset",
+      "type": "boolean",
+      "description": "Enable to reset the conversation after a period of inactivity."
+    },
+    {
+      "key": "systemRoles",
+      "label": "System Roles",
+      "type": "radioList",
+      "description": "Define custom roles for the AI assistant.",
+      "defaultItems": [
+        { "enabled": true, "value": "You are a helpful assistant." },
+        { "enabled": false, "value": "You are a professional translator." }
+      ]
     }
   ]
 }

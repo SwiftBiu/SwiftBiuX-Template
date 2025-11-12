@@ -1,24 +1,48 @@
 /**
  * @param {object} context - 包含有关当前选择的所有信息的上下文对象。
+ * 必须实现此函数以确定插件在当前上下文中是否可在工具栏展示。
+ * @returns {boolean} - 如果插件可用则返回 true，否则返回 false。
+ */
+function isAvailable(context) {
+    const selectedText = context.selectedText.trim();
+    if (!selectedText) {
+        return false;
+    }
+    // ✅ 健壮性修复：在检查前，先移除常见的货币符号和千位分隔符。
+    // 这使得插件能够正确识别 "¥1,234.56" 或 "$123" 这样的输入。
+    const cleanedText = selectedText.replace(/[¥$,]/g, '');
+    // 如果清理后的文本不为空，并且可以成功转换为一个数字，则返回 true。
+    return cleanedText && !isNaN(parseFloat(cleanedText));
+}
+
+/**
+ * @param {object} context - 包含有关当前选择的所有信息的上下文对象。
+ * 必须实现此函数以执行插件的主要操作。
  */
 function performAction(context) {
     const selectedText = context.selectedText;
     console.log(`cny plugin received text: "${selectedText}"`);
 
-    if (!selectedText || isNaN(parseFloat(selectedText))) {
-        console.log("Validation failed: selected text is not a valid number.");
-        SwiftBiu.showNotification("操作失败", "请选择有效的数字。");
+    // ✅ 健壮性修复：使用与 isAvailable 中相同的清理逻辑。
+    const cleanedText = selectedText.trim().replace(/[¥$,]/g, '');
+
+    if (!cleanedText || isNaN(parseFloat(cleanedText))) {
+        console.log(`Validation failed: cleaned text "${cleanedText}" is not a valid number.`);
+        SwiftBiu.showNotification("操作失败", "请选择一个有效的数字。");
         return;
     }
 
-    const rmb = convertToRMB(selectedText);
+    const rmb = convertToRMB(cleanedText);
     if (rmb) {
         console.log(`Successfully converted "${selectedText}" to "${rmb}"`);
         const newContent = selectedText + "\n\n" + rmb;
+        SwiftBiu.showNotification(rmb);
         SwiftBiu.pasteText(newContent);
 
     } else {
-        SwiftBiu.showNotification("操作失败", "无法转换该数字。");
+        // ✅ 用户反馈优化: 如果 convertToRMB 返回了具体的错误信息，就显示它。
+        const errorMessage = (typeof rmb === 'string' && rmb.includes("范围")) ? rmb : "无法转换该数字。";
+        SwiftBiu.showNotification("操作失败", errorMessage);
     }
 }
 

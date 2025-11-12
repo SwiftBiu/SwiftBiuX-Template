@@ -1,12 +1,12 @@
 {
-    "identifier": "com.swiftbiu.gemini-image",
-    "name": "AI Drawing New",
+    "identifier": "com.swiftbiu.gemini-imageToast",
+    "name": "AI Drawing Toast",
     "author": "SwiftBiu",
     "description": "Generates an image based on the selected text using the Gemini API.",
     "version": "1.0",
     "actions": [
         {
-            "title": "AI Drawing",
+            "title": "AI Drawing Toast",
             "script": "script.js"
         }
     ],
@@ -23,7 +23,7 @@
             "label": "Gemini API Key",
             "placeholder": "Enter your Google AI Studio API Key",
             "description": "Required for generating images.",
-            "isSecure": true
+            "type": "secure"
         }
     ]
 }

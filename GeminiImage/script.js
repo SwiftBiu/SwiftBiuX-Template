@@ -1,7 +1,19 @@
 /**
- * This function is called when the user triggers the plugin action.
- * @param {object} context - An object containing information about the selection.
- * @param {string} context.selectedText - The text selected by the user.
+ * 检查插件在当前上下文是否可用。
+ * @param {object} context - 包含当前选择信息的上下文对象。
+ * @returns {boolean} - 如果插件可用则返回 true，否则返回 false。
+ */
+function isAvailable(context) {
+    // 仅当用户选中文本时，图片生成插件才可用。
+    return context.selectedText.trim().length > 0;
+}
+
+/**
+ * SwiftBiu 插件的主入口函数。
+ * 当用户触发此动作（例如，点击工具栏图标）时，该函数被调用。
+ * 它的核心功能是使用 Gemini API 将选中的文本作为提示词来生成图片。
+ * @param {object} context - 包含有关当前选择的所有信息的上下文对象。
+ * @param {string} context.selectedText - 用户选中的文本，将用作图片生成的提示词。
  */
 function performAction(context) {
     const apiKey = SwiftBiu.getConfig("apiKey");
@@ -53,6 +65,7 @@ function performAction(context) {
             // On success, the image preview window will automatically replace the indicator.
             try {
                 const chunks = JSON.parse(response.data);
+                console.log("Streaming response chunks:", chunks);
                 let base64Image = null;
 
                 for (const chunk of chunks) {
@@ -70,8 +83,8 @@ function performAction(context) {
                     SwiftBiu.hideLoadingIndicator();
                     // Call the newly implemented native function.
                     // The native side will handle usage limits and showing notifications.
-                    SwiftBiu.openImageInPreview(base64Image);
-                    
+                    SwiftBiu.showImage(base64Image);
+
                 } else {
                     SwiftBiu.hideLoadingIndicator();
                     console.error("No image data found in the streaming response. Full response:", response.data);
