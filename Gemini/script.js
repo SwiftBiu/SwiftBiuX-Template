@@ -25,19 +25,15 @@ function resetConversation() {
 }
 
 /**
- * 将内部维护的对话历史记录转换为 Gemini API 所需的特定格式。
- * @returns {object} - 用于 Gemini API 请求的 contents 对象。
+ * Converts the internal message history to the format required by the Gemini API.
+ * @returns {object} A request body object with the 'contents' property.
  */
 function convertMessagesToGeminiFormat() {
     return {
-        contents: messages.map(msg => {
-            // Convert 'system' role to 'user' for Gemini compatibility, as it doesn't have a separate system role.
-            const role = (msg.role === 'user' || msg.role === 'system') ? 'user' : 'model';
-            return {
-                role: role,
-                parts: [{ text: msg.content }]
-            };
-        })
+        contents: messages.map(msg => ({
+            role: msg.role === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.content }]
+        }))
     };
 }
 
@@ -51,35 +47,33 @@ function performAction(context) {
     const apiKey = SwiftBiu.getConfig("apikey");
     const customApiUrl = SwiftBiu.getConfig("apiurl");
     // Read the new boolean config key. It will be a string "true" or "false".
-    const enableReset = SwiftBiu.getConfig("enableReset") === 'true';
     const model = SwiftBiu.getConfig("model");
+    const contextMessageCount = parseInt(SwiftBiu.getConfig("contextMessageCount") || "0", 10);
 
     const chatModel = model || "gemini-1.5-flash";
     const apiUrl = customApiUrl || `https://generativelanguage.googleapis.com/v1beta/models/${chatModel}:generateContent`;
 
+    
     // --- 2. Check for API Key ---
     if (!apiKey) {
         SwiftBiu.showNotification("Configuration Error", "Please set your Gemini API Key in the plugin settings.");
         return;
     }
 
-    // --- 3. Handle Manual Reset Command ---
+    // Manual reset is no longer needed as context is explicitly controlled.
     if (context.selectedText.trim().toLowerCase() === "reset chat") {
         resetConversation();
         return;
     }
 
-    // --- 4. Handle Automatic Reset Timer ---
-    // Use a fixed 15-minute timer if the reset is enabled.
-    if (enableReset) {
-        const resetInterval = 15 * 60 * 1000; // 15 minutes in milliseconds
-        if (new Date().getTime() - lastChatDate.getTime() > resetInterval) {
-            console.log(`Conversation automatically reset due to inactivity of over 15 minutes.`);
-            messages.length = 0; // Silently reset without notification
-        }
-    }
-
     // --- 5. Build System Prompt from Roles ---
+    // 从 manifest.json 的 "systemRoles" 配置中构建系统提示。
+    // SwiftBiu.getConfig("systemRoles") 会返回一个 JSON 字符串，
+    // 该字符串代表了用户在设置中启用的角色列表。
+    //
+    // 关键说明: 默认情况下，脚本会读取每个角色对象中的 `value` 属性。
+    // 如果插件开发者在 manifest.json 中使用了不同的属性名（例如 `content` 或 `prompt`），
+    // 则必须相应地修改下面的 `.map(role => role.value)`。
     const systemRolesConfig = SwiftBiu.getConfig("systemRoles");
     let systemPrompt = "";
     if (systemRolesConfig) {
@@ -87,25 +81,34 @@ function performAction(context) {
             const roles = JSON.parse(systemRolesConfig);
             systemPrompt = roles
                 .filter(role => role.enabled)
-                .map(role => role.role)
+                .map(role => role.value) // Correctly access the 'value' property
                 .join(' ');
         } catch (e) {
             console.log("Could not parse system roles config:", e);
         }
     }
 
-    // --- 6. Add User's Message to History (and system prompt if needed) ---
-    // Clear history to inject system prompt at the start of a new conversation
-    if (messages.length === 0 && systemPrompt) {
-        messages.push({ role: "system", content: systemPrompt });
-    }
-    messages.push({ role: "user", content: context.selectedText });
+    // --- 6. Combine System Prompt with User Text and Add to History ---
+    // The system prompt is combined with the current user text for each new message.
+    const combinedUserPrompt = `${systemPrompt} 我选择的内容是“${context.selectedText}”`.trim();
+    messages.push({ role: "user", content: combinedUserPrompt });
 
     // --- 7. Prepare and Send API Request ---
-    const requestBody = convertMessagesToGeminiFormat();
+    // The entire conversation history is converted to the Gemini format.
+    // --- 7. Prepare and Send API Request ---
+    // Slice the history to include the number of context messages specified by the user.
+    // The user's current message is the last one, so we take `contextMessageCount` from the history before it, plus the current one.
+    const historyToSend = messages.slice(-(contextMessageCount + 1));
 
-    // The model name is often in the URL for Gemini, but we add it here if needed by the API.
-    // For generateContent, it's in the URL, so we don't add it to the body.
+    const requestBody = {
+        contents: historyToSend.map(msg => ({
+            role: msg.role === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.content }]
+        }))
+    };
+
+    console.log(`Using API URL: ${apiUrl}`);
+    console.log(`Request Body: ${JSON.stringify(requestBody)}`);
 
     SwiftBiu.showLoadingIndicator(context.screenPosition);
     SwiftBiu.fetch(
@@ -121,9 +124,18 @@ function performAction(context) {
             SwiftBiu.hideLoadingIndicator();
             try {
                 const responseData = JSON.parse(response.data);
-                const candidate = responseData.candidates.at(0);
 
-                if (candidate && candidate.content && candidate.content.parts) {
+                // --- Robust Error Handling ---
+                // First, check if the API returned an error object.
+                if (responseData.error) {
+                    console.log(`API Error Response: ${JSON.stringify(responseData.error)}`);
+                    throw new Error(responseData.error.message || "Unknown API error.");
+                }
+
+                // --- Graceful Success Parsing ---
+                // Proceed only if candidates array exists and is not empty.
+                const candidate = responseData.candidates && responseData.candidates.at(0);
+                if (candidate && candidate.content && candidate.content.parts && candidate.content.parts.at(0)) {
                     const assistantText = candidate.content.parts.at(0).text;
                     const assistantMessage = { role: "model", content: assistantText };
 
@@ -132,7 +144,7 @@ function performAction(context) {
 
                     // Update last chat time
                     lastChatDate = new Date();
-
+                    
                     // Paste response and notify user
                     const newContent = context.selectedText + "\n\n" + assistantText;
                     SwiftBiu.pasteText(newContent);

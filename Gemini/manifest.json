@@ -39,15 +39,39 @@
       "type": "option",
       "description": "The model to use.",
       "options": [
-        { "label": "Gemini 1.5 Flash", "value": "gemini-1.5-flash" },
-        { "label": "Gemini 1.5 Pro", "value": "gemini-1.5-pro" }
+        {
+          "label": "Gemma 3n-e4b-it",
+          "value": "gemma-3n-e4b-it"
+        },
+        {
+          "label": "Gemini 2.0 Flash Lite",
+          "value": "gemini-2.0-flash-lite"
+        },
+        {
+          "label": "Gemini 2.0 Flash",
+          "value": "gemini-2.0-flash"
+        },
+        {
+          "label": "Gemini 2.5 Flash Lite",
+          "value": "gemini-flash-lite-latest"
+        },
+        {
+          "label": "Gemini 2.5 Flash",
+          "value": "gemini-flash-latest"
+        },
+        {
+          "label": "Gemini 2.5 Pro",
+          "value": "gemini-2.5-pro"
+        }
       ]
     },
     {
-      "key": "enableReset",
-      "label": "Enable Conversation Reset",
-      "type": "boolean",
-      "description": "Enable to reset the conversation after a period of inactivity."
+      "key": "contextMessageCount",
+      "label": "上下文消息数量",
+      "type": "string",
+      "default": "0",
+      "placeholder": "0-10",
+      "description": "设置发送给 AI 的历史消息数量。0 表示不带上下文，最高可设置 10 条。"
     },
     {
       "key": "systemRoles",
@@ -55,8 +79,14 @@
       "type": "radioList",
       "description": "Define custom roles for the AI assistant.",
       "defaultItems": [
-        { "enabled": true, "value": "You are a helpful assistant." },
-        { "enabled": false, "value": "You are a professional translator." }
+        {
+          "enabled": true,
+          "value": "You are a helpful assistant."
+        },
+        {
+          "enabled": false,
+          "value": "You are a professional translator."
+        }
       ]
     }
   ]
