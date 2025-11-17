@@ -7,10 +7,10 @@
   "actions": [
     {
       "title": "CNY",
-      "script": "script.js",
-      "icon": "dollarsign.circle"
+      "script": "script.js"
     }
   ],
+  "icon": "dollarsign.circle",
   "iconType": "sfSymbol",
   "permissions": [
     "clipboardWrite",

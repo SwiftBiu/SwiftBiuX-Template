@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Translator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            background-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .frosted-glass {
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(128, 128, 128, 0.3);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(128, 128, 128, 0.5);
+        }
+
+        textarea:focus {
+            outline: none;
+        }
+
+        .analysis-section {
+            margin-bottom: 1.25rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: rgba(128, 128, 128, 0.05);
+        }
+
+        .dark .analysis-section {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            color: #6b7280;
+        }
+
+        .dark .section-title {
+            color: #9ca3af;
+        }
+    </style>
+</head>
+
+<body class="text-black dark:text-white">
+
+    <div id="app-container"
+        class="frosted-glass bg-gray-100/80 dark:bg-gray-800/85 flex flex-col rounded-lg overflow-hidden min-h-full">
+
+        <!-- Language Selection Section -->
+        <div class="flex justify-between items-center p-2 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <select id="source-lang-select"
+                class="flex-1 bg-transparent border-none text-sm font-medium text-center cursor-pointer focus:outline-none appearance-none"></select>
+            <button id="swap-lang-btn"
+                class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                </svg>
+            </button>
+            <select id="target-lang-select"
+                class="flex-1 bg-transparent border-none text-sm font-medium text-center cursor-pointer focus:outline-none appearance-none"></select>
+        </div>
+
+        <!-- Original Text Section -->
+        <div class="relative p-3 flex-shrink-0">
+            <textarea id="original-text"
+                class="w-full h-8 bg-transparent border-none resize-none text-gray-600 dark:text-gray-400 text-lg leading-relaxed focus:outline-none"
+                placeholder="Enter text to translate..."></textarea>
+        </div>
+
+        <hr class="border-t border-gray-200 dark:border-gray-700 mx-3">
+
+        <!-- Translated Text Section -->
+        <div class="relative p-3 flex-grow flex items-center justify-center">
+            <div id="loading-indicator" class="flex flex-col items-center gap-2 text-gray-400">
+                <div
+                    class="animate-spin rounded-full h-6 w-6 border-2 border-t-blue-500 border-r-blue-500 border-b-transparent border-l-transparent">
+                </div>
+                <span class="text-sm">Translating...</span>
+            </div>
+            <div id="error-display" class="text-red-500 text-sm text-center hidden"></div>
+            <div id="translated-text" class="text-lg leading-relaxed hidden w-full h-full overflow-y-auto"></div>
+            <div class="absolute bottom-3 right-3 flex gap-1">
+                <button id="copy-btn" class="p-1 text-gray-400 hover:text-blue-500 transition-colors">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM5 11a1 1 0 100 2h4a1 1 0 100-2H5z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Element Cache ---
+        const dom = {
+            originalText: document.getElementById("original-text"),
+            translatedText: document.getElementById("translated-text"),
+            loadingIndicator: document.getElementById("loading-indicator"),
+            errorDisplay: document.getElementById("error-display"),
+            copyBtn: document.getElementById("copy-btn"),
+            sourceLangSelect: document.getElementById("source-lang-select"),
+            targetLangSelect: document.getElementById("target-lang-select"),
+            swapLangBtn: document.getElementById("swap-lang-btn"),
+        };
+
+        // --- State ---
+        let originalTextContent = '';
+        let currentTargetLang = 'zh-CN';
+        let settings = {
+            apiKey: null,
+            service: 'gemini',
+            customApiUrl: null,
+            customModel: null,
+            promptTemplate: null
+        };
+
+        // --- Language Data ---
+        const languages = {
+            'auto': 'Auto Detect', 'en-US': 'English', 'zh-CN': 'Chinese (Simplified)', 'ja-JP': 'Japanese', 'ko-KR': 'Korean',
+            'fr-FR': 'French', 'de-DE': 'German', 'es-ES': 'Spanish', 'ru-RU': 'Russian', 'it-IT': 'Italian'
+        };
+
+        // --- Initialization ---
+        window.swiftBiu_initialize = function (context) {
+            originalTextContent = context.selectedText || '';
+            dom.originalText.value = originalTextContent;
+            populateLanguageSelectors();
+
+            // Use .then() to handle the async settings load without making the initializer async
+            loadSettings().then(() => {
+                triggerTranslation();
+            });
+        }
+
+        async function loadSettings() {
+            try {
+                const [apiKeyResponse, serviceResponse, apiUrlResponse, modelResponse, templateResponse] = await Promise.all([
+                    swiftBiu.storage.get('api_key'),
+                    swiftBiu.storage.get('translation_service'),
+                    swiftBiu.storage.get('apiurl'),
+                    swiftBiu.storage.get('model'),
+                    swiftBiu.storage.get('prompt_template')
+                ]);
+
+                settings.apiKey = apiKeyResponse.result;
+                settings.service = serviceResponse.result || 'gemini';
+                settings.customApiUrl = apiUrlResponse.result;
+                settings.customModel = modelResponse.result;
+
+                if (templateResponse.result) {
+                    try {
+                        const templates = JSON.parse(templateResponse.result);
+                        const enabledTemplate = templates.find(t => t.enabled);
+                        if (enabledTemplate) {
+                            settings.promptTemplate = enabledTemplate.value;
+                        }
+                    } catch (e) {
+                        console.error("Failed to parse prompt templates:", e);
+                    }
+                }
+            } catch (error) {
+                console.error("[UI] Failed to load settings:", error);
+                showErrorState("Could not load plugin settings from SwiftBiu. " + error.message);
+            }
+        }
+
+        async function triggerTranslation() {
+            const textToTranslate = dom.originalText.value.trim();
+            if (!textToTranslate) {
+                showResultState("");
+                return;
+            }
+
+            if (!settings.apiKey || settings.apiKey.trim() === '') {
+                showErrorState("API Key is not configured. Please set it up in the plugin's configuration.");
+                return;
+            }
+
+            showLoadingState(textToTranslate);
+            try {
+                dom.targetLangSelect.value = currentTargetLang;
+                const translatedData = await performTranslation(
+                    settings.service,
+                    textToTranslate,
+                    settings.apiKey,
+                    currentTargetLang,
+                    settings.customApiUrl,
+                    settings.customModel,
+                    settings.promptTemplate
+                );
+                showResultState(translatedData);
+            } catch (error) {
+                console.error("[UI] Translation failed:", error);
+                showErrorState(error.message);
+            }
+        }
+
+        // --- Core Logic ---
+        async function performTranslation(service, text, apiKey, targetLang, customApiUrl, customModel, promptTemplate) {
+            let url, body;
+            const model = customModel || 'gemini-flash-latest';
+            const prompt = promptTemplate
+                ? `${promptTemplate} My content is: ${text}. Please reply in ${targetLang}.`
+                : `Analyze the word. Respond in a structured JSON format. The JSON object should have the following keys: 'word', 'ipa', 'etymology', 'rootAnalysis', 'collocations', 'memoryAids', 'commonConfusions'. Each key should have a string value containing the corresponding analysis. My content is: ${text}. Please reply in ${targetLang}.`;
+
+            switch (service) {
+                case 'gemini':
+                    url = customApiUrl || `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                    body = { contents: [{ parts: [{ text: prompt }] }] };
+                    break;
+                default:
+                    throw new Error(`Service "${service}" is not supported.`);
+            }
+
+            const response = await swiftBiu.fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            console.log("[UI] API Response:", response);
+            if (response.status !== 200) throw new Error(`API request failed: ${response.status}`);
+            
+            const serviceResponse = JSON.parse(response.data);
+            const aiOutputText = serviceResponse?.candidates?.at(0)?.content?.parts?.at(0)?.text;
+            if (!aiOutputText) throw new Error("Failed to parse translation from API response.");
+
+            // Use a global, non-greedy match to find all JSON blocks.
+            const jsonMatches = aiOutputText.match(/```json\n([\s\S]*?)\n```/g);
+            if (!jsonMatches || jsonMatches.length === 0) {
+                throw new Error("Could not find any valid JSON blocks in the AI's response.");
+            }
+            // We only care about the first JSON block.
+            const firstJsonBlock = jsonMatches[0];
+            // Extract the content within the first block.
+            const jsonString = firstJsonBlock.replace(/```json\n/, '').replace(/\n```/, '');
+            return JSON.parse(jsonString);
+        }
+
+        // --- UI State Management ---
+        function showLoadingState(text) {
+            dom.originalText.value = text;
+            dom.loadingIndicator.classList.remove('hidden');
+            dom.translatedText.classList.add('hidden');
+            dom.errorDisplay.classList.add('hidden');
+        }
+
+        function showResultState(data) {
+            dom.loadingIndicator.classList.add('hidden');
+            dom.translatedText.classList.remove('hidden');
+            dom.errorDisplay.classList.add('hidden');
+
+            if (!data) {
+                dom.translatedText.innerHTML = "";
+                return;
+            }
+
+            try {
+                dom.translatedText.innerHTML = renderResponse(data);
+            } catch (error) {
+                console.error("Failed to render JSON:", error);
+                const rawText = JSON.stringify(data, null, 2);
+                dom.translatedText.innerHTML = `<div class="text-sm text-gray-500">Failed to render analysis. Raw output:</div><pre class="whitespace-pre-wrap text-xs">${rawText}</pre>`;
+            }
+
+            setTimeout(adjustWindowHeight, 50);
+        }
+
+        function showErrorState(errorMessage) {
+            dom.loadingIndicator.classList.add('hidden');
+            dom.translatedText.classList.add('hidden');
+            dom.errorDisplay.textContent = errorMessage;
+            dom.errorDisplay.classList.remove('hidden');
+            setTimeout(adjustWindowHeight, 50);
+        }
+
+        // --- UI Rendering Engine ---
+        function markdownToList(text) {
+            if (!text || typeof text !== 'string') return '';
+            const items = text.split('\n').filter(line => line.trim().startsWith('*') || line.trim().startsWith('-'));
+            if (items.length === 0) {
+                return `<p class="text-sm">${text}</p>`;
+            }
+            const listItems = items.map(item => `<li class="text-sm mb-1">${item.substring(1).trim()}</li>`).join('');
+            return `<ul class="list-disc list-inside">${listItems}</ul>`;
+        }
+
+        function renderResponse(data) {
+            // Template 2 Check: Has 'analysis' key and it's an array
+            if (data.analysis && Array.isArray(data.analysis)) {
+                return renderTemplate2(data);
+            }
+            // Template 1 Check: Has 'word' and 'etymology' keys
+            else if (data.word && data.etymology) {
+                return renderTemplate1(data);
+            }
+            // Fallback to Template 3: Assumes simple explanation structure
+            else if (data.pronunciation && data.meaning) {
+                return renderTemplate3(data);
+            }
+            // If none match, return an error message
+            else {
+                console.error("Unknown JSON structure:", data);
+                return `<p class="text-red-500">Error: Could not render the received data due to an unknown format.</p>`;
+            }
+        }
+
+        function renderTemplate1(data) {
+            return `
+                <div class="space-y-4 text-base">
+                    <div class="text-center mb-6">
+                        <h1 class="text-4xl font-bold tracking-tight">${data.word}</h1>
+                        <p class="text-gray-500 dark:text-gray-400 mt-1">${data.ipa}</p>
+                    </div>
+                    <div class="analysis-section">
+                        <h2 class="section-title">Etymology</h2>
+                        <p class="text-sm">${data.etymology}</p>
+                    </div>
+                    <div class="analysis-section">
+                        <h2 class="section-title">Root Analysis</h2>
+                        <p class="text-sm">${data.rootAnalysis}</p>
+                    </div>
+                    <div class="analysis-section">
+                        <h2 class="section-title">Collocations</h2>
+                        ${markdownToList(data.collocations)}
+                    </div>
+                    <div class="analysis-section">
+                        <h2 class="section-title">Memory Aids</h2>
+                        <p class="text-sm">${data.memoryAids}</p>
+                    </div>
+                    <div class="analysis-section">
+                        <h2 class="section-title">Common Confusions</h2>
+                        ${markdownToList(data.commonConfusions)}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTemplate2(data) {
+            let analysisHtml = data.analysis.map(section => {
+                let contentHtml = '';
+                if (typeof section.content === 'object') {
+                    contentHtml = Object.entries(section.content)
+                        .map(([key, value]) => `<p class="text-sm mb-1"><strong>${key.replace(/([A-Z])/g, ' $1').trim()}:</strong> ${value}</p>`)
+                        .join('');
+                } else {
+                    contentHtml = `<p class="text-sm">${section.content}</p>`;
+                }
+                return `
+                    <div class="analysis-section">
+                        <h2 class="section-title">${section.title}</h2>
+                        ${contentHtml}
+                    </div>
+                `;
+            }).join('');
+
+            return `<div class="space-y-4 text-base">${analysisHtml}</div>`;
+        }
+
+        function renderTemplate3(data) {
+            let relatedWordsHtml = data.relatedWords.map(w => `<span class="inline-block bg-gray-200 dark:bg-gray-700 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 dark:text-gray-200 mr-2 mb-2">${w}</span>`).join('');
+            let examplesHtml = data.exampleSentences.map(s => `<li class="text-sm mb-1">${s}</li>`).join('');
+
+            return `
+                <div class="space-y-4 text-base">
+                    <div class="text-center mb-6">
+                        <h1 class="text-4xl font-bold tracking-tight">${dom.originalText.value}</h1>
+                        <p class="text-gray-500 dark:text-gray-400 mt-1">${data.pronunciation}</p>
+                    </div>
+                    <div class="analysis-section">
+                        <h2 class="section-title">What it means</h2>
+                        <p class="text-sm">${data.meaning}</p>
+                    </div>
+                    <div class="analysis-section">
+                        <h2 class="section-title">Where it's used</h2>
+                        <p class="text-sm">${data.usage}</p>
+                    </div>
+                    <div class="analysis-section">
+                        <h2 class="section-title">How it was formed (Analogy)</h2>
+                        <p class="text-sm">${data.formationAnalogy}</p>
+                    </div>
+                    <div class="analysis-section">
+                        <h2 class="section-title">Common related words</h2>
+                        <div class="flex flex-wrap">${relatedWordsHtml}</div>
+                    </div>
+                    <div class="analysis-section">
+                        <h2 class="section-title">Example sentences</h2>
+                        <ul class="list-disc list-inside">${examplesHtml}</ul>
+                    </div>
+                    <div class="analysis-section">
+                        <h2 class="section-title">Best way to remember it</h2>
+                        <p class="text-sm">${data.memoryAid}</p>
+                    </div>
+                    <div class="analysis-section">
+                        <h2 class="section-title">Common mistakes</h2>
+                        <p class="text-sm">${data.commonMistakes}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        // --- Web API Helpers ---
+        function adjustWindowHeight() {
+            const langSelection = document.querySelector('.flex.justify-between.items-center');
+            const originalText = document.querySelector('.relative.p-3.flex-shrink-0');
+            const separator = document.querySelector('hr');
+            const translatedContainer = document.querySelector('.relative.p-3.flex-grow');
+
+            if (!langSelection || !originalText || !separator || !translatedContainer) return;
+
+            const langSelectionHeight = langSelection.offsetHeight;
+            const originalTextHeight = originalText.offsetHeight;
+            const separatorHeight = separator.offsetHeight;
+
+            // Determine which content is visible to calculate height
+            const isErrorVisible = !dom.errorDisplay.classList.contains('hidden');
+            const contentElement = isErrorVisible ? dom.errorDisplay : dom.translatedText;
+            const contentHeight = contentElement.scrollHeight;
+            
+            const containerStyle = window.getComputedStyle(translatedContainer);
+            const containerPadding = parseFloat(containerStyle.paddingTop) + parseFloat(containerStyle.paddingBottom);
+            const totalContentHeight = contentHeight + containerPadding;
+
+            const totalHeight = langSelectionHeight + originalTextHeight + separatorHeight + totalContentHeight + 26;
+
+            console.log(`[UI] Adjusting window height. Parts: [Lang: ${langSelectionHeight}, Orig: ${originalTextHeight}, Sep: ${separatorHeight}, Content: ${totalContentHeight}] => Total: ${totalHeight}`);
+            swiftBiu.ui.resizeWindow({ height: totalHeight });
+        }
+
+        function populateLanguageSelectors() {
+            for (const [code, name] of Object.entries(languages)) {
+                dom.sourceLangSelect.add(new Option(name, code));
+                if (code !== 'auto') dom.targetLangSelect.add(new Option(name, code));
+            }
+        }
+
+        // --- Event Listeners ---
+        document.addEventListener("DOMContentLoaded", () => {
+            dom.originalText.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    triggerTranslation();
+                }
+            });
+
+            dom.targetLangSelect.addEventListener('change', (event) => {
+                currentTargetLang = event.target.value;
+                triggerTranslation();
+            });
+
+            dom.swapLangBtn.addEventListener('click', () => {
+                const source = dom.sourceLangSelect.value;
+                const target = dom.targetLangSelect.value;
+                if (source !== 'auto') {
+                    dom.sourceLangSelect.value = target;
+                    dom.targetLangSelect.value = source;
+                    currentTargetLang = source;
+                    triggerTranslation();
+                }
+            });
+
+            dom.copyBtn.addEventListener("click", () => {
+                const textToCopy = dom.translatedText.innerText;
+                if (textToCopy) {
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        const originalIcon = dom.copyBtn.innerHTML;
+                        dom.copyBtn.innerHTML = '✅';
+                        setTimeout(() => { dom.copyBtn.innerHTML = originalIcon; }, 1500);
+                    }).catch(err => console.error('Failed to copy:', err));
+                }
+            });
+        });
+
+        window.addEventListener('beforeunload', () => swiftBiu.closeWindow());
+    </script>
+</body>
+
+</html>

@@ -29,9 +29,12 @@ function performAction(context) {
         return;
     }
 
-    const modelId = "gemini-2.0-flash-preview-image-generation";
+    const modelId = "gemini-2.5-flash-image";
     const apiMethod = "streamGenerateContent";
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:${apiMethod}?key=${apiKey}`;
+
+    console.log(`Image API URL: ${url}`);
+    
 
     const requestBody = {
         "contents": [
@@ -49,6 +52,8 @@ function performAction(context) {
         }
     };
 
+    console.log(`Request Body: ${JSON.stringify(requestBody)}`);
+    
     const options = {
         method: 'POST',
         headers: {
@@ -87,20 +92,20 @@ function performAction(context) {
 
                 } else {
                     SwiftBiu.hideLoadingIndicator();
-                    console.error("No image data found in the streaming response. Full response:", response.data);
+                    console.log("No image data found in the streaming response. Full response:", response.data);
                     SwiftBiu.showNotification("API Error", "No image data found in response.");
                 }
             } catch (e) {
                 SwiftBiu.hideLoadingIndicator();
-                console.error("Failed to parse streaming response:", e.message);
-                console.error("Raw response data:", response.data);
+                console.log("Failed to parse streaming response:", e.message);
+                console.log("Raw response data:", response.data);
                 SwiftBiu.showNotification("API Error", "Could not process image data from the server.");
             }
         },
         (error) => {
             // On failure, hide the indicator and show a notification.
             SwiftBiu.hideLoadingIndicator();
-            console.error("Fetch error:", error);
+            console.log("Fetch error:", error);
             SwiftBiu.showNotification("Network Error", "Failed to connect to the Gemini API.");
         }
     );

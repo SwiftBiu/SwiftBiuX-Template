@@ -1,0 +1,105 @@
+{
+  "identifier": "com.swiftbiu.plugin.advancedtranslator",
+  "name": "Advanced Translator",
+  "author": "SwiftBiu Team",
+  "description": "A powerful translation plugin that uses custom UI and supports multiple translation services.",
+  "version": "1.0.1",
+  "icon": "translate",
+  "iconType": "sfSymbol",
+  "actions": [
+    {
+      "title": "Translate with Advanced Translator",
+      "script": "script.js"
+    }
+  ],
+  "permissions": [
+    "ui",
+    "network",
+    "clipboardWrite",
+    "notifications"
+  ],
+  "ui": {
+    "main": "ui/index.html"
+  },
+  "configuration": [
+    {
+      "key": "translation_service",
+      "label": "Translation Service",
+      "type": "option",
+      "description": "Choose your preferred translation service.",
+      "options": [
+        {
+          "label": "Gemini",
+          "value": "gemini"
+        }
+      ]
+    },
+    {
+      "key": "api_key",
+      "label": "API Key",
+      "type": "secure",
+      "placeholder": "Enter your API key for the selected service",
+      "description": "Your API key is stored securely."
+    },
+    {
+      "key": "apiurl",
+      "label": "API URL",
+      "type": "string",
+      "placeholder": "e.g., https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+      "description": "Custom Gemini API endpoint. Leave blank for default.",
+      "isSecure": false
+    },
+    {
+      "key": "model",
+      "label": "Model",
+      "type": "option",
+      "description": "The model to use.",
+      "options": [
+        {
+          "label": "Gemini 2.5 Flash Lite",
+          "value": "gemini-flash-lite-latest"
+        },
+        {
+          "label": "Gemma 3n-e4b-it",
+          "value": "gemma-3n-e4b-it"
+        },
+        {
+          "label": "Gemini 2.0 Flash Lite",
+          "value": "gemini-2.0-flash-lite"
+        },
+        {
+          "label": "Gemini 2.0 Flash",
+          "value": "gemini-2.0-flash"
+        },
+        {
+          "label": "Gemini 2.5 Flash",
+          "value": "gemini-flash-latest"
+        },
+        {
+          "label": "Gemini 2.5 Pro",
+          "value": "gemini-2.5-pro"
+        }
+      ]
+    },
+    {
+      "key": "prompt_template",
+      "label": "Prompt Template",
+      "type": "radioList",
+      "description": "Choose a template for word analysis.",
+      "defaultItems": [
+        {
+          "enabled": true,
+          "value": "Analyze the word. Respond in a structured JSON format. The JSON object must have keys: 'word', 'ipa', 'etymology', 'rootAnalysis', 'collocations', 'memoryAids', 'commonConfusions'. For 'collocations' and 'commonConfusions', if there are multiple items, format them as a single string using Markdown unordered lists (e.g., '* item 1\\n* item 2'). All other keys should have a simple string value."
+        },
+        {
+          "enabled": false,
+          "value": "As an etymology expert, analyze the word. Respond in a structured JSON format. The JSON object should contain a single key 'analysis' which is an array of objects. Each object represents a section and must have 'title' and 'content' keys. The sections should be: 'Basic Info', 'Word Formation', 'Root Network', 'Affix Value', 'Collocations', 'Memory Aids', 'Common Confusions'. The 'content' for 'Basic Info' should be an object with keys: 'pronunciation', 'partOfSpeech', 'coreMeaning', 'frequency'. The 'content' for other sections should be a string."
+        },
+        {
+          "enabled": false,
+          "value": "Explain the word simply. Respond in a structured JSON format. The JSON object should have the following keys: 'pronunciation', 'meaning', 'usage', 'formationAnalogy', 'relatedWords', 'exampleSentences', 'memoryAid', 'commonMistakes'. 'relatedWords' and 'exampleSentences' should be arrays of strings. All other keys should have a string value."
+        }
+      ]
+    }
+  ]
+}
