@@ -174,12 +174,10 @@ window.swiftBiu_initialize = async function(context) {
     *   **返回**: `Promise<{ result: String }>`
     *   **示例**: `const { result: apiKey } = await swiftBiu.storage.get('api_key');`
 
-#### 5. 高级系统交互
+#### 5. 系统交互
 
-某些 API 被归类为“高级 API”。调用它们可能会受到 SwiftBiu 免费版用户的使用次数限制。请仅在插件核心功能确实需要时才使用它们。
-
-*   `swiftBiu.showImage(...)`
-*   `swiftBiu.openFileInPreview(...)`
+*   `swiftBiu.showImage(...)`: 显示图片。
+*   `swiftBiu.openFileInPreview(...)`: 在预览中打开文件。
 
 ## 权限 (`permissions`)
 

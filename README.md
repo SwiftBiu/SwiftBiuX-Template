@@ -174,12 +174,10 @@ To achieve perfect, smooth resizing, follow this CSS and JavaScript strategy:
     *   **Returns**: `Promise<{ result: String }>`
     *   **Example**: `const { result: apiKey } = await swiftBiu.storage.get('api_key');`
 
-#### 5. Advanced System Interactions
+#### 5. System Interactions
 
-Certain APIs are classified as "Advanced." Calling them may be subject to usage limits for free-tier users of SwiftBiu. Use them only when necessary for your plugin's core functionality.
-
-*   `swiftBiu.showImage(...)`
-*   `swiftBiu.openFileInPreview(...)`
+*   `swiftBiu.showImage(...)`: Displays an image.
+*   `swiftBiu.openFileInPreview(...)`: Opens a file in Preview.
 
 ## Permissions (`permissions`)
 
