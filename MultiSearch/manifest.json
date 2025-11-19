@@ -1,0 +1,43 @@
+{
+  "identifier": "com.swiftbiu.multisearch",
+  "name": "MultiSearch",
+  "author": "SwiftBiu",
+  "description": "Search selected text using your preferred search engine.",
+  "version": "1.0",
+  "actions": [
+    {
+      "title": "Search",
+      "icon": "magnifyingglass",
+      "script": "script.js"
+    }
+  ],
+  "icon": "magnifyingglass",
+  "iconType": "sfSymbol",
+  "permissions": [],
+  "configuration": [
+    {
+      "key": "searchEngines",
+      "label": "Search Engine",
+      "type": "radioList",
+      "description": "Select the search engine to use. Format: Name|URL",
+      "defaultItems": [
+        {
+          "value": "Bing|https://www.bing.com/search?q=%s",
+          "enabled": true
+        },
+        {
+          "value": "Google|https://www.google.com/search?q=%s",
+          "enabled": false
+        },
+        {
+          "value": "GitHub|https://github.com/search?q=%s",
+          "enabled": false
+        },
+        {
+          "value": "StackOverflow|https://stackoverflow.com/search?q=%s",
+          "enabled": false
+        }
+      ]
+    }
+  ]
+}
