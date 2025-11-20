@@ -1,0 +1,50 @@
+{
+  "identifier": "app.ikw.swiftbiu.openairewriter",
+  "name": "OpenAI Rewriter",
+  "author": "kweizh",
+  "description": "Use preset prompt to rewrite the selected text by OpenAI Compatible API",
+  "version": "1.0",
+  "actions": [
+    {
+      "title": "OAIRewrite",
+      "script": "script.js"
+    }
+  ],
+  "iconType": "file",
+  "permissions": [
+    "network",
+    "paste",
+    "notifications"
+  ],
+  "configuration": [
+    {
+      "key": "apikey",
+      "label": "API Key",
+      "placeholder": "Enter your API key",
+      "description": "Your OpenAI compatible API key.",
+      "type": "secure"
+    },
+    {
+      "key": "apiurl",
+      "label": "API URL",
+      "type": "string",
+      "placeholder": "e.g., https://api.openai.com/v1",
+      "description": "OpenAI compatible API endpoint for chat completions.",
+      "isSecure": false
+    },
+    {
+      "key": "model",
+      "label": "Model",
+      "type": "string",
+      "placeholder": "e.g., gpt-4o, gpt-4o-mini",
+      "description": "The model to use for rewriting."
+    },
+    {
+      "key": "promptTemplate",
+      "label": "Prompt Template",
+      "type": "string",
+      "placeholder": "e.g., Rewrite the following text to make it more professional",
+      "description": "The prompt template for rewriting"
+    }
+  ]
+}
