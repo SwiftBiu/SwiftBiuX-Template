@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# Conventional Commits Git hook
+#
+# This hook checks if the commit message follows the Conventional Commits specification.
+# See https://www.conventionalcommits.org/ for more details.
+
+# The commit message is passed in a file as the first argument
+commit_msg_file=$1
+commit_msg=$(cat "$commit_msg_file")
+
+# Regex for Conventional Commits: <type>(<scope>): <subject>
+# Allowed types: feat, fix, docs, style, refactor, perf, test, chore, ci, build
+# Scope is optional. Subject must not be empty.
+regex="^(feat|fix|docs|style|refactor|perf|test|chore|ci|build)(\([a-zA-Z0-9\-\_]+\))?!?: .{1,}$"
+
+if ! echo "$commit_msg" | grep -qE "$regex"; then
+  echo "❌ Invalid commit message format." >&2
+  echo "" >&2
+  echo "Your commit message does not follow the Conventional Commits format." >&2
+  echo "Please format your commit message as follows:" >&2
+  echo "" >&2
+  echo "  <type>(<scope>): <description>" >&2
+  echo "" >&2
+  echo "Allowed <type> values:" >&2
+  echo "  feat:     A new feature" >&2
+  echo "  fix:      A bug fix" >&2
+  echo "  docs:     Documentation only changes" >&2
+  echo "  style:    Changes that do not affect the meaning of the code (white-space, formatting, etc)" >&2
+  echo "  refactor: A code change that neither fixes a bug nor adds a feature" >&2
+  echo "  perf:     A code change that improves performance" >&2
+  echo "  test:     Adding missing tests or correcting existing tests" >&2
+  echo "  chore:    Changes to the build process or auxiliary tools and libraries" >&2
+  echo "  ci:       Changes to our CI configuration files and scripts" >&2
+  echo "  build:    Changes that affect the build system or external dependencies" >&2
+  echo "" >&2
+  echo "Example:" >&2
+  echo "  feat(Plugin): add new Gemini Pro Vision plugin" >&2
+  exit 1
+fi
+
+exit 0

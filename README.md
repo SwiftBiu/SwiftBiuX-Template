@@ -22,12 +22,9 @@ You can get your plugin package (`.swiftbiux` file) in two ways: through our aut
 
 ### Automated Builds (Recommended)
 
-All plugins in this template are automatically built and packaged by a GitHub Actions workflow. This is the easiest way to get the latest, consistently built versions.
+All plugins in this template are automatically built and packaged into a **Nightly Build** release. This is the easiest and most visible way to get the latest versions.
 
-1.  Go to the **Actions** tab of this repository on GitHub.
-2.  Find the latest successful run for the `main` branch.
-3.  Under the **Artifacts** section of the run summary, you will find a zip file named `swiftbiux-plugins`.
-4.  Download and unzip this file to get all the latest `.swiftbiux` plugin packages.
+You can always find the latest plugin packages by visiting the **[Releases page](https://github.com/SwiftBiu/SwiftBiuX-Template/releases)** of this repository. The `nightly-build` release is automatically updated every time changes are pushed to the `main` branch.
 
 ### Manual Local Packaging
 
@@ -202,3 +199,36 @@ Any `console.log()` message from your UI's JavaScript is automatically bridged t
 Check out the example plugins included in this template to see these concepts in action. Reading their source code is a great way to learn.
 
 Happy coding!
+
+---
+
+## Contributing Guidelines
+
+To ensure the quality and clarity of the project's history, this repository enforces the **Conventional Commits** specification for all commit messages.
+
+### Automated Validation
+
+We provide a Git hook that automatically checks your commit message format. To enable it, you **must** run the following command once after cloning the repository:
+
+```bash
+./scripts/install-hooks.sh
+```
+
+After installation, any `git commit` with a non-compliant message will be automatically rejected with a helpful guide.
+
+### Commit Message Format
+
+Your commit message must follow this structure:
+
+```
+<type>(<scope>): <subject>
+```
+
+*   **Type**: Must be one of the following: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`, `build`.
+*   **Scope**: (Optional) The module affected by the change (e.g., `Gemini`, `UI`, `build`).
+*   **Subject**: A short, clear description of the change.
+
+**Example:**
+```bash
+git commit -m "feat(Gemini): add support for streaming responses"
+```

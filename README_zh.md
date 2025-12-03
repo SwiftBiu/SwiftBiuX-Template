@@ -22,12 +22,9 @@
 
 ### 自动化构建 (推荐)
 
-此模板中的所有插件均由 GitHub Actions 工作流自动构建和打包。这是获取最新、构建一致的版本的**最简单**方式。
+此模板中的所有插件都会被自动构建和打包到一个 **Nightly Build** 版本中。这是获取最新版本最简单、最直接的方式。
 
-1.  访问此仓库在 GitHub 上的 **Actions** 标签页。
-2.  找到 `main` 分支最新一次成功的运行记录。
-3.  在运行摘要的 **Artifacts** (构建产物) 部分，您会找到一个名为 `swiftbiux-plugins` 的 zip 文件。
-4.  下载并解压该文件，即可获得所有最新版本的 `.swiftbiux` 插件包。
+您可以随时访问本仓库的 **[Releases 页面](https://github.com/SwiftBiu/SwiftBiuX-Template/releases)** 来查找最新的插件包。每当 `main` 分支有更新时，`nightly-build` 版本都会被自动更新。
 
 ### 手动本地打包
 
@@ -202,3 +199,36 @@ window.swiftBiu_initialize = async function(context) {
 请查看此模板中包含的示例插件，以了解这些概念的实际应用。阅读它们的源代码是很好的学习方式。
 
 祝您编码愉快！
+
+---
+
+## 贡献指南
+
+为了保证项目历史的质量和清晰度，本仓库强制要求所有提交信息都遵循 **Conventional Commits** 规范。
+
+### 自动化校验
+
+我们提供了一个 Git 钩子，可以自动检查您的提交信息格式。要启用它，您**必须**在克隆仓库后运行一次以下命令：
+
+```bash
+./scripts/install-hooks.sh
+```
+
+安装后，任何不符合规范的 `git commit` 都将被自动拒绝，并提供有用的格式指引。
+
+### 提交信息格式
+
+您的提交信息必须遵循以下结构：
+
+```
+<类型>(<范围>): <描述>
+```
+
+*   **类型**: 必须是以下之一：`feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`, `build`。
+*   **范围**: (可选) 受变更影响的模块（例如 `Gemini`, `UI`, `build`）。
+*   **描述**: 对变更的简短、清晰的描述。
+
+**示例:**
+```bash
+git commit -m "feat(Gemini): 增加对流式响应的支持"
+```

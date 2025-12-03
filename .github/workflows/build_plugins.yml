@@ -1,4 +1,4 @@
-name: Build and Package Plugins
+name: Build and Release Nightly Plugins
 
 on:
   push:
@@ -7,90 +7,56 @@ on:
   workflow_dispatch: # Allows manual triggering
 
 jobs:
-  build:
+  build-and-release:
     runs-on: macos-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Fetch all history to enable git diff against previous commit
 
       - name: Create distribution directory
         run: mkdir -p dist
 
-      - name: Download latest artifacts
-        uses: dawidd6/action-download-artifact@v6
-        with:
-          name: swiftbiux-plugins
-          path: dist
-          if_no_artifact_found: ignore # Continue if no artifact is found (e.g., first run)
-          workflow: build_plugins.yml
-          branch: main
-
-      - name: Identify changed plugins
-        id: changed_plugins
+      - name: Build all plugins
         run: |
-          # Ensure we are comparing against the previous commit on the main branch
-          if [ "${{ github.event_name }}" == "push" ]; then
-            # Get a list of changed files between the current and previous commit
-            CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
-          else
-            # For manual runs, assume all plugins need to be built
-            CHANGED_FILES="build_plugin.sh"
-          fi
-
-          PLUGINS_TO_BUILD=""
-          # Check if the build script itself has changed, or if it's a manual run
-          if echo "$CHANGED_FILES" | grep -q "build_plugin.sh"; then
-            echo "Build script changed or manual trigger. Rebuilding all plugins."
-            # Find all valid plugin directories (those with a manifest.json)
-            PLUGINS_TO_BUILD=$(find . -name "manifest.json" -maxdepth 2 | sed 's|./||;s|/manifest.json||' | tr '\n' ' ')
-          else
-            echo "Detecting changed plugin directories..."
-            for file in $CHANGED_FILES; do
-              # Check if the file is inside a potential plugin directory
-              if [[ "$file" == */* ]]; then
-                plugin_dir=$(dirname "$file")
-                # Add the plugin to the build list if it's a valid plugin and not already in the list
-                if [ -f "$plugin_dir/manifest.json" ] && [[ ! " $PLUGINS_TO_BUILD " =~ " $plugin_dir " ]]; then
-                  PLUGINS_TO_BUILD="$PLUGINS_TO_BUILD $plugin_dir"
-                fi
+          # Find all directories containing a manifest.json to identify them as plugins.
+          for dir in */; do
+            plugin_name="${dir%/}"
+            if [ -f "${plugin_name}/manifest.json" ]; then
+              echo "Building plugin: ${plugin_name}"
+              ./scripts/build_plugin.sh "${plugin_name}"
+              if [ $? -eq 0 ]; then
+                # Move the successfully built plugin to the dist directory
+                mv "${plugin_name}.swiftbiux" dist/
+              else
+                echo "::error::Failed to build plugin ${plugin_name}"
+                exit 1
               fi
-            done
-          fi
-          
-          echo "Final list of plugins to build: $PLUGINS_TO_BUILD"
-          echo "plugins_to_build=$PLUGINS_TO_BUILD" >> $GITHUB_OUTPUT
-
-      - name: Build changed plugins
-        if: steps.changed_plugins.outputs.plugins_to_build != ''
-        run: |
-          PLUGINS="${{ steps.changed_plugins.outputs.plugins_to_build }}"
-          echo "Starting build for plugins: $PLUGINS"
-          for plugin_name in $PLUGINS; do
-            echo "Building plugin: ${plugin_name}"
-            ./build_plugin.sh "${plugin_name}"
-            if [ $? -eq 0 ]; then
-              # Move the successfully built plugin to the dist directory, overwriting if it exists
-              mv -f "${plugin_name}.swiftbiux" dist/
-              echo "Successfully packaged and moved ${plugin_name}.swiftbiux to dist/"
-            else
-              echo "::error::Failed to build plugin ${plugin_name}"
-              exit 1
             fi
           done
-      - name: Show message if no plugins were built
-        if: steps.changed_plugins.outputs.plugins_to_build == ''
-        run: echo "No plugin changes detected. Skipping build step."
 
       - name: List packaged plugins
         run: |
           echo "Contents of dist directory:"
           ls -l dist
 
-      - name: Upload plugin artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: swiftbiux-plugins
-          path: dist/
+      - name: Delete old nightly release and tag
+        run: |
+          gh release delete nightly-build --yes || echo "No previous nightly-build release to delete."
+          git push origin --delete nightly-build || echo "No previous nightly-build tag to delete."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create new nightly release
+        run: |
+          gh release create nightly-build \
+            --title "Nightly Build $(date +'%Y-%m-%d %H:%M')" \
+            --notes "This release contains the latest plugin builds from the main branch. These are not stable releases and are intended for testing purposes." \
+            --prerelease
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload plugin assets to release
+        run: gh release upload nightly-build dist/*.swiftbiux
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
