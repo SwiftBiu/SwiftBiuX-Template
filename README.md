@@ -1,5 +1,7 @@
 [Switch to Chinese (切换到中文)](README_zh.md)
 
+[![Build and Package Plugins](https://github.com/your-username/your-repo-name/actions/workflows/build_plugins.yml/badge.svg)](https://github.com/your-username/your-repo-name/actions/workflows/build_plugins.yml)
+
 # SwiftBiu Plugin Development Guide
 
 Welcome to the SwiftBiu plugin development world! This guide will help you create powerful plugins using modern web technologies.
@@ -12,31 +14,35 @@ This template provides everything you need to get started. Here's the core devel
 
 1.  **Define `manifest.json`**: Configure your plugin's metadata, actions, and any settings you need.
 2.  **Build Your UI**: Implement your plugin's interface and business logic in `ui/index.html`.
-3.  **Package Your Plugin**: Use the provided build script to create a distributable `.swiftbiux` file.
-4.  **Install & Test**: Load your plugin in SwiftBiu to see it in action.
+3.  **Package and Test**: Package your plugin and load it in SwiftBiu to see it in action.
 
 ## Packaging & Distribution
 
-To ensure your plugin is packaged correctly and easily distributable, use the included `build_plugin.sh` script.
+You can get your plugin package (`.swiftbiux` file) in two ways: through our automated CI builds (recommended for most users) or by packaging it manually for local testing.
 
-This script handles the process of creating a `.swiftbiux` archive (which is a specially named ZIP file) with the correct internal structure.
+### Automated Builds (Recommended)
 
-### How to Use the Build Script
+All plugins in this template are automatically built and packaged by a GitHub Actions workflow. This is the easiest way to get the latest, consistently built versions.
+
+1.  Go to the **Actions** tab of this repository on GitHub.
+2.  Find the latest successful run for the `main` branch.
+3.  Under the **Artifacts** section of the run summary, you will find a zip file named `swiftbiux-plugins`.
+4.  Download and unzip this file to get all the latest `.swiftbiux` plugin packages.
+
+### Manual Local Packaging
+
+For local development and rapid testing, you can use the included `build_plugin.sh` script to package your plugin.
 
 1.  Open your terminal.
 2.  Navigate to the root directory of this template.
 3.  Run the script, passing your plugin's folder name as an argument.
 
 ```bash
-# Navigate to your project's root directory
-cd /path/to/your/SwiftBiuX-Template
-
-# Run the build script with your plugin's directory name
 # For example, if your plugin is in a folder named "MyAwesomePlugin"
 ./build_plugin.sh MyAwesomePlugin
 
 # Success! Find your distributable file at:
-# dist/MyAwesomePlugin.swiftbiux
+# MyAwesomePlugin.swiftbiux
 ```
 
 ## Two Types of Plugin Actions

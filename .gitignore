@@ -1,0 +1,8 @@
+# macOS generated files
+.DS_Store
+
+# SwiftBiuX plugin packages
+*.swiftbiux
+
+# Distribution directory
+dist/

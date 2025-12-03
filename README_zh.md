@@ -1,5 +1,7 @@
 [Switch to English](README.md)
 
+[![构建与打包插件](https://github.com/your-username/your-repo-name/actions/workflows/build_plugins.yml/badge.svg)](https://github.com/your-username/your-repo-name/actions/workflows/build_plugins.yml)
+
 # SwiftBiu 插件开发指南
 
 欢迎来到 SwiftBiu 插件开发的世界！本指南将帮助您使用现代 Web 技术创建功能强大的插件。
@@ -12,31 +14,35 @@
 
 1.  **定义 `manifest.json`**：配置您插件的元数据、动作以及任何您需要的设置。
 2.  **构建您的 UI**：在 `ui/index.html` 中实现插件的界面和业务逻辑。
-3.  **打包您的插件**：使用我们提供的构建脚本来创建一个可分发的 `.swiftbiux` 文件。
-4.  **安装与测试**：在 SwiftBiu 中加载您的插件，查看实际效果。
+3.  **打包与测试**：打包您的插件并在 SwiftBiu 中加载它，以查看实际效果。
 
 ## 打包与分发
 
-为了确保您的插件被正确打包以便于分发，请使用我们提供的 `build_plugin.sh` 脚本。
+您可以通过两种方式获取您的插件包 (`.swiftbiux` 文件)：通过我们的自动化 CI 构建（推荐给大多数用户），或为本地测试手动打包。
 
-该脚本会自动处理创建 `.swiftbiux` 归档文件（一个特殊命名的 ZIP 文件）的过程，并确保其内部文件结构正确无误。
+### 自动化构建 (推荐)
 
-### 如何使用打包脚本
+此模板中的所有插件均由 GitHub Actions 工作流自动构建和打包。这是获取最新、构建一致的版本的**最简单**方式。
+
+1.  访问此仓库在 GitHub 上的 **Actions** 标签页。
+2.  找到 `main` 分支最新一次成功的运行记录。
+3.  在运行摘要的 **Artifacts** (构建产物) 部分，您会找到一个名为 `swiftbiux-plugins` 的 zip 文件。
+4.  下载并解压该文件，即可获得所有最新版本的 `.swiftbiux` 插件包。
+
+### 手动本地打包
+
+对于本地开发和快速测试，您可以使用我们提供的 `build_plugin.sh` 脚本来打包您的插件。
 
 1.  打开您的终端。
 2.  导航到本模板的根目录。
 3.  运行脚本，并将您的插件文件夹名作为参数传入。
 
 ```bash
-# 导航到您项目的根目录
-cd /path/to/your/SwiftBiuX-Template
-
-# 运行打包脚本，并附上您的插件目录名
 # 例如，如果您的插件在名为 "MyAwesomePlugin" 的文件夹中
 ./build_plugin.sh MyAwesomePlugin
 
-# 成功！您可以在以下路径找到您可分发的插件文件：
-# dist/MyAwesomePlugin.swiftbiux
+# 成功！您可以在根目录找到您可分发的插件文件：
+# MyAwesomePlugin.swiftbiux
 ```
 
 ## 两种插件动作类型
