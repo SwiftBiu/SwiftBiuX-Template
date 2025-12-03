@@ -1,234 +1,79 @@
-[Switch to Chinese (切换到中文)](README_zh.md)
+# SwiftBiuX 插件目录
 
-[![Build and Package Plugins](https://github.com/your-username/your-repo-name/actions/workflows/build_plugins.yml/badge.svg)](https://github.com/your-username/your-repo-name/actions/workflows/build_plugins.yml)
+欢迎来到 SwiftBiuX 官方插件模板库。本文档旨在提供一个清晰的概览，介绍当前可用、正在开发以及计划中的所有插件。
+目前对触发方式是选择文本内容触发扩展响应
 
-# SwiftBiu Plugin Development Guide
+**➡️ 想要学习如何开发插件？请查看我们的 [插件开发指南](DEVELOPMENT_GUIDE.md)** ([中文版](DEVELOPMENT_GUIDE_zh.md))
 
-Welcome to the SwiftBiu plugin development world! This guide will help you create powerful plugins using modern web technologies.
+## 插件状态图例
 
-With SwiftBiu's "Rich Web Application" model, you can build plugins with custom user interfaces using HTML, CSS, and JavaScript, providing a seamless, native-like experience for users.
-
-## Quick Start
-
-This template provides everything you need to get started. Here's the core development workflow:
-
-1.  **Define `manifest.json`**: Configure your plugin's metadata, actions, and any settings you need.
-2.  **Build Your UI**: Implement your plugin's interface and business logic in `ui/index.html`.
-3.  **Package and Test**: Package your plugin and load it in SwiftBiu to see it in action.
-
-## Packaging & Distribution
-
-You can get your plugin package (`.swiftbiux` file) in two ways: through our automated CI builds (recommended for most users) or by packaging it manually for local testing.
-
-### Automated Builds (Recommended)
-
-All plugins in this template are automatically built and packaged into a **Nightly Build** release. This is the easiest and most visible way to get the latest versions.
-
-You can always find the latest plugin packages by visiting the **[Releases page](https://github.com/SwiftBiu/SwiftBiuX-Template/releases)** of this repository. The `nightly-build` release is automatically updated every time changes are pushed to the `main` branch.
-
-### Manual Local Packaging
-
-For local development and rapid testing, you can use the included `build_plugin.sh` script to package your plugin.
-
-1.  Open your terminal.
-2.  Navigate to the root directory of this template.
-3.  Run the script, passing your plugin's folder name as an argument.
-
-```bash
-# For example, if your plugin is in a folder named "MyAwesomePlugin"
-./scripts/build_plugin.sh MyAwesomePlugin
-
-# Success! Find your distributable file at:
-# MyAwesomePlugin.swiftbiux
-```
-
-## Two Types of Plugin Actions
-
-SwiftBiu supports two types of actions with varying complexity.
-
-### Type 1: JavaScript Action (Logic-only)
-
-Use this for custom logic (like API calls) that **does not require a custom UI**. The action is powered by the `script.js` file in your plugin's root.
-
-#### `manifest.json` Configuration
-To trigger the JavaScript backend, the action **must** include a `"script": "script.js"` key.
-
-```json
-"actions": [
-  {
-    "title": "Look Up IP Info",
-    "script": "script.js"
-  }
-]
-```
-
-#### `script.js` Development
-You need to implement two functions:
-*   `isAvailable(context)`: (Async) Determines if the action should be visible. Must return a Promise resolving to `{ isAvailable: Boolean, isContextMatch: Boolean }`.
-*   `performAction(context)`: (Async) Executes when the user clicks the action.
-
-### Type 2: Rich Web App Action (Recommended)
-
-The most powerful type, for plugins that need a fully custom user interface. This model treats your UI as a complete web application.
-
-#### `manifest.json` Configuration
-A Rich Web App Action is defined by two key parts in `manifest.json`:
-1.  A root-level `ui` object that points to your HTML file.
-2.  An action in the `actions` array that includes a `"script": "script.js"` key. This is **required** to initialize the plugin's backend JavaScript environment.
-
-```json
-"actions": [
-  {
-    "title": "Advanced Translator",
-    "script": "script.js"
-  }
-],
-"ui": {
-  "main": "ui/index.html"
-}
-```
+*   `[x]` - **已完成**: 插件功能稳定，已在 Nightly Build 中提供。
+*   `[-]` - **开发中**: 插件正在积极开发中。
+*   `[ ]` - **计划中**: 插件已纳入开发路线图。
+*   `[!]` - **需要核心支持/受限**: 插件的实现需要对 SwiftBiu 主应用进行功能增强，或在特定环境（如 App Store）下功能受限。
 
 ---
 
-## Core API Reference
+## ✅ 已有插件 (Existing Plugins)
 
-### `manifest.json` Explained
+| 插件名称                     | 作者 | 描述               |
+| :--------------------------- | :--- | :----------------- |
+| **--- ✍️ 文本处理与转换 ---** |
+| `cny`                        | 官方 | 数字转人民币大写。 |
 
-This file is the "ID card" for your plugin. Here are the most important keys:
+| **--- 🚀 在线服务集成 ---** |
 
-| Key | Type | Required | Description |
-| --- | --- | --- | --- |
-| `identifier` | String | Yes | A unique ID for your plugin, e.g., `com.yourname.plugin`. **Must be globally unique, as a plugin with a duplicate identifier will overwrite any existing one.** |
-| `name` | String | Yes | The display name of your plugin. |
-| `version` | String | Yes | The plugin's version, e.g., `1.0`. |
-| `actions` | Array | Yes | An array defining one or more actions the plugin provides. |
-| `icon` | String | No | **(Root Level)** An SF Symbol name (e.g., `swift`) or a local PNG file name. This serves as the default icon for the entire plugin. |
-| `iconType` | String | No | **(Root Level)** Defines the type of the root `icon`. Can be `"sfSymbol"` or `"file"`. |
-| `configuration` | Array | No | Defines a user-configurable settings UI for your plugin. |
-| `permissions` | Array | No | Declares system permissions required by the plugin. |
+| `Gemini` | 官方 | 集成 Google Gemini 模型的 AI 插件。 |
+| `GeminiImage` | 官方 | 使用 Nano Banana 模型进行文生图。 |
+| `MultiSearch` | 官方 | 同时在多个搜索引擎中搜索选中的文本。 |
+| `OpenAIRewriter` | [zwpaper](https://github.com/zwpaper) | 使用 OpenAI 模型来润色和改写文本。 |
 
-### Plugin Configuration (`configuration`)
-
-If your plugin needs user-provided settings (like an API key), define them in the `configuration` array. SwiftBiu will automatically generate a settings UI.
-
-**Example of a text input field:**
-```json
-"configuration": [
-  {
-    "key": "api_key",
-    "label": "API Key",
-    "description": "Your secret API key.",
-    "type": "secure",
-    "placeholder": "Enter your key here"
-  }
-]
-```
-
-Supported `type` values include: `string`, `secure` (for passwords), `boolean` (for switches), `option` (for dropdowns), and `radioList`.
-
-##### `radioList`
-*   **UI**: A dynamic, editable list where each row contains a radio button, a multi-line text view, and a delete button. Users can add new rows.
-*   **Functionality**: Ideal for complex scenarios where users need to configure a set of rules and activate one at a time (e.g., multiple translation prompts).
-*   **Additional Keys**:
-    *   `defaultItems` (Array, No): Defines the initial default items for the list. Each object requires:
-        *   `enabled` (Boolean, Yes): Whether the radio button for this item is selected by default.
-        *   `value` (String, Yes): The default content of the text view.
-
-### JavaScript API (`window.swiftBiu`)
-
-When your plugin's UI is displayed, SwiftBiu injects a powerful `window.swiftBiu` object into your JavaScript context. All asynchronous methods return **Promises**, so you can use modern `async/await` syntax.
-
-#### 1. Initializing Your UI
-
-You **must** define a global function `window.swiftBiu_initialize` in your `ui/index.html`. SwiftBiu calls this function and passes the initial `context` (like selected text) once your UI is loaded.
-
-```javascript
-// In your ui/index.html <script> tag
-window.swiftBiu_initialize = async function(context) {
-  console.log("UI Initialized with context:", context);
-  // context -> { selectedText: "Hello World", sourceAppBundleID: "com.apple.TextEdit" }
-  const text = context.selectedText;
-  // Start your business logic here...
-};
-```
-
-#### 2. Core Functions
-
-*   **`swiftBiu.fetch(url, options)`**: (Async) Makes a network request. `options` supports `method`, `headers`, and `body`.
-    *   **Returns**: `Promise<{ status: Int, data: String }>`
-    *   **Example**: `const response = await swiftBiu.fetch('https://api.example.com/data');`
-
-*   **`swiftBiu.copyText(text)`**: (Async) Copies the given text to the system clipboard.
-
-*   **`swiftBiu.closeWindow()`**: (Sync) Closes the current plugin UI window.
-
-#### 3. UI Control & Best Practices
-
-*   **`swiftBiu.ui.resizeWindow({ height: Number })`**: (Async) Adjusts the height of the plugin window. This is crucial for creating UIs with dynamic content.
-
-##### Best Practice for Auto-Resizing Height
-To achieve perfect, smooth resizing, follow this CSS and JavaScript strategy:
-1.  **CSS**: Set `background-color: transparent;` on `<html>` and apply your main background styles (like frosted glass) to `<body>` with `min-height: 100vh;`. Let your main content container resize naturally without a fixed height.
-2.  **JavaScript**: After your content is rendered, manually calculate the total height of all visible elements (`element.offsetHeight`) and add a small buffer. Call `resizeWindow` with this calculated height. This is more reliable than `ResizeObserver` or `document.body.scrollHeight` alone.
-
-#### 4. Storage
-
-*   **`swiftBiu.storage.get(key)`**: (Async) Reads a value from your plugin's configuration. The `key` must match one defined in `manifest.json`.
-    *   **Returns**: `Promise<{ result: String }>`
-    *   **Example**: `const { result: apiKey } = await swiftBiu.storage.get('api_key');`
-
-#### 5. System Interactions
-
-*   `swiftBiu.showImage(...)`: Displays an image.
-*   `swiftBiu.openFileInPreview(...)`: Opens a file in Preview.
-
-## Permissions (`permissions`)
-
-To ensure your plugin functions correctly, especially in the sandboxed App Store version of SwiftBiu, you must declare the permissions it needs in `manifest.json`.
-
-*   `"network"`: Required for `swiftBiu.fetch`.
-*   `"clipboardWrite"`: Required for `swiftBiu.copyText`.
-*   And others like `"paste"`, `"notifications"`, etc.
-
-## Debugging & Logging
-
-Any `console.log()` message from your UI's JavaScript is automatically bridged to SwiftBiu's native logging system. You can view these logs in SwiftBiu's "Log Viewer". They will be prefixed with `[UI]` and your plugin's identifier, making end-to-end debugging much easier.
-
-## Examples
-
-Check out the example plugins included in this template to see these concepts in action. Reading their source code is a great way to learn.
-
-Happy coding!
-
+| **--- 🛠️ 富 Web 应用 ---** |
+| `AdvancedTranslator` | 官方 | 一个功能强大的翻译插件 (富 Web 应用范例)。 |
 ---
 
-## Contributing Guidelines
+## 🗺️ 插件路线图 (Plugin Roadmap)
 
-To ensure the quality and clarity of the project's history, this repository enforces the **Conventional Commits** specification for all commit messages.
+| 插件名称                     | 作者 | 描述                                                       | 状态                 |
+| :--------------------------- | :--- | :--------------------------------------------------------- | :------------------- |
+| **--- ✍️ 文本处理与转换 ---** |
+| **JSON 格式化**              | 官方 | 美化和验证 JSON 字符串。                                   | `[ ]` 计划中         |
+| **Base64 编解码**            | 官方 | Base64 编解码。                                            | `[ ]` 计划中         |
+| **单词/字符统计**            | 官方 | 统计选中内容的单词数、字符数、行数等。                     | `[ ]` 计划中         |
+| **时间戳转换**               | 官方 | 时间戳和日期时间格式互相转换。                             | `[ ]` 计划中         |
+| **大小写转换**               | 官方 | 英文字母大小写转换 (Upper, Lower, Camel, Snake)。          | `[ ]` 计划中         |
+| **文本清洗工**               | 官方 | 去除空行/首尾空格、全角转半角、行去重、排序等。            | `[ ]` 计划中         |
+| **正则提取器**               | 官方 | 使用正则表达式批量提取文本中的关键信息（如邮箱、URL）。    | `[ ]` 计划中         |
+| **Markdown 表格格式化**      | 官方 | 将杂乱的文本一键整理为对齐的 Markdown 表格。               | `[ ]` 计划中         |
+| **哈希计算器**               | 官方 | 计算 MD5, SHA-1, SHA-256, Base64 摘要。                    | `[ ]` 计划中         |
+| **Slug 生成器**              | 官方 | 将标题文本转换为 URL 友好的 Slug。                         | `[ ]` 计划中         |
+| **文本处理流水线**           | 官方 | 像搭积木一样组合多个文本处理操作。                         | `[ ]` 计划中         |
 
-### Automated Validation
+| **--- 🛠️ 开发者利器 (DevTools) ---** |
+| **颜色助手**                 | 官方 | 预览 Hex/RGB 颜色，并转换为 SwiftUI, UIKit, CSS 等格式。   | `[ ]` 计划中         |
+| **JWT 解码器**               | 官方 | **本地**解码 JWT Token，展示 Payload 和过期时间。          | `[ ]` 计划中         |
+| **Mermaid 预览器**           | 官方 | 将 Mermaid 文本直接渲染为流程图/时序图。                   | `[ ]` 计划中         |
+| **Curl 转代码**              | 官方 | 将 curl 命令转换为 Swift, Python, JS 等语言的请求代码。    | `[ ]` 计划中         |
 
-We provide a Git hook that automatically checks your commit message format. To enable it, you **must** run the following command once after cloning the repository:
+| **--- ⚡️ 生产力与效率 ---** |
+| **文本差异比对**             | 官方 | 将**选中的文本**与**剪贴板内容**进行 Diff 比对。           | `[ ]` 计划中         |
+| **Markdown 实时预览**        | 官方 | 实时预览 Markdown 渲染效果。                               | `[ ]` 计划中         |
+| **智能日程**                 | 官方 | 识别文本中的时间信息，生成日程或 .ics 文件。               | `[ ]` 计划中         |
+| **临时便签板**               | 官方 | 一个简单的临时文本暂存区。                                 | `[ ]` 计划中         |
 
-```bash
-./scripts/install-hooks.sh
-```
+| **--- 🚀 在线服务集成 ---**   |
+| **AI 工具箱**                | 官方 | 一个通用的 AI 平台，允许用户自定义 Prompt 对接多种大模型。 | `[ ]` 计划中         |
+| **IP 地址信息**              | 官方 | 查询 IP 地址的地理位置和详细信息。                         | `[ ]` 计划中         |
+| **短链接生成器**             | 官方 | 将长链接转换为短链接 (bit.ly 等)。                         | `[ ]` 计划中         |
+| **实时汇率/加密货币**        | 官方 | 实时查询法币汇率和加密货币价格。                           | `[ ]` 计划中         |
+| **代码分享 (Gist)**          | 官方 | 一键上传代码到 GitHub Gist 或 Pastebin。                   | `[ ]` 计划中         |
+| **聚合翻译**                 | 官方 | 同时展示 Google, DeepL, ChatGPT 等多源翻译结果。           | `[ ]` 计划中         |
+| **链接元数据预览**           | 官方 | 抓取 URL 的 Open Graph 信息（标题、摘要、缩略图）。        | `[ ]` 计划中         |
 
-After installation, any `git commit` with a non-compliant message will be automatically rejected with a helpful guide.
+| **--- 🧩 数据与创意 ---** |
+| **迷你图表**                 | 官方 | 将简单的 CSV/数字数据生成柱状图或饼图。                    | `[ ]` 计划中         |
+| **文本加密胶囊**             | 官方 | AES 加密/解密文本，用于安全传输。                          | `[ ]` 计划中         |
+| **二维码生成器**             | 官方 | 将选中的文本实时生成二维码。                               | `[ ]` 计划中         |
 
-### Commit Message Format
-
-Your commit message must follow this structure:
-
-```
-<type>(<scope>): <subject>
-```
-
-*   **Type**: Must be one of the following: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`, `build`.
-*   **Scope**: (Optional) The module affected by the change (e.g., `Gemini`, `UI`, `build`).
-*   **Subject**: A short, clear description of the change.
-
-**Example:**
-```bash
-git commit -m "feat(Gemini): add support for streaming responses"
-```
+| **--- 🖥️ 系统与应用联动 ---** |
+| **系统联动插件**             | 官方 | 与提醒事项、终端等系统应用交互。                           | `[!]` App Store 受限 |
