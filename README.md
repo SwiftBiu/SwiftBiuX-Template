@@ -36,7 +36,7 @@ For local development and rapid testing, you can use the included `build_plugin.
 
 ```bash
 # For example, if your plugin is in a folder named "MyAwesomePlugin"
-./build_plugin.sh MyAwesomePlugin
+./scripts/build_plugin.sh MyAwesomePlugin
 
 # Success! Find your distributable file at:
 # MyAwesomePlugin.swiftbiux

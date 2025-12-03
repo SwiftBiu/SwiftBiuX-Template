@@ -36,7 +36,7 @@
 
 ```bash
 # 例如，如果您的插件在名为 "MyAwesomePlugin" 的文件夹中
-./build_plugin.sh MyAwesomePlugin
+./scripts/build_plugin.sh MyAwesomePlugin
 
 # 成功！您可以在根目录找到您可分发的插件文件：
 # MyAwesomePlugin.swiftbiux
