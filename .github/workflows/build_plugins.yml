@@ -9,6 +9,8 @@ on:
 jobs:
   build-and-release:
     runs-on: macos-latest
+    permissions:
+      contents: write # Grant write permission to create/delete releases and tags
 
     steps:
       - name: Checkout repository
