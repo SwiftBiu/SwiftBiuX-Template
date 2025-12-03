@@ -1,8 +1,36 @@
-# macOS generated files
-.DS_Store
-
 # SwiftBiuX plugin packages
 *.swiftbiux
 
-# Distribution directory
+# macOS
+.DS_Store
+._*
+
+
+# Logs
+logs
+*.log
+
+# Build outputs
 dist/
+build/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.cache
+.cache/
+*.swp
+*.swo
+*~
+.*.sw[a-p]
+*~
+\#*\#
+auto-save-list
+
+# OS generated
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
