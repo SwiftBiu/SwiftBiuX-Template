@@ -127,6 +127,31 @@ If your plugin needs user-provided settings (like an API key), define them in th
 
 Supported `type` values include: `string`, `secure` (for passwords), `boolean` (for switches), `option` (for dropdowns), and `radioList`.
 
+##### `option`
+*   **UI**: A dropdown selection menu.
+*   **Functionality**: Allows the user to select a value from a predefined set of options.
+*   **Additional Keys**:
+    *   `options` (Array, Yes): Defines the options in the dropdown. Each object in the array requires the following keys:
+        *   `label` (String, Yes): The text displayed for the option in the UI.
+        *   `value` (String, Yes): The actual value of the option, which is stored and retrieved in scripts via `storage.get()`.
+    *   `defaultValue` (String, No): The `value` of the option that is selected by default.
+
+**Example of a dropdown menu (`option`):**
+```json
+"configuration": [
+  {
+    "key": "targetLanguage",
+    "label": "Target Language",
+    "type": "option",
+    "defaultValue": "Python (Requests)",
+    "options": [
+      { "label": "Python (Requests)", "value": "Python (Requests)" },
+      { "label": "JavaScript (Fetch)", "value": "JavaScript (Fetch)" }
+    ]
+  }
+]
+```
+
 ##### `radioList`
 *   **UI**: A dynamic, editable list where each row contains a radio button, a multi-line text view, and a delete button. Users can add new rows.
 *   **Functionality**: Ideal for complex scenarios where users need to configure a set of rules and activate one at a time (e.g., multiple translation prompts).
@@ -183,6 +208,30 @@ To achieve perfect, smooth resizing, follow this CSS and JavaScript strategy:
 *   `swiftBiu.showImage(...)`: Displays an image.
 *   `swiftBiu.openFileInPreview(...)`: Opens a file in Preview.
 
+*   **`swiftBiu.runShellScript(command, context)`**: (Async) Executes a shell command. This API invokes `/bin/zsh` via the main SwiftBiu application's `Process` API.
+    *   **Important: Sandbox Restrictions (Primarily for App Store Version)**:
+        *   The behavior of this API **depends on the version of SwiftBiu**. In the **App Store version**, it is strictly limited by the App Sandbox, and the launched subprocess inherits all sandbox rules.
+        *   **What You Can Do (App Store Version)**: You can safely execute self-contained command-line tools that process data via standard input/output (stdin/stdout), such as `md5`, `shasum`, `base64`, `grep`, and `awk`, as they do not access restricted resources outside the sandbox.
+        *   **What You Cannot Do (App Store Version)**: You cannot access files outside the sandbox, make unauthorized network connections, or control other applications via tools like `osascript` (unless the main app has specific entitlements).
+        *   **Website Version**: A future version distributed directly from our website may remove sandbox restrictions, granting this API significantly more power. Please refer to the release notes for your version.
+    *   **Permission**: You must declare the `"runShellScript"` permission in your `manifest.json`'s `permissions` array.
+    *   **Security**: Regardless of the version, always sanitize any variables passed into the command to prevent potential command injection vulnerabilities.
+    *   **Returns**: `Promise<{ result: String }>`
+    *   **Example**:
+        ```javascript
+        // manifest.json must include the "runShellScript" permission
+        // "permissions": ["runShellScript"]
+
+        // script.js
+        const text = context.selectedText;
+        // Escape single quotes to be used safely in a shell command
+        const escapedText = text.replace(/'/g, "'\\''");
+        const ctx = { "text": escapedText };
+
+        // Piping text via printf %s to md5 is safe within the sandbox
+        const md5Result = SwiftBiu.runShellScript("printf %s '{text}' | md5", ctx);
+        console.log(md5Result.result); // Outputs the MD5 hash
+        ```
 ## Permissions (`permissions`)
 
 To ensure your plugin functions correctly, especially in the sandboxed App Store version of SwiftBiu, you must declare the permissions it needs in `manifest.json`.

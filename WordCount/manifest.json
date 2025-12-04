@@ -1,0 +1,19 @@
+{
+  "identifier": "com.SwiftBiu.wordcount",
+  "name": "单词/字符统计",
+  "author": "SwiftBiu",
+  "description": "统计选中内容的单词数、字符数、行数等。",
+  "version": "1.0",
+  "actions": [
+    {
+      "title": "统计字数",
+      "script": "script.js"
+    }
+  ],
+  "icon": "text.alignleft",
+  "iconType": "sfSymbol",
+  "permissions": [
+    "notifications"
+  ],
+  "configuration": []
+}

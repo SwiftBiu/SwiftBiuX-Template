@@ -1,0 +1,21 @@
+{
+  "identifier": "com.SwiftBiu.caseconverter",
+  "name": "大小写转换",
+  "author": "SwiftBiu",
+  "description": "英文字母大小写转换 (Cycle: Lower -> Upper -> Title -> Camel -> Snake -> Kebab)。",
+  "version": "1.0",
+  "actions": [
+    {
+      "title": "转换大小写",
+      "script": "script.js"
+    }
+  ],
+  "icon": "textformat",
+  "iconType": "sfSymbol",
+  "permissions": [
+    "clipboardWrite",
+    "notifications",
+    "paste"
+  ],
+  "configuration": []
+}

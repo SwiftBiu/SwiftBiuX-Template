@@ -1,0 +1,21 @@
+{
+  "identifier": "com.SwiftBiu.jsonformatter",
+  "name": "JSON 格式化",
+  "author": "SwiftBiu",
+  "description": "美化和验证 JSON 字符串。",
+  "version": "1.0",
+  "actions": [
+    {
+      "title": "格式化 JSON",
+      "script": "script.js"
+    }
+  ],
+  "icon": "curlybraces",
+  "iconType": "sfSymbol",
+  "permissions": [
+    "clipboardWrite",
+    "notifications",
+    "paste"
+  ],
+  "configuration": []
+}

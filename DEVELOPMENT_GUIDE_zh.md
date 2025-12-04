@@ -98,8 +98,8 @@ SwiftBiu 支持两种不同复杂度的动作类型。
 | --------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------- |
 | `identifier`    | String | 是       | 插件的唯一 ID，例如 `com.yourname.plugin`。**此 ID 必须全局唯一，因为标识符重复的插件会覆盖已安装的插件。** |
 | `name`          | String | 是       | 插件的显示名称。                                                                                            |
-| `author`        | String | 是       | 插件的作者。                                                                |
-| `description`        | String | 是       | 插件的介绍。                                                                |
+| `author`        | String | 是       | 插件的作者。                                                                                                |
+| `description`   | String | 是       | 插件的介绍。                                                                                                |
 | `version`       | String | 是       | 插件的版本号，例如 `1.0`。                                                                                  |
 | `actions`       | Array  | 是       | 定义插件提供的一个或多个动作的数组（目前只支持一个动作）。                                                  |
 | `icon`          | String | 否       | **(根级别)** SF Symbol 的名称 (如 `swift`) 或本地 PNG 文件名。这将作为整个插件的默认图标。                  |
@@ -125,6 +125,31 @@ SwiftBiu 支持两种不同复杂度的动作类型。
 ```
 
 支持的 `type` 值包括：`string` (文本)、`secure` (密码)、`boolean` (开关)、`option` (下拉菜单) 和 `radioList`。
+
+##### `option`
+*   **UI**: 一个下拉选择菜单。
+*   **功能**: 允许用户从一组预定义的选项中选择一个值。
+*   **额外键**:
+    *   `options` (Array, 是): 定义下拉菜单中的选项。数组中的每个对象都需要以下键：
+        *   `label` (String, 是): 选项在 UI 中显示的文本。
+        *   `value` (String, 是): 选项的实际值，会存储并在脚本中通过 `storage.get()` 获取。
+    *   `defaultValue` (String, 否): 默认选中的选项的 `value`。
+
+**下拉菜单 (`option`) 示例：**
+```json
+"configuration": [
+  {
+    "key": "targetLanguage",
+    "label": "目标语言",
+    "type": "option",
+    "defaultValue": "Python (Requests)",
+    "options": [
+      { "label": "Python (Requests)", "value": "Python (Requests)" },
+      { "label": "JavaScript (Fetch)", "value": "JavaScript (Fetch)" }
+    ]
+  }
+]
+```
 
 ##### `radioList`
 *   **UI**: 一个动态的、可编辑的列表。每一行包含一个单选按钮、一个多行文本输入框和一个删除按钮。用户可以动态添加新行。
@@ -182,6 +207,30 @@ window.swiftBiu_initialize = function(context) {
 *   `swiftBiu.showImage(...)`: 显示图片。
 *   `swiftBiu.openFileInPreview(...)`: 在预览中打开文件。
 
+*   **`swiftBiu.runShellScript(command, context)`**: (异步) 执行一个 Shell 命令。此 API 通过 SwiftBiu 主应用的 `Process` API 调用 `/bin/zsh` 来执行命令。
+    *   **重要：沙盒限制 (主要针对 App Store 版本)**:
+        *   此 API 的行为**取决于 SwiftBiu 的版本**。在 **App Store 版本**中，它受到 App Sandbox 的严格限制，子进程会继承所有沙盒规则。
+        *   **可以做什么 (App Store 版本)**: 您可以安全地执行那些通过标准输入/输出（stdin/stdout）处理数据的、自包含的命令行工具（例如 `md5`, `shasum`, `base64`, `grep`, `awk` 等），因为它们不访问沙盒外的受限资源。
+        *   **不能做什么 (App Store 版本)**: 您无法访问沙盒外的文件、进行未经授权的网络连接、或通过 `osascript` 等工具控制其他应用（除非主应用有特定授权）。
+        *   **官网版本**: 未来的官网版本可能会移除沙盒限制，从而赋予此 API 更大的能力。请留意版本更新说明。
+    *   **权限**: 您必须在 `manifest.json` 的 `permissions` 数组中声明 `"runShellScript"` 权限。
+    *   **安全**: 无论在哪个版本中，都务必谨慎处理传入命令的任何变量，以防范潜在的命令注入风险。
+    *   **返回**: `Promise<{ result: String }>`
+    *   **示例**:
+        ```javascript
+        // manifest.json 必须包含 "runShellScript" 权限
+        // "permissions": ["runShellScript"]
+
+        // script.js
+        const text = context.selectedText;
+        // 为了安全地在 shell 命令中使用，需要对单引号进行转义
+        const escapedText = text.replace(/'/g, "'\\''");
+        const ctx = { "text": escapedText };
+
+        // 使用 printf %s 将文本通过管道传给 md5，这在沙盒内是安全的
+        const md5Result = SwiftBiu.runShellScript("printf %s '{text}' | md5", ctx);
+        console.log(md5Result.result); // 输出 MD5 哈希值
+        ```
 ## 权限 (`permissions`)
 
 为确保您的插件正常工作（尤其是在沙盒化的 App Store 版 SwiftBiu 中），您必须在 `manifest.json` 中声明它需要的权限。

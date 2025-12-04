@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for git log
 
       - name: Create distribution directory
         run: mkdir -p dist
@@ -51,11 +53,35 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate release notes
+        id: generate_notes
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            # For push events, get commits between the previous and current HEAD
+            LOG_CONTENT=$(git log --pretty=format:"- %s (%h)" ${{ github.event.before }}..${{ github.event.after }})
+          else
+            # For manual dispatch, get the last 5 commits as a fallback
+            LOG_CONTENT=$(git log --pretty=format:"- %s (%h)" -n 5)
+          fi
+          
+          if [ -z "$LOG_CONTENT" ]; then
+            LOG_CONTENT="No new commits to display."
+          fi
+          
+          NOTES="This release contains the latest plugin builds from the main branch. These are not stable releases and are intended for testing purposes.
+
+          **Recent Changes:**
+          ${LOG_CONTENT}"
+          
+          echo "$NOTES" > RELEASE_NOTES.md
+          echo "Generated Release Notes:"
+          cat RELEASE_NOTES.md
+
       - name: Create new nightly release
         run: |
           gh release create nightly-build \
             --title "Nightly Build $(date +'%Y-%m-%d %H:%M')" \
-            --notes "This release contains the latest plugin builds from the main branch. These are not stable releases and are intended for testing purposes." \
+            --notes-file RELEASE_NOTES.md \
             --prerelease
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

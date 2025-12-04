@@ -1,0 +1,21 @@
+{
+  "identifier": "com.SwiftBiu.timestampconverter",
+  "name": "时间戳转换",
+  "author": "SwiftBiu",
+  "description": "时间戳和日期时间格式互相转换。",
+  "version": "1.0",
+  "actions": [
+    {
+      "title": "时间戳转换",
+      "script": "script.js"
+    }
+  ],
+  "icon": "clock",
+  "iconType": "sfSymbol",
+  "permissions": [
+    "clipboardWrite",
+    "notifications",
+    "paste"
+  ],
+  "configuration": []
+}

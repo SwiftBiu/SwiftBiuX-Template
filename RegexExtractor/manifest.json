@@ -1,0 +1,51 @@
+{
+  "identifier": "com.SwiftBiu.regexextractor",
+  "name": "正则提取器",
+  "author": "SwiftBiu",
+  "description": "使用正则表达式批量提取文本中的关键信息（如邮箱、URL、手机号等）。",
+  "version": "1.0",
+  "actions": [
+    {
+      "title": "提取信息",
+      "script": "script.js"
+    }
+  ],
+  "icon": "magnifyingglass.circle",
+  "iconType": "sfSymbol",
+  "permissions": [
+    "clipboardWrite",
+    "notifications",
+    "paste"
+  ],
+  "configuration": [
+    {
+      "key": "patternType",
+      "label": "提取类型",
+      "description": "选择要提取的信息类型。",
+      "type": "option",
+      "options": [
+        { "label": "Email", "value": "Email" },
+        { "label": "URL", "value": "URL" },
+        { "label": "IPv4", "value": "IPv4" },
+        { "label": "Phone (CN)", "value": "Phone (CN)" },
+        { "label": "Date (YYYY-MM-DD)", "value": "Date (YYYY-MM-DD)" },
+        { "label": "Custom", "value": "Custom" }
+      ],
+      "defaultValue": "Email"
+    },
+    {
+      "key": "customRegex",
+      "label": "自定义正则",
+      "description": "如果选择了“Custom”类型，请输入您的正则表达式。",
+      "type": "string",
+      "placeholder": "\\d+"
+    },
+    {
+      "key": "separator",
+      "label": "分隔符",
+      "description": "提取结果之间的分隔符（默认为换行符）。",
+      "type": "string",
+      "defaultValue": "\\n"
+    }
+  ]
+}

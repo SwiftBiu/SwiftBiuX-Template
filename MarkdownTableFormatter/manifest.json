@@ -1,0 +1,21 @@
+{
+  "identifier": "com.SwiftBiu.markdowntableformatter",
+  "name": "Markdown 表格格式化",
+  "author": "SwiftBiu",
+  "description": "将杂乱的文本一键整理为对齐的 Markdown 表格。",
+  "version": "1.0",
+  "actions": [
+    {
+      "title": "格式化表格",
+      "script": "script.js"
+    }
+  ],
+  "icon": "tablecells",
+  "iconType": "sfSymbol",
+  "permissions": [
+    "clipboardWrite",
+    "notifications",
+    "paste"
+  ],
+  "configuration": []
+}

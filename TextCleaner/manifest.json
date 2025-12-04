@@ -1,0 +1,57 @@
+{
+  "identifier": "com.SwiftBiu.textcleaner",
+  "name": "文本清洗工",
+  "author": "SwiftBiu",
+  "description": "针对多行文本的处理工具：可按行去重、排序、去除空行/空格、全角转半角等（可在设置中配置）。",
+  "version": "1.0",
+  "actions": [
+    {
+      "title": "清洗文本",
+      "script": "script.js"
+    }
+  ],
+  "icon": "wand.and.stars",
+  "iconType": "sfSymbol",
+  "permissions": [
+    "clipboardWrite",
+    "notifications",
+    "paste"
+  ],
+  "configuration": [
+    {
+      "key": "sortLines",
+      "label": "按行排序",
+      "description": "将所有行按字母顺序进行升序排序。",
+      "type": "boolean",
+      "defaultValue": true
+    },
+    {
+      "key": "trimLines",
+      "label": "去除首尾空格",
+      "description": "去除每一行开头和结尾的空白字符。",
+      "type": "boolean",
+      "defaultValue": true
+    },
+    {
+      "key": "removeEmptyLines",
+      "label": "去除空行",
+      "description": "移除内容为空的行。",
+      "type": "boolean",
+      "defaultValue": true
+    },
+    {
+      "key": "fullToHalf",
+      "label": "全角转半角",
+      "description": "将全角字母和数字转换为半角。",
+      "type": "boolean",
+      "defaultValue": true
+    },
+    {
+      "key": "deduplicate",
+      "label": "去除重复行",
+      "description": "移除重复的行（保留首次出现）。",
+      "type": "boolean",
+      "defaultValue": true
+    }
+  ]
+}
