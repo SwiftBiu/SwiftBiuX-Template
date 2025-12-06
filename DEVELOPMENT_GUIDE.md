@@ -86,6 +86,35 @@ A Rich Web App Action is defined by two key parts in `manifest.json`:
 }
 ```
 
+#### `script.js` Development (Critical Step)
+
+Unlike logic-only actions, Rich Web Apps **do not automatically display the UI**. You must explicitly call `swiftBiu.displayUI()` within the `performAction` function in your `script.js` to launch the window.
+
+```javascript
+function performAction(context) {
+    // Define window dimensions
+    const width = 400;
+    const height = 300;
+
+    // Get screen dimensions from the SwiftBiu API to calculate position (e.g., top-right)
+    const screenSize = swiftBiu.screenSize;
+    const position = {
+        x: screenSize.width - width,
+        y: 0
+    };
+
+    // Explicitly launch the UI
+    swiftBiu.displayUI({
+        htmlPath: "ui/index.html",
+        width: width,
+        height: height,
+        isFloating: true, // Whether the window floats above others
+        title: "Plugin Title",
+        position: position
+    });
+}
+```
+
 ---
 
 ## Core API Reference
@@ -160,9 +189,27 @@ Supported `type` values include: `string`, `secure` (for passwords), `boolean` (
         *   `enabled` (Boolean, Yes): Whether the radio button for this item is selected by default.
         *   `value` (String, Yes): The default content of the text view.
 
-### JavaScript API (`window.swiftBiu`)
+### JavaScript API (Dual Environments)
 
-When your plugin's UI is displayed, SwiftBiu injects a powerful `window.swiftBiu` object into your JavaScript context. 
+SwiftBiu provides two distinct JavaScript contexts for plugins, each with its own dedicated API object. Understanding their differences is crucial:
+
+1.  **Background Script (`script.js`)**:
+    *   **API Object**: `SwiftBiu` (globally available)
+    *   **Purpose**: Used for the core logic of your plugin, such as network requests, data processing, and invoking system functions. This environment has **no DOM** and cannot directly manipulate a UI.
+    *   **Key APIs**: `SwiftBiu.displayUI()`, `SwiftBiu.showNotification()`, `SwiftBiu.pasteText()`, `SwiftBiu.writeToClipboard()`, etc.
+
+2.  **UI Script (`ui/index.html`)**:
+    *   **API Object**: `window.swiftBiu`
+    *   **Purpose**: Specifically for controlling and responding to your plugin's web-based UI. This environment has a full browser DOM API.
+    *   **Key APIs**: `window.swiftBiu.copyText()`, `window.swiftBiu.closeWindow()`, `window.swiftBiu.ui.resizeWindow()`, etc.
+
+**Key Difference**: `copyText` exists only on the `window.swiftBiu` object in the UI environment, as it's typically associated with user interaction (e.g., clicking a "Copy" button). The background script should use the more fundamental `SwiftBiu.writeToClipboard()` (writes to clipboard only) or `SwiftBiu.pasteText()` (writes and then pastes).
+
+---
+
+### UI Environment API (`window.swiftBiu`)
+
+When your plugin's UI is displayed, SwiftBiu injects a powerful `window.swiftBiu` object into your `index.html`'s JavaScript context.
 
 #### 1. Initializing Your UI
 
@@ -195,7 +242,7 @@ window.swiftBiu_initialize = function(context) {
 ##### Best Practice for Auto-Resizing Height
 To achieve perfect, smooth resizing, follow this CSS and JavaScript strategy:
 1.  **CSS**: Set `background-color: transparent;` on `<html>` and apply your main background styles (like frosted glass) to `<body>` with `min-height: 100vh;`. Let your main content container resize naturally without a fixed height.
-2.  **JavaScript**: After your content is rendered, manually calculate the total height of all visible elements (`element.offsetHeight`) and add a small buffer. Call `resizeWindow` with this calculated height. This is more reliable than `ResizeObserver` or `document.body.scrollHeight` alone.
+2.  **JavaScript**: After your content is rendered, manually calculate the total height of all visible elements (`element.offsetHeight`) and add a **sufficient buffer (e.g., 30px - 50px)**. This buffer is crucial to prevent content from being clipped by window edges or shadows. Call `resizeWindow` with this calculated height. This is more reliable than `ResizeObserver` or `document.body.scrollHeight` alone.
 
 #### 4. Storage
 

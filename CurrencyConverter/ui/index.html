@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <style>
+        :root {
+            --bg-color: transparent;
+            --card-bg: #ffffff;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --border-color: #d2d2d7;
+            --accent-color: #0071e3;
+            --accent-hover: #0077ed;
+            --danger-color: #ff3b30;
+            --radius-l: 12px;
+            --radius-m: 8px;
+            --radius-s: 6px;
+            --spacing: 16px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --card-bg: #1c1c1e;
+                --text-primary: #f5f5f7;
+                --text-secondary: #86868b;
+                --border-color: #424245;
+                --accent-color: #0a84ff;
+                --accent-hover: #409cff;
+                --shadow: 0 4px 12px rgba(0,0,0,0.2);
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding: var(--spacing);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-l);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .currency-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(128, 128, 128, 0.05);
+            border-radius: var(--radius-m);
+            padding: 8px 12px;
+            border: 1px solid transparent;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .currency-row:focus-within {
+            border-color: var(--accent-color);
+            background: var(--card-bg);
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            outline: none;
+            font-family: "SF Pro Display", -apple-system, sans-serif;
+            -moz-appearance: textfield;
+        }
+        
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        select {
+            appearance: none;
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            outline: none;
+            cursor: pointer;
+            padding-right: 20px;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2386868b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0px center;
+            background-size: 10px;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .swap-container {
+            display: flex;
+            justify-content: center;
+            margin: -8px 0;
+            z-index: 1;
+        }
+
+        .swap-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--accent-color);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .swap-btn:hover {
+            transform: scale(1.1);
+            border-color: var(--accent-color);
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .result-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 4px;
+            padding: 0 4px;
+        }
+
+        .rate-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .copy-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .copy-btn:hover { opacity: 0.9; }
+        .copy-btn:active { transform: scale(0.96); }
+
+        .error-msg {
+            color: var(--danger-color);
+            font-size: 12px;
+            text-align: center;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .loading { opacity: 0.6; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="mainContainer">
+        <!-- From Section -->
+        <div class="currency-row">
+            <div class="input-wrapper">
+                <div class="label">From</div>
+                <input type="number" id="amountInput" value="1" placeholder="0.00">
+            </div>
+            <select id="fromCurrency">
+                <option value="USD">USD</option>
+                <!-- Options populated by JS -->
+            </select>
+        </div>
+
+        <!-- Swap Button -->
+        <div class="swap-container">
+            <button class="swap-btn" id="swapBtn" title="Swap Currencies">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 10V3M7 3L3 7M7 3L11 7M17 14V21M17 21L21 17M17 21L13 17"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- To Section -->
+        <div class="currency-row">
+            <div class="input-wrapper">
+                <div class="label">To</div>
+                <div id="resultText" style="font-size: 22px; font-weight: 600; font-family: 'SF Pro Display', sans-serif; min-height: 27px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">...</div>
+            </div>
+            <select id="toCurrency">
+                <option value="CNY">CNY</option>
+                <!-- Options populated by JS -->
+            </select>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="result-info">
+            <div class="rate-text" id="rateText">1 USD ≈ ... CNY</div>
+            <button class="copy-btn" id="copyBtn">Copy</button>
+        </div>
+
+        <div class="error-msg" id="errorMsg"></div>
+    </div>
+
+    <script>
+        // State
+        let currencies = {};
+        let rates = {};
+        let lastFromCurrency = '';
+        
+        // Elements
+        const amountInput = document.getElementById('amountInput');
+        const fromSelect = document.getElementById('fromCurrency');
+        const toSelect = document.getElementById('toCurrency');
+        const swapBtn = document.getElementById('swapBtn');
+        const resultText = document.getElementById('resultText');
+        const rateText = document.getElementById('rateText');
+        const copyBtn = document.getElementById('copyBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const mainContainer = document.getElementById('mainContainer');
+
+        // Initialize
+        window.swiftBiu_initialize = async function(context) {
+            console.log("Currency Converter Initialized", context);
+            
+            // 1. Parse Input
+            const text = context.selectedText || "";
+            parseInput(text);
+            
+            // 2. Fetch Currencies & Rates
+            await fetchCurrencies();
+            
+            // 3. Initial Calculation
+            await updateRates();
+            
+            // 4. Resize Window
+            updateHeight();
+        };
+
+        // Event Listeners
+        amountInput.addEventListener('input', calculate);
+        fromSelect.addEventListener('change', updateRates);
+        toSelect.addEventListener('change', calculate);
+        
+        swapBtn.addEventListener('click', () => {
+            const temp = fromSelect.value;
+            fromSelect.value = toSelect.value;
+            toSelect.value = temp;
+            updateRates();
+        });
+
+        copyBtn.addEventListener('click', () => {
+            const text = resultText.innerText;
+            if (text && text !== '...' && text !== '---') {
+                window.swiftBiu.copyText(text);
+                const originalText = copyBtn.innerText;
+                copyBtn.innerText = 'Copied!';
+                copyBtn.style.backgroundColor = '#34c759'; // Green for success
+                setTimeout(() => {
+                    copyBtn.innerText = originalText;
+                    copyBtn.style.backgroundColor = ''; // Reset
+                }, 1500);
+            }
+        });
+
+        // Logic
+        function parseInput(text) {
+            // Try to find a number
+            const numberMatch = text.match(/[\d,]+\.?\d*/);
+            if (numberMatch) {
+                // Remove commas for parsing
+                const cleanNum = numberMatch[0].replace(/,/g, '');
+                const val = parseFloat(cleanNum);
+                if (!isNaN(val)) {
+                    amountInput.value = val;
+                }
+            }
+
+            // Try to find currency codes (simple check for common ones)
+            const commonCurrencies = ['USD', 'CNY', 'EUR', 'JPY', 'GBP', 'HKD', 'AUD', 'CAD', 'KRW', 'SGD'];
+            const upperText = text.toUpperCase();
+            
+            for (const code of commonCurrencies) {
+                if (upperText.includes(code)) {
+                    fromSelect.value = code;
+                    
+                    // Smart 'to' selection
+                    if (code === 'CNY') toSelect.value = 'USD';
+                    else if (code === 'USD') toSelect.value = 'CNY';
+                    else toSelect.value = 'CNY'; // Default target
+                    break;
+                }
+            }
+        }
+
+        async function fetchCurrencies() {
+            try {
+                const response = await window.swiftBiu.fetch('https://api.frankfurter.app/currencies');
+                if (response.status === 200) {
+                    currencies = JSON.parse(response.data);
+                    populateSelects();
+                }
+            } catch (e) {
+                console.error("Failed to fetch currencies", e);
+                showError("Failed to load currency list.");
+            }
+        }
+
+        function populateSelects() {
+            const currentFrom = fromSelect.value;
+            const currentTo = toSelect.value;
+
+            let optionsHTML = '';
+            Object.keys(currencies).forEach(code => {
+                optionsHTML += `<option value="${code}">${code}</option>`;
+            });
+
+            fromSelect.innerHTML = optionsHTML;
+            toSelect.innerHTML = optionsHTML;
+
+            // Restore selection if valid, otherwise default
+            if (currencies[currentFrom]) fromSelect.value = currentFrom;
+            else fromSelect.value = 'USD';
+
+            if (currencies[currentTo]) toSelect.value = currentTo;
+            else toSelect.value = 'CNY';
+        }
+
+        async function updateRates() {
+            const from = fromSelect.value;
+            if (from === lastFromCurrency && Object.keys(rates).length > 0) {
+                calculate();
+                return;
+            }
+
+            mainContainer.classList.add('loading');
+            try {
+                // Fetch rates for the 'from' currency
+                const response = await window.swiftBiu.fetch(`https://api.frankfurter.app/latest?from=${from}`);
+                if (response.status === 200) {
+                    const data = JSON.parse(response.data);
+                    rates = data.rates;
+                    // Add self rate
+                    rates[from] = 1.0;
+                    lastFromCurrency = from;
+                    calculate();
+                } else {
+                    showError("Failed to fetch rates.");
+                }
+            } catch (e) {
+                console.error(e);
+                showError("Network error.");
+            } finally {
+                mainContainer.classList.remove('loading');
+            }
+        }
+
+        function calculate() {
+            const amount = parseFloat(amountInput.value);
+            const to = toSelect.value;
+            const from = fromSelect.value;
+
+            if (isNaN(amount)) {
+                resultText.innerText = '---';
+                return;
+            }
+
+            let rate = 0;
+            if (from === to) {
+                rate = 1;
+            } else if (rates[to]) {
+                rate = rates[to];
+            } else {
+                // Rate not found
+                resultText.innerText = '---';
+                return;
+            }
+
+            const result = amount * rate;
+            
+            // Formatting
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'decimal',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            resultText.innerText = formatter.format(result);
+            
+            // Rate text
+            rateText.innerText = `1 ${from} ≈ ${rate.toFixed(4)} ${to}`;
+            
+            updateHeight();
+        }
+
+        function showError(msg) {
+            errorMsg.innerText = msg;
+            errorMsg.style.display = 'block';
+            updateHeight();
+        }
+
+        function updateHeight() {
+            // Add a larger buffer to account for window chrome and padding
+            const height = mainContainer.offsetHeight + 50;
+            window.swiftBiu.ui.resizeWindow({ height: height });
+        }
+    </script>
+</body>
+</html>

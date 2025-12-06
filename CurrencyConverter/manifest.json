@@ -1,0 +1,24 @@
+{
+  "identifier": "com.swiftbiu.plugin.currencyconverter",
+  "name": "Currency Converter",
+  "author": "SwiftBiu",
+  "description": "Real-time currency conversion with support for multiple currencies.",
+  "version": "1.0",
+  "icon": "banknote",
+  "iconType": "sfSymbol",
+  "actions": [
+    {
+      "title": "Convert Currency",
+      "script": "script.js"
+    }
+  ],
+  "permissions": [
+    "network",
+    "clipboardWrite",
+    "notifications"
+  ],
+  "ui": {
+    "main": "ui/index.html"
+  },
+  "configuration": []
+}

@@ -86,6 +86,35 @@ SwiftBiu 支持两种不同复杂度的动作类型。
 }
 ```
 
+#### `script.js` 开发 (关键步骤)
+
+与纯逻辑动作不同，富 Web 应用**不会自动显示 UI**。您必须在 `script.js` 的 `performAction` 函数中显式调用 `swiftBiu.displayUI()` 来启动窗口。
+
+```javascript
+function performAction(context) {
+    // 定义窗口尺寸
+    const width = 400;
+    const height = 300;
+
+    // 获取屏幕尺寸以计算位置（例如右上角）
+    const screenSize = swiftBiu.screenSize;
+    const position = {
+        x: screenSize.width - width,
+        y: 0
+    };
+
+    // 显式启动 UI
+    swiftBiu.displayUI({
+        htmlPath: "ui/index.html",
+        width: width,
+        height: height,
+        isFloating: true, // 是否为浮动窗口
+        title: "插件标题",
+        position: position
+    });
+}
+```
+
 ---
 
 ## 核心 API 参考
@@ -159,9 +188,27 @@ SwiftBiu 支持两种不同复杂度的动作类型。
         *   `enabled` (Boolean, 是): 该项的单选按钮是否默认选中。
         *   `value` (String, 是): 文本框中的默认内容。
 
-### JavaScript API (`window.swiftBiu`)
+### JavaScript API (双环境)
 
-当您的插件 UI 显示时，SwiftBiu 会向您的 JavaScript 上下文中注入一个强大的 `window.swiftBiu` 对象。
+SwiftBiu 为插件提供了两个不同的 JavaScript 上下文，每个上下文都拥有自己专属的 API 对象。理解它们的区别至关重要：
+
+1.  **后台脚本 (`script.js`)**:
+    *   **API 对象**: `SwiftBiu` (全局可用)
+    *   **用途**: 用于实现插件的核心逻辑，例如网络请求、数据处理、调用系统功能等。此环境**没有 DOM**，不能直接操作 UI。
+    *   **关键 API**: `SwiftBiu.displayUI()`, `SwiftBiu.showNotification()`, `SwiftBiu.pasteText()`, `SwiftBiu.writeToClipboard()` 等。
+
+2.  **UI 脚本 (`ui/index.html`)**:
+    *   **API 对象**: `window.swiftBiu`
+    *   **用途**: 专门用于控制和响应插件的 Web UI 界面。此环境拥有完整的浏览器 DOM API。
+    *   **关键 API**: `window.swiftBiu.copyText()`, `window.swiftBiu.closeWindow()`, `window.swiftBiu.ui.resizeWindow()` 等。
+
+**核心区别**: `copyText` 仅存在于 UI 环境的 `window.swiftBiu` 对象中，因为它通常与用户的界面交互（如点击“复制”按钮）相关联。而后台脚本应使用功能更底层的 `SwiftBiu.writeToClipboard()` (仅写入剪贴板) 或 `SwiftBiu.pasteText()` (写入并粘贴)。
+
+---
+
+### UI 环境 API (`window.swiftBiu`)
+
+当您的插件 UI 显示时，SwiftBiu 会向您的 `index.html` 的 JavaScript 上下文中注入一个强大的 `window.swiftBiu` 对象。
 
 #### 1. 初始化您的 UI
 
@@ -194,7 +241,7 @@ window.swiftBiu_initialize = function(context) {
 ##### 窗口高度自适应最佳实践
 为了实现完美、流畅的窗口高度自适应，请遵循以下 CSS 和 JavaScript 策略：
 1.  **CSS**: 在 `<html>` 上设置 `background-color: transparent;`，并将您的主背景样式（如毛玻璃效果）应用到 `<body>` 上，并设置 `min-height: 100vh;`。让您的主内容容器在不设置固定高度的情况下自然伸缩。
-2.  **JavaScript**: 在您的内容渲染完毕后，手动计算所有可见元素的总高度 (`element.offsetHeight`)，并增加一个小的缓冲值。然后使用这个计算出的高度调用 `resizeWindow`。这种方法比单独使用 `ResizeObserver` 或 `document.body.scrollHeight` 更可靠。
+2.  **JavaScript**: 在您的内容渲染完毕后，手动计算所有可见元素的总高度 (`element.offsetHeight`)，并增加一个**足够的缓冲值 (例如 30px - 50px)**。这个缓冲值对于防止内容被窗口边缘或阴影遮挡至关重要。然后使用这个计算出的高度调用 `resizeWindow`。这种方法比单独使用 `ResizeObserver` 或 `document.body.scrollHeight` 更可靠。
 
 #### 4. 存储
 
