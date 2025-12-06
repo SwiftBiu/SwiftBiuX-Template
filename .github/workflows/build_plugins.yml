@@ -1,11 +1,9 @@
-name: Build and Release Nightly Plugins
+name: Build and Release Versioned Plugins
 
 on:
   push:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
+    tags:
+      - 'v*' # Trigger on tags like v0.1.0, v1.0.0, etc.
   workflow_dispatch: # Allows manual triggering
 
 jobs:
@@ -46,47 +44,15 @@ jobs:
           echo "Contents of dist directory:"
           ls -l dist
 
-      - name: Delete old nightly release and tag
+      - name: Create GitHub Release
         run: |
-          gh release delete nightly-build --yes || echo "No previous nightly-build release to delete."
-          git push origin --delete nightly-build || echo "No previous nightly-build tag to delete."
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Generate release notes
-        id: generate_notes
-        run: |
-          if [[ "${{ github.event_name }}" == "push" ]]; then
-            # For push events, get commits between the previous and current HEAD
-            LOG_CONTENT=$(git log --pretty=format:"- %s (%h)" ${{ github.event.before }}..${{ github.event.after }})
-          else
-            # For manual dispatch, get the last 5 commits as a fallback
-            LOG_CONTENT=$(git log --pretty=format:"- %s (%h)" -n 5)
-          fi
-          
-          if [ -z "$LOG_CONTENT" ]; then
-            LOG_CONTENT="No new commits to display."
-          fi
-          
-          NOTES="This release contains the latest plugin builds from the main branch. These are not stable releases and are intended for testing purposes.
-
-          **Recent Changes:**
-          ${LOG_CONTENT}"
-          
-          echo "$NOTES" > RELEASE_NOTES.md
-          echo "Generated Release Notes:"
-          cat RELEASE_NOTES.md
-
-      - name: Create new nightly release
-        run: |
-          gh release create nightly-build \
-            --title "Nightly Build $(date +'%Y-%m-%d %H:%M')" \
-            --notes-file RELEASE_NOTES.md \
-            --prerelease
+          gh release create ${{ github.ref_name }} \
+            --title "Release ${{ github.ref_name }}" \
+            --generate-notes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload plugin assets to release
-        run: gh release upload nightly-build dist/*.swiftbiux
+        run: gh release upload ${{ github.ref_name }} dist/*.swiftbiux
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
