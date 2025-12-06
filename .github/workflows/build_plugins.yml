@@ -42,6 +42,19 @@ jobs:
       - name: Generate plugins.json catalog
         run: node scripts/generate_catalog.js
 
+      - name: Commit and push catalog
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add catalog/plugins.json
+          # Only commit if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to catalog."
+          else
+            git commit -m "chore: Update plugin catalog [skip ci]"
+            git push origin HEAD:main
+          fi
+
       - name: List packaged assets
         run: |
           echo "Contents of dist directory:"
