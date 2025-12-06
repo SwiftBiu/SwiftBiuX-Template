@@ -1,0 +1,307 @@
+{
+  "generatedAt": "2025-12-06T07:37:00.762Z",
+  "categories": [
+    {
+      "id": "text-processing",
+      "title": {
+        "en": "Text Processing",
+        "zh": "✍️ 文本处理与转换"
+      },
+      "icon": "edit_note"
+    },
+    {
+      "id": "devtools",
+      "title": {
+        "en": "DevTools",
+        "zh": "️ 开发者利器"
+      },
+      "icon": "build"
+    },
+    {
+      "id": "productivity",
+      "title": {
+        "en": "Productivity",
+        "zh": "️ 生产力与效率"
+      },
+      "icon": "speed"
+    },
+    {
+      "id": "online-services",
+      "title": {
+        "en": "Online Services",
+        "zh": "在线服务集成"
+      },
+      "icon": "cloud"
+    },
+    {
+      "id": "data-creative",
+      "title": {
+        "en": "Data & Creative",
+        "zh": "数据与创意"
+      },
+      "icon": "palette"
+    },
+    {
+      "id": "system",
+      "title": {
+        "en": "System",
+        "zh": "️ 系统与应用联动"
+      },
+      "icon": "settings"
+    }
+  ],
+  "plugins": [
+    {
+      "id": "com.swiftbiu.plugin.advancedtranslator",
+      "name": "Advanced Translator",
+      "description": {
+        "en": "A powerful translation plugin that uses custom UI and supports multiple translation services.",
+        "zh": "A powerful translation plugin that uses custom UI and supports multiple translation services."
+      },
+      "icon": "translate",
+      "version": "1.0.1",
+      "type": "Web App",
+      "author": "SwiftBiu Team",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AdvancedTranslator.swiftbiux",
+      "categoryId": "online-services"
+    },
+    {
+      "id": "com.SwiftBiu.base64converter",
+      "name": "Base64 编解码",
+      "description": {
+        "en": "智能 Base64 编码与解码。",
+        "zh": "智能 Base64 编码与解码。"
+      },
+      "icon": "arrow.triangle.2.circlepath",
+      "version": "1.0",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/Base64Converter.swiftbiux",
+      "categoryId": "text-processing"
+    },
+    {
+      "id": "com.SwiftBiu.caseconverter",
+      "name": "大小写转换",
+      "description": {
+        "en": "英文字母大小写转换 (Cycle: Lower -> Upper -> Title -> Camel -> Snake -> Kebab)。",
+        "zh": "英文字母大小写转换 (Cycle: Lower -> Upper -> Title -> Camel -> Snake -> Kebab)。"
+      },
+      "icon": "textformat",
+      "version": "1.0",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/CaseConverter.swiftbiux",
+      "categoryId": "text-processing"
+    },
+    {
+      "id": "com.swiftbiu.plugin.currencyconverter",
+      "name": "Currency Converter",
+      "description": {
+        "en": "Real-time currency conversion with support for multiple currencies.",
+        "zh": "Real-time currency conversion with support for multiple currencies."
+      },
+      "icon": "banknote",
+      "version": "1.0",
+      "type": "Web App",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/CurrencyConverter.swiftbiux",
+      "categoryId": "online-services"
+    },
+    {
+      "id": "com.swiftbiu.plugin.currencyconverterlite",
+      "name": "Currency Converter (Lite)",
+      "description": {
+        "en": "Convert currency instantly and copy the result. (Pure JS)",
+        "zh": "Convert currency instantly and copy the result. (Pure JS)"
+      },
+      "icon": "banknote.fill",
+      "version": "1.0",
+      "type": "Network",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/CurrencyConverterLite.swiftbiux",
+      "categoryId": "online-services"
+    },
+    {
+      "id": "com.SwiftBiu.gemini",
+      "name": "Gemini",
+      "description": {
+        "en": "Send the selected text to Google Gemini and get the response.",
+        "zh": "Send the selected text to Google Gemini and get the response."
+      },
+      "icon": "gemini.png",
+      "version": "1.0",
+      "type": "Network",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/Gemini.swiftbiux",
+      "categoryId": "online-services"
+    },
+    {
+      "id": "com.swiftbiu.gemini-imageToast",
+      "name": "AI Drawing Toast",
+      "description": {
+        "en": "Generates an image based on the selected text using the Gemini API.",
+        "zh": "Generates an image based on the selected text using the Gemini API."
+      },
+      "icon": "nano-banana.png",
+      "version": "1.0",
+      "type": "Network",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/GeminiImage.swiftbiux",
+      "categoryId": "online-services"
+    },
+    {
+      "id": "com.SwiftBiu.hashcalculator",
+      "name": "哈希计算器",
+      "description": {
+        "en": "计算选中文本的 MD5, SHA-1, SHA-256 摘要。",
+        "zh": "计算选中文本的 MD5, SHA-1, SHA-256 摘要。"
+      },
+      "icon": "number.circle",
+      "version": "1.0",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/HashCalculator.swiftbiux",
+      "categoryId": "text-processing"
+    },
+    {
+      "id": "com.SwiftBiu.jsonformatter",
+      "name": "JSON 格式化",
+      "description": {
+        "en": "美化和验证 JSON 字符串。",
+        "zh": "美化和验证 JSON 字符串。"
+      },
+      "icon": "curlybraces",
+      "version": "1.0",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/JSONFormatter.swiftbiux",
+      "categoryId": "text-processing"
+    },
+    {
+      "id": "com.SwiftBiu.markdowntableformatter",
+      "name": "Markdown 表格格式化",
+      "description": {
+        "en": "将杂乱的文本一键整理为对齐的 Markdown 表格。",
+        "zh": "将杂乱的文本一键整理为对齐的 Markdown 表格。"
+      },
+      "icon": "tablecells",
+      "version": "1.0",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/MarkdownTableFormatter.swiftbiux",
+      "categoryId": "text-processing"
+    },
+    {
+      "id": "com.swiftbiu.multisearch",
+      "name": "MultiSearch",
+      "description": {
+        "en": "Search selected text using your preferred search engine.",
+        "zh": "Search selected text using your preferred search engine."
+      },
+      "icon": "magnifyingglass",
+      "version": "1.0",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/MultiSearch.swiftbiux",
+      "categoryId": "online-services"
+    },
+    {
+      "id": "app.ikw.swiftbiu.openairewriter",
+      "name": "OpenAI Rewriter",
+      "description": {
+        "en": "Use preset prompt to rewrite the selected text by OpenAI Compatible API",
+        "zh": "Use preset prompt to rewrite the selected text by OpenAI Compatible API"
+      },
+      "icon": "extension",
+      "version": "1.0",
+      "type": "Network",
+      "author": "kweizh",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/OpenAIRewriter.swiftbiux",
+      "categoryId": "online-services"
+    },
+    {
+      "id": "com.SwiftBiu.regexextractor",
+      "name": "正则提取器",
+      "description": {
+        "en": "使用正则表达式批量提取文本中的关键信息（如邮箱、URL、手机号等）。",
+        "zh": "使用正则表达式批量提取文本中的关键信息（如邮箱、URL、手机号等）。"
+      },
+      "icon": "magnifyingglass.circle",
+      "version": "1.0",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/RegexExtractor.swiftbiux",
+      "categoryId": "text-processing"
+    },
+    {
+      "id": "com.SwiftBiu.sluggenerator",
+      "name": "Slug 生成器",
+      "description": {
+        "en": "将标题文本转换为 URL 友好的 Slug。",
+        "zh": "将标题文本转换为 URL 友好的 Slug。"
+      },
+      "icon": "link",
+      "version": "1.0",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/SlugGenerator.swiftbiux",
+      "categoryId": "text-processing"
+    },
+    {
+      "id": "com.SwiftBiu.textcleaner",
+      "name": "文本清洗工",
+      "description": {
+        "en": "针对多行文本的处理工具：可按行去重、排序、去除空行/空格、全角转半角等（可在设置中配置）。",
+        "zh": "针对多行文本的处理工具：可按行去重、排序、去除空行/空格、全角转半角等（可在设置中配置）。"
+      },
+      "icon": "wand.and.stars",
+      "version": "1.0",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/TextCleaner.swiftbiux",
+      "categoryId": "text-processing"
+    },
+    {
+      "id": "com.SwiftBiu.timestampconverter",
+      "name": "时间戳转换",
+      "description": {
+        "en": "时间戳和日期时间格式互相转换。",
+        "zh": "时间戳和日期时间格式互相转换。"
+      },
+      "icon": "clock",
+      "version": "1.0",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/TimestampConverter.swiftbiux",
+      "categoryId": "text-processing"
+    },
+    {
+      "id": "com.SwiftBiu.wordcount",
+      "name": "单词/字符统计",
+      "description": {
+        "en": "统计选中内容的单词数、字符数、行数等。",
+        "zh": "统计选中内容的单词数、字符数、行数等。"
+      },
+      "icon": "text.alignleft",
+      "version": "1.0",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/WordCount.swiftbiux",
+      "categoryId": "text-processing"
+    },
+    {
+      "id": "com.SwiftBiu.rmbconverter",
+      "name": "CNY",
+      "description": {
+        "en": "将选中的数字金额转换为大写人民币并复制到剪贴板。",
+        "zh": "将选中的数字金额转换为大写人民币并复制到剪贴板。"
+      },
+      "icon": "dollarsign.circle",
+      "version": "1.0",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/cny.swiftbiux",
+      "categoryId": "text-processing"
+    }
+  ]
+}
