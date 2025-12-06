@@ -39,7 +39,10 @@ jobs:
             fi
           done
 
-      - name: List packaged plugins
+      - name: Generate plugins.json catalog
+        run: node scripts/generate_catalog.js
+
+      - name: List packaged assets
         run: |
           echo "Contents of dist directory:"
           ls -l dist
@@ -53,6 +56,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload plugin assets to release
-        run: gh release upload ${{ github.ref_name }} dist/*.swiftbiux
+        run: gh release upload ${{ github.ref_name }} dist/*
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
