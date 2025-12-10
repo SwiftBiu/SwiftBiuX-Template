@@ -226,9 +226,36 @@
         async function performTranslation(service, text, apiKey, targetLang, customApiUrl, customModel, promptTemplate) {
             let url, body;
             const model = customModel || 'gemini-flash-latest';
+            // Use the human-readable language name for better AI instruction adherence
+            const targetLangName = languages[targetLang] || targetLang;
+            
             const prompt = promptTemplate
-                ? `${promptTemplate} My content is: ${text}. Please reply in ${targetLang}.`
-                : `Analyze the word. Respond in a structured JSON format. The JSON object should have the following keys: 'word', 'ipa', 'etymology', 'rootAnalysis', 'collocations', 'memoryAids', 'commonConfusions'. Each key should have a string value containing the corresponding analysis. My content is: ${text}. Please reply in ${targetLang}.`;
+                ? `IMPORTANT: You MUST provide all explanations, definitions, and analysis in ${targetLangName}. The JSON keys must remain in English, but the values must be in ${targetLangName}. ${promptTemplate} My content is: ${text}.`
+                : `IMPORTANT: You MUST provide all explanations, definitions, and analysis in ${targetLangName}. The JSON keys must remain in English, but the values must be in ${targetLangName}. Analyze the content.
+If it is a single word or a short compound word, respond in this JSON format:
+{
+  "type": "word",
+  "word": "original word",
+  "ipa": "IPA pronunciation",
+  "etymology": "origin (in ${targetLangName})",
+  "rootAnalysis": "roots (in ${targetLangName})",
+  "collocations": "list of collocations formatted as a markdown list (in ${targetLangName})",
+  "memoryAids": "memory aid (in ${targetLangName})",
+  "commonConfusions": "confusing words formatted as a markdown list (in ${targetLangName})"
+}
+If it is a sentence or a phrase, respond in this JSON format:
+{
+  "type": "sentence",
+  "original": "original text",
+  "translation": "translated text (in ${targetLangName})",
+  "grammarNotes": "brief grammar analysis or key points (in ${targetLangName})",
+  "alternatives": ["alternative translation 1 (in ${targetLangName})", "alternative translation 2 (in ${targetLangName})"]
+}
+IMPORTANT: You MUST wrap your response in a markdown code block like this:
+\`\`\`json
+{ ... }
+\`\`\`
+My content is: ${text}. Remember: All values in the JSON must be in ${targetLangName}.`;
 
             switch (service) {
                 case 'gemini':
@@ -251,16 +278,33 @@
             const aiOutputText = serviceResponse?.candidates?.at(0)?.content?.parts?.at(0)?.text;
             if (!aiOutputText) throw new Error("Failed to parse translation from API response.");
 
-            // Use a global, non-greedy match to find all JSON blocks.
-            const jsonMatches = aiOutputText.match(/```json\n([\s\S]*?)\n```/g);
-            if (!jsonMatches || jsonMatches.length === 0) {
-                throw new Error("Could not find any valid JSON blocks in the AI's response.");
+            // Robust JSON Extraction
+            let jsonString = null;
+
+            // 1. Try finding markdown code blocks (with or without 'json' tag)
+            const codeBlockMatch = aiOutputText.match(/```(?:json)?\n([\s\S]*?)\n```/);
+            if (codeBlockMatch && codeBlockMatch[1]) {
+                jsonString = codeBlockMatch[1];
+            } else {
+                // 2. If no code blocks, assume the whole text might be JSON (or try to find the first '{' and last '}')
+                const firstBrace = aiOutputText.indexOf('{');
+                const lastBrace = aiOutputText.lastIndexOf('}');
+                if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                    jsonString = aiOutputText.substring(firstBrace, lastBrace + 1);
+                }
             }
-            // We only care about the first JSON block.
-            const firstJsonBlock = jsonMatches[0];
-            // Extract the content within the first block.
-            const jsonString = firstJsonBlock.replace(/```json\n/, '').replace(/\n```/, '');
-            return JSON.parse(jsonString);
+
+            if (!jsonString) {
+                 throw new Error("Could not find any valid JSON in the AI's response.");
+            }
+
+            try {
+                return JSON.parse(jsonString);
+            } catch (e) {
+                console.error("JSON Parse Error:", e);
+                console.log("Raw JSON String:", jsonString);
+                throw new Error("Failed to parse the extracted JSON data.");
+            }
         }
 
         // --- UI State Management ---
@@ -312,8 +356,12 @@
         }
 
         function renderResponse(data) {
+            // Sentence Template Check
+            if (data.type === 'sentence' || (data.translation && data.original)) {
+                return renderSentenceTemplate(data);
+            }
             // Template 2 Check: Has 'analysis' key and it's an array
-            if (data.analysis && Array.isArray(data.analysis)) {
+            else if (data.analysis && Array.isArray(data.analysis)) {
                 return renderTemplate2(data);
             }
             // Template 1 Check: Has 'word' and 'etymology' keys
@@ -329,6 +377,35 @@
                 console.error("Unknown JSON structure:", data);
                 return `<p class="text-red-500">Error: Could not render the received data due to an unknown format.</p>`;
             }
+        }
+
+        function renderSentenceTemplate(data) {
+            const alternativesHtml = data.alternatives && data.alternatives.length > 0
+                ? `<div class="analysis-section">
+                     <h2 class="section-title">Alternatives</h2>
+                     <ul class="list-disc list-inside text-sm space-y-1">
+                       ${data.alternatives.map(alt => `<li>${alt}</li>`).join('')}
+                     </ul>
+                   </div>`
+                : '';
+
+            const grammarHtml = data.grammarNotes
+                ? `<div class="analysis-section">
+                     <h2 class="section-title">Grammar & Notes</h2>
+                     <p class="text-sm">${data.grammarNotes}</p>
+                   </div>`
+                : '';
+
+            return `
+                <div class="space-y-6 text-base">
+                    <div class="text-center mb-2">
+                        <h1 class="text-2xl font-bold tracking-tight mb-2">${data.translation}</h1>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm italic">"${data.original}"</p>
+                    </div>
+                    ${grammarHtml}
+                    ${alternativesHtml}
+                </div>
+            `;
         }
 
         function renderTemplate1(data) {

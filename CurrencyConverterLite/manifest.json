@@ -20,6 +20,138 @@
   ],
   "configuration": [
     {
+      "key": "fromCurrency",
+      "label": "默认源货币",
+      "type": "option",
+      "defaultValue": "USD",
+      "options": [
+        {
+          "label": "USD (United States Dollar)",
+          "value": "USD"
+        },
+        {
+          "label": "CNY (Chinese Renminbi Yuan)",
+          "value": "CNY"
+        },
+        {
+          "label": "AUD (Australian Dollar)",
+          "value": "AUD"
+        },
+        {
+          "label": "BGN (Bulgarian Lev)",
+          "value": "BGN"
+        },
+        {
+          "label": "BRL (Brazilian Real)",
+          "value": "BRL"
+        },
+        {
+          "label": "CAD (Canadian Dollar)",
+          "value": "CAD"
+        },
+        {
+          "label": "CHF (Swiss Franc)",
+          "value": "CHF"
+        },
+        {
+          "label": "CZK (Czech Koruna)",
+          "value": "CZK"
+        },
+        {
+          "label": "DKK (Danish Krone)",
+          "value": "DKK"
+        },
+        {
+          "label": "EUR (Euro)",
+          "value": "EUR"
+        },
+        {
+          "label": "GBP (British Pound)",
+          "value": "GBP"
+        },
+        {
+          "label": "HKD (Hong Kong Dollar)",
+          "value": "HKD"
+        },
+        {
+          "label": "HUF (Hungarian Forint)",
+          "value": "HUF"
+        },
+        {
+          "label": "IDR (Indonesian Rupiah)",
+          "value": "IDR"
+        },
+        {
+          "label": "ILS (Israeli New Sheqel)",
+          "value": "ILS"
+        },
+        {
+          "label": "INR (Indian Rupee)",
+          "value": "INR"
+        },
+        {
+          "label": "ISK (Icelandic Króna)",
+          "value": "ISK"
+        },
+        {
+          "label": "JPY (Japanese Yen)",
+          "value": "JPY"
+        },
+        {
+          "label": "KRW (South Korean Won)",
+          "value": "KRW"
+        },
+        {
+          "label": "MXN (Mexican Peso)",
+          "value": "MXN"
+        },
+        {
+          "label": "MYR (Malaysian Ringgit)",
+          "value": "MYR"
+        },
+        {
+          "label": "NOK (Norwegian Krone)",
+          "value": "NOK"
+        },
+        {
+          "label": "NZD (New Zealand Dollar)",
+          "value": "NZD"
+        },
+        {
+          "label": "PHP (Philippine Peso)",
+          "value": "PHP"
+        },
+        {
+          "label": "PLN (Polish Złoty)",
+          "value": "PLN"
+        },
+        {
+          "label": "RON (Romanian Leu)",
+          "value": "RON"
+        },
+        {
+          "label": "SEK (Swedish Krona)",
+          "value": "SEK"
+        },
+        {
+          "label": "SGD (Singapore Dollar)",
+          "value": "SGD"
+        },
+        {
+          "label": "THB (Thai Baht)",
+          "value": "THB"
+        },
+        {
+          "label": "TRY (Turkish Lira)",
+          "value": "TRY"
+        },
+        {
+          "label": "ZAR (South African Rand)",
+          "value": "ZAR"
+        }
+      ]
+    },
+    {
       "key": "targetCurrency",
       "label": "默认目标货币",
       "type": "option",
@@ -155,13 +287,13 @@
       "key": "includeCurrencySymbol",
       "label": "结果中包含货币符号",
       "type": "boolean",
-      "defaultValue": true
+      "defaultValue": false
     },
     {
       "key": "showExchangeRate",
       "label": "通知中显示汇率",
       "type": "boolean",
-      "defaultValue": true
+      "defaultValue": false
     }
   ]
 }

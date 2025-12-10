@@ -1,0 +1,130 @@
+{
+  "identifier": "com.swiftbiu.plugin.doubaoimage",
+  "name": "豆包图像生成",
+  "version": "1.0.0",
+  "author": "SwiftBiu Team",
+  "description": "使用豆包文生图模型生成图像，并直接预览。",
+  "icon": "photo.on.rectangle.angled",
+  "iconType": "sfSymbol",
+  "permissions": [
+    "network",
+    "ui",
+    "notifications"
+  ],
+  "actions": [
+    {
+      "title": "豆包图像生成",
+      "script": "script.js"
+    }
+  ],
+  "configuration": [
+    {
+      "key": "apiUrl",
+      "label": "API URL",
+      "description": "豆包文生图 API 的请求地址。",
+      "type": "string",
+      "defaultValue": "https://ark.cn-beijing.volces.com/api/v3/images/generations"
+    },
+    {
+      "key": "apiKey",
+      "label": "API Key",
+      "description": "请输入您从火山方舟获取的 Secret Access Key。",
+      "type": "secure",
+      "placeholder": "在此输入您的 Secret Access Key"
+    },
+    {
+      "key": "imageModel",
+      "label": "图像模型",
+      "description": "请选择用于生成图像的模型。",
+      "type": "option",
+      "defaultValue": "doubao-seedream-3.0-t2i-250415",
+      "options": [
+        {
+          "label": "Doubao Seedream 3.0 (文生图)",
+          "value": "doubao-seedream-3-0-t2i-250415"
+        },
+        {
+          "label": "Doubao Seedream 4.0",
+          "value": "doubao-seedream-4-0-250828"
+        },
+        {
+          "label": "Doubao Seedream 4.5 (推荐)",
+          "value": "doubao-seedream-4-5-251128"
+        }
+      ]
+    },
+    {
+      "key": "imageSize",
+      "label": "图像尺寸",
+      "description": "请根据您选择的模型，选择合适的尺寸。v4.x模型和v3.0模型支持的尺寸不同。",
+      "type": "option",
+      "defaultValue": "1024x1024",
+      "options": [
+        {
+          "label": "v3.0 - 1:1 (1024x1024)",
+          "value": "1024x1024"
+        },
+        {
+          "label": "v3.0 - 4:3 (1152x864)",
+          "value": "1152x864"
+        },
+        {
+          "label": "v3.0 - 3:4 (864x1152)",
+          "value": "864x1152"
+        },
+        {
+          "label": "v3.0 - 16:9 (1280x720)",
+          "value": "1280x720"
+        },
+        {
+          "label": "v3.0 - 9:16 (720x1280)",
+          "value": "720x1280"
+        },
+        {
+          "label": "v3.0 - 3:2 (1248x832)",
+          "value": "1248x832"
+        },
+        {
+          "label": "v3.0 - 2:3 (832x1248)",
+          "value": "832x1248"
+        },
+        {
+          "label": "v3.0 - 21:9 (1512x648)",
+          "value": "1512x648"
+        },
+        {
+          "label": "v4.x - 1:1 (2048x2048)",
+          "value": "2048x2048"
+        },
+        {
+          "label": "v4.x - 4:3 (2304x1728)",
+          "value": "2304x1728"
+        },
+        {
+          "label": "v4.x - 3:4 (1728x2304)",
+          "value": "1728x2304"
+        },
+        {
+          "label": "v4.x - 16:9 (2560x1440)",
+          "value": "2560x1440"
+        },
+        {
+          "label": "v4.x - 9:16 (1440x2560)",
+          "value": "1440x2560"
+        },
+        {
+          "label": "v4.x - 3:2 (2496x1664)",
+          "value": "2496x1664"
+        },
+        {
+          "label": "v4.x - 2:3 (1664x2496)",
+          "value": "1664x2496"
+        },
+        {
+          "label": "v4.x - 21:9 (3024x1296)",
+          "value": "3024x1296"
+        }
+      ]
+    }
+  ]
+}

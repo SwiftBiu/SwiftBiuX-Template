@@ -62,7 +62,11 @@ SwiftBiu 支持两种不同复杂度的动作类型。
 
 #### `script.js` 开发
 您需要实现两个函数：
-*   `isAvailable(context)`: **(同步)** 判断动作是否应在当前上下文显示。必须返回一个对象：`{ isAvailable: Boolean, isContextMatch: Boolean }`。为保证性能，此函数应快速同步执行。
+*   `isAvailable(context)`: **(同步)** 这是插件的“守门员”函数，用于判断动作在当前上下文（如用户选中的文本、当前的应用等）的行为。为保证工具栏的流畅响应，此函数必须同步且快速地执行。它支持两种返回格式：
+    *   **推荐格式 (对象)**: 返回一个结构为 `{ isAvailable: Boolean, isContextMatch: Boolean }` 的对象，以实现最精细的控制：
+        *   `isAvailable` (`Boolean`): 决定了您的插件动作**是否会显示**在工具栏上。如果为 `false`，用户将看不到该动作。
+        *   `isContextMatch` (`Boolean`): 决定了动作的**显示优先级**。如果为 `true`，意味着插件与当前上下文高度相关（例如，翻译插件遇到了文本），动作图标会**优先展示在工具栏的最前端**。如果为 `false`，则会按默认顺序显示。
+    *   **兼容格式 (布尔值)**: 为了兼容旧版插件，您也可以直接返回一个布尔值。这等同于 `{ isAvailable: a_boolean, isContextMatch: false }`。
 *   `performAction(context)`: 当用户点击动作时执行。如果需要执行网络请求等操作。
 
 ### 类型二：富 Web 应用动作 (推荐)
@@ -289,6 +293,76 @@ window.swiftBiu_initialize = function(context) {
 ## 调试与日志
 
 您 UI 的 JavaScript 中的任何 `console.log()` 信息都会被自动桥接到 SwiftBiu 的原生日志系统中。您可以在 SwiftBiu 的“日志查看器”中查看这些日志。它们会以 `[UI]` 和您的插件标识符作为前缀，极大地简化了端到端的调试过程。
+
+---
+
+## 最佳实践与常见问题 (Best Practices & FAQ)
+
+在插件开发过程中，我们总结了一些常见的“陷阱”和推荐的最佳实践。遵循这些建议可以帮助您避免不必要的调试，并构建出更健壮、体验更好的插件。
+
+**1. 精确控制插件的显示与优先级**
+
+*   **问题**: 如何让我的插件只在特定情况下出现？如何让它在最需要的时候排在最前面？
+*   **解决方案**: 充分利用 `isAvailable(context)` 函数的返回对象 `{ isAvailable: Boolean, isContextMatch: Boolean }`。
+    *   **`isAvailable`**: 这是插件的“开关”。例如，一个“代码格式化”插件可以在 `isAvailable` 中检查选中文本是否包含代码特征，如果不包含，则返回 `false`，插件图标便不会出现，保持了工具栏的整洁。
+    *   **`isContextMatch`**: 这是插件的“VIP通道”。例如，一个“翻译”插件，当用户选中的是文本时，返回 `isContextMatch: true`，它的图标就会立刻出现在工具栏的最左侧，方便用户第一时间点击。
+    *   **向后兼容**: 虽然可以直接返回一个布尔值，但我们强烈推荐始终返回标准对象，以实现更丰富的用户体验。
+
+**2. 正确读取用户配置**
+
+*   **问题**: 在后台脚本 (`script.js`) 中，读取用户在设置界面中配置的值时，容易混淆 API。
+*   **解决方案**: 必须使用 `SwiftBiu.getConfig('your_key')` 来获取配置项的值。`SwiftBiu.storage.get()` 是用于 UI 环境的异步 API，两者不可混用。
+
+**3. 精确声明权限**
+
+*   **问题**: 插件的功能依赖于在 `manifest.json` 中声明的权限。错误的权限声明会导致功能调用失败。
+*   **解决方案**:
+    *   若要将文本**直接粘贴**到用户的光标位置，请使用 `SwiftBiu.pasteText(text)` API，并声明 `"paste"` 权限。
+    *   若要将文本**复制到剪贴板**（不粘贴），请使用 `SwiftBiu.writeToClipboard(text)` API，并声明 `"clipboardWrite"` 权限。
+
+**4. 注意 JavaScript 运行环境的兼容性**
+
+*   **问题**: SwiftBiu 的插件后台运行在 `JavaScriptCore` 环境中，其对最新的 ECMAScript 标准支持可能不如现代浏览器。使用过于前沿的语法（如数组的 `.at()` 方法）可能会导致运行时错误。
+*   **解决方案**: 推荐使用兼容性更强的 JavaScript 语法。例如，使用传统的数组索引 `array[0]` 来替代 `array.at(0)`，以确保插件在所有环境下都能稳定运行。
+
+**5. 异步操作：必须使用回调模式**
+
+*   **问题**: 在 `performAction` 中执行耗时操作（如网络请求）会阻塞 UI，给用户带来卡顿感。
+*   **解决方案**: SwiftBiu 提供了基于**回调函数**的异步 API 来解决这个问题。**严禁**在脚本中使用 `async/await` 或 `Promise`，因为插件的 `JavaScriptCore` 运行环境不支持这些现代 JavaScript 特性。
+*   **正确实践**:
+    1.  在请求开始前，立即调用 `SwiftBiu.showLoadingIndicator(context.screenPosition)` 显示加载动画。
+    2.  使用 `SwiftBiu.fetch(url, options, onSuccess, onError)`，并分别在 `onSuccess` 和 `onError` 回调函数中处理业务逻辑。
+    3.  在成功或失败的回调函数中，首先调用 `SwiftBiu.hideLoadingIndicator()` 隐藏加载动画。
+    4.  最后通过 `SwiftBiu.showNotification(title, message)` 向用户展示最终结果。
+    ```javascript
+    function performAction(context) {
+        SwiftBiu.showLoadingIndicator(context.screenPosition);
+        SwiftBiu.fetch(
+            'https://api.example.com/data',
+            {},
+            (response) => { // onSuccess Callback
+                SwiftBiu.hideLoadingIndicator();
+                SwiftBiu.showNotification("Success", "Data loaded.");
+            },
+            (error) => { // onError Callback
+                SwiftBiu.hideLoadingIndicator();
+                SwiftBiu.showNotification("Error", "Failed to load data.");
+            }
+        );
+    }
+    ```
+
+**6. 调试时完整打印对象**
+
+*   **问题**: 在后台脚本中使用 `console.log()` 打印复杂的 JavaScript 对象时，原生日志查看器可能无法完整显示其内容，导致调试困难。
+*   **解决方案**: 在打印对象时，使用 `JSON.stringify` 将其转换为格式化的字符串，可以确保所有信息都被完整记录。
+    ```javascript
+    // 推荐
+    console.log("API Response:", JSON.stringify(result, null, 2));
+
+    // 不推荐
+    console.log("API Response:", result);
+    ```
 
 ## 示例
 

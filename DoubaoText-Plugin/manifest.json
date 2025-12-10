@@ -1,0 +1,97 @@
+{
+  "identifier": "com.swiftbiu.plugin.doubaotext",
+  "name": "豆包问答AI",
+  "version": "1.0.0",
+  "author": "SwiftBiu Team",
+  "description": "使用豆包大语言模型生成文本，并将结果直接粘贴。",
+  "icon": "text.bubble",
+  "iconType": "sfSymbol",
+  "permissions": [
+    "network",
+    "notifications",
+    "paste"
+  ],
+  "actions": [
+    {
+      "title": "豆包文本生成",
+      "script": "script.js"
+    }
+  ],
+  "configuration": [
+    {
+      "key": "apiUrl",
+      "label": "API URL",
+      "description": "豆包文生文 API 的请求地址。",
+      "type": "string",
+      "defaultValue": "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
+    },
+    {
+      "key": "apiKey",
+      "label": "API Key",
+      "description": "请输入您从火山方舟获取的 Secret Access Key。",
+      "type": "secure",
+      "placeholder": "在此输入您的 Secret Access Key"
+    },
+    {
+      "key": "textModel",
+      "label": "文本模型",
+      "description": "请选择用于生成文本的模型。",
+      "type": "option",
+      "defaultValue": "doubao-seed-1-6-251015",
+      "options": [
+        {
+          "label": "Doubao Seed 1.6 (通用)",
+          "value": "doubao-seed-1-6-251015"
+        },
+        {
+          "label": "Doubao Seed 1.6 Lite",
+          "value": "doubao-seed-1-6-lite-251015"
+        },
+        {
+          "label": "Doubao Seed 1.6 Flash",
+          "value": "doubao-seed-1-6-flash-250828"
+        },
+        {
+          "label": "Deepseek V3.2 (通用)",
+          "value": "deepseek-v3-2-251201"
+        },
+        {
+          "label": "Deepseek V3.1 (通用)",
+          "value": "deepseek-v3-1-terminus"
+        },
+        {
+          "label": "Doubao Seed Code (代码)",
+          "value": "doubao-seed-code-preview-251028"
+        },
+        {
+          "label": "Doubao Seed Translation (翻译)",
+          "value": "doubao-seed-translation-250915"
+        },
+        {
+          "label": "Kimi K2 (长文本)",
+          "value": "kimi-k2-thinking-251104"
+        }
+      ]
+    },
+    {
+      "key": "systemPrompt",
+      "label": "AI 角色预设 (System Roles)",
+      "type": "radioList",
+      "description": "选择或添加一个 AI 角色，AI 将根据该角色的设定进行回应。",
+      "defaultItems": [
+        {
+          "enabled": true,
+          "value": "你是一个通用的人工智能助手。"
+        },
+        {
+          "enabled": false,
+          "value": "我是写代码，这个是我的甲方。他提需求很过分，帮我怼他"
+        },
+        {
+          "enabled": false,
+          "value": "她是我的刁蛮女友，我要哄她开心"
+        }
+      ]
+    }
+  ]
+}

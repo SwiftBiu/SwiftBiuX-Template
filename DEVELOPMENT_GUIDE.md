@@ -62,7 +62,11 @@ To trigger the JavaScript backend, the action **must** include a `"script": "scr
 
 #### `script.js` Development
 You need to implement two functions:
-*   `isAvailable(context)`: **(Sync)** Determines if the action should be visible. Must return an object: `{ isAvailable: Boolean, isContextMatch: Boolean }`. For performance reasons, this function should execute quickly and synchronously.
+*   `isAvailable(context)`: **(Sync)** This is the "gatekeeper" function for your plugin, determining its behavior based on the current context (like selected text, current app, etc.). To ensure a responsive toolbar, this function must execute synchronously and quickly. It supports two return formats:
+    *   **Recommended (Object)**: Return an object with the structure `{ isAvailable: Boolean, isContextMatch: Boolean }` for the finest control:
+        *   `isAvailable` (`Boolean`): Determines **if your plugin action will be displayed** on the toolbar. If `false`, the user won't see the action.
+        *   `isContextMatch` (`Boolean`): Determines the action's **display priority**. If `true`, it means the plugin is highly relevant to the current context (e.g., a translation plugin seeing text), and its icon will be **prioritized at the front of the toolbar**. If `false`, it will be displayed in the default order.
+    *   **Compatible (Boolean)**: For backward compatibility with older plugins, you can also return a simple boolean. This is equivalent to `{ isAvailable: a_boolean, isContextMatch: false }`.
 *   `performAction(context)`: Executes when the user clicks the action. 
 
 ### Type 2: Rich Web App Action (Recommended)
@@ -290,6 +294,76 @@ To ensure your plugin functions correctly, especially in the sandboxed App Store
 ## Debugging & Logging
 
 Any `console.log()` message from your UI's JavaScript is automatically bridged to SwiftBiu's native logging system. You can view these logs in SwiftBiu's "Log Viewer". They will be prefixed with `[UI]` and your plugin's identifier, making end-to-end debugging much easier.
+
+---
+
+## Best Practices & FAQ
+
+Through the development process, we've identified some common pitfalls and recommended best practices. Following these tips can help you avoid unnecessary debugging and build more robust, user-friendly plugins.
+
+**1. Precisely Control Plugin Visibility and Priority**
+
+*   **Problem**: How do I make my plugin appear only in specific situations? How can I make it show up first when it's most needed?
+*   **Solution**: Fully leverage the return object of the `isAvailable(context)` function: `{ isAvailable: Boolean, isContextMatch: Boolean }`.
+    *   **`isAvailable`**: This is the "on/off switch" for your plugin. For example, a "Format Code" plugin can check if the selected text contains code-like features. If not, it returns `false`, and the plugin icon won't appear, keeping the toolbar clean.
+    *   **`isContextMatch`**: This is the "VIP lane" for your plugin. For instance, when a "Translate" plugin detects that the user has selected text, it can return `isContextMatch: true`. Its icon will then immediately jump to the far left of the toolbar, making it instantly accessible.
+    *   **Backward Compatibility**: While returning a simple boolean is supported, we strongly recommend always returning the standard object to create a richer user experience.
+
+**2. Read User Configuration Correctly**
+
+*   **Problem**: It's easy to confuse the APIs for reading user-configured values in the background script (`script.js`).
+*   **Solution**: You **must** use `SwiftBiu.getConfig('your_key')` to retrieve configuration values. `SwiftBiu.storage.get()` is an asynchronous API intended for the UI environment and the two cannot be used interchangeably.
+
+**3. Declare Permissions Precisely**
+
+*   **Problem**: Plugin functionality depends on the permissions declared in `manifest.json`. Incorrect permission declarations will cause API calls to fail.
+*   **Solution**:
+    *   To **paste text directly** at the user's cursor, use the `SwiftBiu.pasteText(text)` API and declare the `"paste"` permission.
+    *   To **copy text to the clipboard** (without pasting), use `SwiftBiu.writeToClipboard(text)` and declare the `"clipboardWrite"` permission.
+
+**4. Be Mindful of JavaScript Environment Compatibility**
+
+*   **Problem**: SwiftBiu's plugin backend runs in a `JavaScriptCore` environment, which may not support the latest ECMAScript standards as fully as modern browsers. Using cutting-edge syntax (like the `.at()` method for arrays) can lead to runtime errors.
+*   **Solution**: It is recommended to use more widely compatible JavaScript syntax. For example, use traditional array indexing `array[0]` instead of `array.at(0)` to ensure your plugin runs stably in all environments.
+
+**5. Asynchronous Operations: Callback Model is Mandatory**
+
+*   **Problem**: Performing time-consuming operations (like network requests) synchronously within `performAction` will block the UI, leading to a sluggish user experience.
+*   **Solution**: SwiftBiu provides **callback-based** asynchronous APIs to solve this. It is **strictly forbidden** to use `async/await` or `Promise` in your scripts, as the plugin's `JavaScriptCore` runtime environment does not support these modern JavaScript features.
+*   **Correct Practice**:
+    1.  Before the request starts, immediately call `SwiftBiu.showLoadingIndicator(context.screenPosition)` to display a loading animation.
+    2.  Use `SwiftBiu.fetch(url, options, onSuccess, onError)`, and handle your business logic within the `onSuccess` and `onError` callback functions respectively.
+    3.  In the success or failure callback, first call `SwiftBiu.hideLoadingIndicator()` to hide the animation.
+    4.  Finally, use `SwiftBiu.showNotification(title, message)` to show the final result to the user.
+    ```javascript
+    function performAction(context) {
+        SwiftBiu.showLoadingIndicator(context.screenPosition);
+        SwiftBiu.fetch(
+            'https://api.example.com/data',
+            {},
+            (response) => { // onSuccess Callback
+                SwiftBiu.hideLoadingIndicator();
+                SwiftBiu.showNotification("Success", "Data loaded.");
+            },
+            (error) => { // onError Callback
+                SwiftBiu.hideLoadingIndicator();
+                SwiftBiu.showNotification("Error", "Failed to load data.");
+            }
+        );
+    }
+    ```
+
+**6. Log Objects Completely for Debugging**
+
+*   **Problem**: When using `console.log()` in the background script to print complex JavaScript objects, the native log viewer may not display their contents fully, making debugging difficult.
+*   **Solution**: When logging objects, use `JSON.stringify` to convert them into a formatted string. This ensures all information is captured completely.
+    ```javascript
+    // Recommended
+    console.log("API Response:", JSON.stringify(result, null, 2));
+
+    // Not Recommended
+    console.log("API Response:", result);
+    ```
 
 ## Examples
 

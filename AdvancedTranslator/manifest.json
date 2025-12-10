@@ -3,7 +3,7 @@
   "name": "Advanced Translator",
   "author": "SwiftBiu Team",
   "description": "A powerful translation plugin that uses custom UI and supports multiple translation services.",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "icon": "translate",
   "iconType": "sfSymbol",
   "actions": [
@@ -89,15 +89,15 @@
       "defaultItems": [
         {
           "enabled": true,
-          "value": "Analyze the word. Respond in a structured JSON format. The JSON object must have keys: 'word', 'ipa', 'etymology', 'rootAnalysis', 'collocations', 'memoryAids', 'commonConfusions'. For 'collocations' and 'commonConfusions', if there are multiple items, format them as a single string using Markdown unordered lists (e.g., '* item 1\\n* item 2'). All other keys should have a simple string value."
+          "value": "Analyze the content.\nIf it is a single word or a short compound word, respond in this JSON format:\n{\n  \"type\": \"word\",\n  \"word\": \"original word\",\n  \"ipa\": \"IPA pronunciation\",\n  \"etymology\": \"origin\",\n  \"rootAnalysis\": \"roots\",\n  \"collocations\": \"list of collocations formatted as a markdown list\",\n  \"memoryAids\": \"memory aid\",\n  \"commonConfusions\": \"confusing words formatted as a markdown list\"\n}\nIf it is a sentence or a phrase, respond in this JSON format:\n{\n  \"type\": \"sentence\",\n  \"original\": \"original text\",\n  \"translation\": \"translated text\",\n  \"grammarNotes\": \"brief grammar analysis or key points\",\n  \"alternatives\": [\"alternative translation 1\", \"alternative translation 2\"]\n}\nIMPORTANT: You MUST wrap your response in a markdown code block like this:\n```json\n{ ... }\n```"
         },
         {
           "enabled": false,
-          "value": "As an etymology expert, analyze the word. Respond in a structured JSON format. The JSON object should contain a single key 'analysis' which is an array of objects. Each object represents a section and must have 'title' and 'content' keys. The sections should be: 'Basic Info', 'Word Formation', 'Root Network', 'Affix Value', 'Collocations', 'Memory Aids', 'Common Confusions'. The 'content' for 'Basic Info' should be an object with keys: 'pronunciation', 'partOfSpeech', 'coreMeaning', 'frequency'. The 'content' for other sections should be a string."
+          "value": "As an etymology expert, analyze the content.\nIf it is a single word or a short compound word, respond in this JSON format:\n{\n  \"analysis\": [\n    { \"title\": \"Basic Info\", \"content\": { \"pronunciation\": \"...\", \"partOfSpeech\": \"...\", \"coreMeaning\": \"...\", \"frequency\": \"...\" } },\n    { \"title\": \"Word Formation\", \"content\": \"...\" },\n    { \"title\": \"Root Network\", \"content\": \"...\" },\n    { \"title\": \"Affix Value\", \"content\": \"...\" },\n    { \"title\": \"Collocations\", \"content\": \"...\" },\n    { \"title\": \"Memory Aids\", \"content\": \"...\" },\n    { \"title\": \"Common Confusions\", \"content\": \"...\" }\n  ]\n}\nIf it is a sentence or a phrase, respond in this JSON format:\n{\n  \"type\": \"sentence\",\n  \"original\": \"original text\",\n  \"translation\": \"translated text\",\n  \"grammarNotes\": \"brief grammar analysis or key points\",\n  \"alternatives\": [\"alternative translation 1\", \"alternative translation 2\"]\n}\nIMPORTANT: You MUST wrap your response in a markdown code block like this:\n```json\n{ ... }\n```"
         },
         {
           "enabled": false,
-          "value": "Explain the word simply. Respond in a structured JSON format. The JSON object should have the following keys: 'pronunciation', 'meaning', 'usage', 'formationAnalogy', 'relatedWords', 'exampleSentences', 'memoryAid', 'commonMistakes'. 'relatedWords' and 'exampleSentences' should be arrays of strings. All other keys should have a string value."
+          "value": "Explain the content simply.\nIf it is a single word or a short compound word, respond in this JSON format:\n{\n  \"pronunciation\": \"...\",\n  \"meaning\": \"...\",\n  \"usage\": \"...\",\n  \"formationAnalogy\": \"...\",\n  \"relatedWords\": [\"...\", \"...\"],\n  \"exampleSentences\": [\"...\", \"...\"],\n  \"memoryAid\": \"...\",\n  \"commonMistakes\": \"...\"\n}\nIf it is a sentence or a phrase, respond in this JSON format:\n{\n  \"type\": \"sentence\",\n  \"original\": \"original text\",\n  \"translation\": \"translated text\",\n  \"grammarNotes\": \"brief grammar analysis or key points\",\n  \"alternatives\": [\"alternative translation 1\", \"alternative translation 2\"]\n}\nIMPORTANT: You MUST wrap your response in a markdown code block like this:\n```json\n{ ... }\n```"
         }
       ]
     }

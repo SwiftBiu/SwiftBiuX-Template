@@ -36,20 +36,21 @@ function performAction(context) {
 
     // 2. Determine Source and Target Currencies
     const configTarget = SwiftBiu.getConfig("targetCurrency") || "CNY";
+    const configFrom = SwiftBiu.getConfig("fromCurrency") || "USD";
     const includeSymbolConfig = SwiftBiu.getConfig("includeCurrencySymbol");
     const showRateConfig = SwiftBiu.getConfig("showExchangeRate");
 
-    // Defaults to true if config is missing or not 'false'
-    const includeCurrencySymbol = includeSymbolConfig !== 'false';
-    const showExchangeRate = showRateConfig !== 'false';
-    let fromCurrency = currency || "USD";
+    // Defaults to false if config is missing or not 'true'
+    const includeCurrencySymbol = includeSymbolConfig === 'true' || includeSymbolConfig === true;
+    const showExchangeRate = showRateConfig === 'true' || showRateConfig === true;
+    let fromCurrency = currency || configFrom;
     let toCurrency = configTarget;
 
     // Smart switching: if source is same as target, switch target to USD (or CNY if source was USD)
-    if (fromCurrency === toCurrency) {
-        if (fromCurrency === "CNY") toCurrency = "USD";
-        else toCurrency = "CNY";
-    }
+    // if (fromCurrency === toCurrency) {
+    //     if (fromCurrency === "CNY") toCurrency = "USD";
+    //     else toCurrency = "CNY";
+    // }
 
     console.log(`Converting ${amount} ${fromCurrency} to ${toCurrency}`);
 
@@ -91,7 +92,7 @@ function performAction(context) {
                         SwiftBiu.pasteText(resultText);
 
                         const notificationTitle = resultText;
-                        
+
                         let notificationSubtitle;
                         if (showExchangeRate) {
                             const baseRate = result / amount;
@@ -101,9 +102,7 @@ function performAction(context) {
                                 maximumFractionDigits: 4
                             });
                             const formattedBaseRate = rateFormatter.format(baseRate);
-                            notificationSubtitle = `1 ${fromCurrency} ≈ ${formattedBaseRate} ${toCurrency} (Copied & Pasted)`;
-                        } else {
-                            notificationSubtitle = `Result Copied & Pasted`;
+                            notificationSubtitle = `1 ${fromCurrency} ≈ ${formattedBaseRate} ${toCurrency}`;
                         }
 
                         SwiftBiu.showNotification(
