@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-12-06T07:37:00.762Z",
+  "generatedAt": "2025-12-10T12:00:50.124Z",
   "categories": [
     {
       "id": "text-processing",
@@ -59,7 +59,7 @@
         "zh": "A powerful translation plugin that uses custom UI and supports multiple translation services."
       },
       "icon": "translate",
-      "version": "1.0.1",
+      "version": "1.0.3",
       "type": "Web App",
       "author": "SwiftBiu Team",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AdvancedTranslator.swiftbiux",
@@ -119,6 +119,34 @@
       "type": "Network",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/CurrencyConverterLite.swiftbiux",
+      "categoryId": "online-services"
+    },
+    {
+      "id": "com.swiftbiu.plugin.doubaoimage",
+      "name": "豆包图像生成",
+      "description": {
+        "en": "使用豆包文生图模型生成图像，并直接预览。",
+        "zh": "使用豆包文生图模型生成图像，并直接预览。"
+      },
+      "icon": "photo.on.rectangle.angled",
+      "version": "1.0.0",
+      "type": "Network",
+      "author": "SwiftBiu Team",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DoubaoImage-Plugin.swiftbiux",
+      "categoryId": "online-services"
+    },
+    {
+      "id": "com.swiftbiu.plugin.doubaotext",
+      "name": "豆包问答AI",
+      "description": {
+        "en": "使用豆包大语言模型生成文本，并将结果直接粘贴。",
+        "zh": "使用豆包大语言模型生成文本，并将结果直接粘贴。"
+      },
+      "icon": "text.bubble",
+      "version": "1.0.0",
+      "type": "Network",
+      "author": "SwiftBiu Team",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DoubaoText-Plugin.swiftbiux",
       "categoryId": "online-services"
     },
     {
