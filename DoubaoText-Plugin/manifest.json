@@ -92,6 +92,13 @@
           "value": "她是我的刁蛮女友，我要哄她开心"
         }
       ]
+    },
+    {
+      "key": "pasteBehavior",
+      "label": "追加模式",
+      "description": "开启后，生成的内容会追加到原文后；关闭则直接替换原文。",
+      "type": "boolean",
+      "defaultValue": true
     }
   ]
 }

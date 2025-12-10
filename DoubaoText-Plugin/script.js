@@ -28,7 +28,13 @@ function performAction(context) {
   const apiUrl = SwiftBiu.getConfig('apiUrl') || "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
   const apiKey = SwiftBiu.getConfig('apiKey');
   const textModel = SwiftBiu.getConfig('textModel');
+  // 读取粘贴行为配置。显式处理布尔值 false 和字符串 "false" 为关闭状态。
+  // 其他情况（包括 undefined、null、true）均默认为追加模式 (true)。
+  const pasteBehaviorConfig = SwiftBiu.getConfig('pasteBehavior');
+  const isAppendMode = !(pasteBehaviorConfig === false || pasteBehaviorConfig === 'false');
 
+  console.log(`pasteBehaviorConfig: ${pasteBehaviorConfig}`);
+  console.log(`isAppendMode: ${isAppendMode}`);
   // 从 radioList 配置中解析出启用的 AI 角色
   let systemPrompt = "你是一个通用的人工智能助手。"; // 默认值
   const systemRolesConfig = SwiftBiu.getConfig('systemPrompt');
@@ -96,10 +102,18 @@ function performAction(context) {
         // 单独打印提取出的 content 内容
         console.log("API Response content:", content);
         if (content) {
-          // 4. 将原始文本和生成结果拼接后直接粘贴，并显示成功通知
-          const newContent = context.selectedText + "\n\n" + content;
+          // 4. 根据配置决定是追加还是替换
+          let newContent;
+          let notificationMessage;
+          if (isAppendMode) {
+            newContent = context.selectedText + "\n\n" + content;
+            notificationMessage = "结果已追加到原文后。";
+          } else {
+            newContent = content;
+            notificationMessage = "结果已替换原文。";
+          }
           SwiftBiu.pasteText(newContent);
-          SwiftBiu.showNotification("文本生成成功", "结果已直接粘贴。");
+          SwiftBiu.showNotification("文本生成成功", notificationMessage);
         } else {
           throw new Error("API 未返回有效内容。");
         }
