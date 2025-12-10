@@ -3,12 +3,18 @@ name: Build and Release Versioned Plugins
 on:
   push:
     tags:
-      - 'v*' # Trigger on tags like v0.1.0, v1.0.0, etc.
+      - "v*" # Trigger on tags like v0.1.0, v1.0.0, etc.
+    branches:
+      - main
   workflow_dispatch: # Allows manual triggering
 
 jobs:
   build-and-release:
     runs-on: macos-latest
+    # Run on v* tags or on pushes to main with "[release]" in the commit message
+    if: |
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release]'))
     permissions:
       contents: write # Grant write permission to create/delete releases and tags
 
@@ -52,7 +58,6 @@ jobs:
             echo "No changes to catalog."
           else
             git commit -m "chore: Update plugin catalog [skip ci]"
-            git pull origin main --rebase
             git push origin HEAD:main
           fi
 
@@ -61,15 +66,36 @@ jobs:
           echo "Contents of dist directory:"
           ls -l dist
 
+      - name: Determine Release Tag and Type
+        id: determine_tag
+        run: |
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+            echo "PRERELEASE=false" >> $GITHUB_OUTPUT
+            echo "TITLE=Release ${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          else
+            TAG="nightly-$(date +%Y%m%d-%H%M%S)"
+            echo "TAG=${TAG}" >> $GITHUB_OUTPUT
+            echo "PRERELEASE=true" >> $GITHUB_OUTPUT
+            echo "TITLE=Nightly Build ${TAG}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create and Push Git Tag
+        if: steps.determine_tag.outputs.PRERELEASE == 'true'
+        run: |
+          git tag ${{ steps.determine_tag.outputs.TAG }}
+          git push origin ${{ steps.determine_tag.outputs.TAG }}
+
       - name: Create GitHub Release
         run: |
-          gh release create ${{ github.ref_name }} \
-            --title "Release ${{ github.ref_name }}" \
-            --generate-notes
+          gh release create ${{ steps.determine_tag.outputs.TAG }} \
+            --title "${{ steps.determine_tag.outputs.TITLE }}" \
+            --generate-notes \
+            ${{ steps.determine_tag.outputs.PRERELEASE == 'true' && '--prerelease' || '' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload plugin assets to release
-        run: gh release upload ${{ github.ref_name }} dist/*
+        run: gh release upload ${{ steps.determine_tag.outputs.TAG }} dist/*
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
