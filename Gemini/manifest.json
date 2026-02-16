@@ -3,7 +3,7 @@
   "name": "Gemini",
   "author": "SwiftBiu",
   "description": "Send the selected text to Google Gemini and get the response.",
-  "version": "1.2",
+  "version": "1.3",
   "actions": [
     {
       "title": "Gemini",
