@@ -41,11 +41,11 @@
       "options": [
         {
           "label": "Gemini 3.0 Pro",
-          "value": "gemini-3.0-pro-preview"
+          "value": "gemini-3-pro-preview"
         },
         {
           "label": "Gemini 3.0 Flash",
-          "value": "gemini-3.0-flash-preview"
+          "value": "gemini-3-flash-preview"
         },
         {
           "label": "Gemini 2.5 Pro",
