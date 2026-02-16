@@ -29,84 +29,115 @@ function performAction(context) {
         return;
     }
 
-    const modelId = "gemini-2.5-flash-image";
-    const apiMethod = "streamGenerateContent";
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:${apiMethod}?key=${apiKey}`;
+    const modelId = SwiftBiu.getConfig("model") || "gemini-2.5-flash-image";
+    const aspectRatio = SwiftBiu.getConfig("aspectRatio") || "1:1";
+    let imageSize = SwiftBiu.getConfig("imageSize") || "1K";
 
-    console.log(`Image API URL: ${url}`);
-    
+    // Gemini 2.5 Flash typically supports up to 1K only.
+    if (modelId.indexOf("2.5") !== -1 && (imageSize === "2K" || imageSize === "4K")) {
+        imageSize = "1K";
+    }
 
-    const requestBody = {
-        "contents": [
-            {
-                "role": "user",
-                "parts": [
-                    {
-                        "text": `A high-quality, detailed image of: ${prompt}`
-                    }
-                ]
-            }
-        ],
-        "generationConfig": {
-            "responseModalities": ["IMAGE", "TEXT"]
-        }
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
+
+    // Build generationConfig based on model
+    const generationConfig = {
+        "responseModalities": ["IMAGE", "TEXT"]
     };
 
-    console.log(`Request Body: ${JSON.stringify(requestBody)}`);
-    
+    // imageConfig is only supported by gemini-3-pro-image-preview
+    // gemini-2.5-flash-image does NOT use imageConfig per official API examples
+    if (modelId.indexOf("gemini-3") !== -1) {
+        generationConfig.imageConfig = {
+            "aspectRatio": aspectRatio,
+            "imageSize": imageSize
+        };
+    }
+
+    const requestBody = {
+        "contents": [{ "role": "user", "parts": [{ "text": prompt }] }],
+        "generationConfig": generationConfig
+    };
+
     const options = {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody)
     };
 
-    // Show loading indicator at the selection position for immediate feedback.
+    // Debug: log request details
+    console.log("[GeminiImage] URL: " + url);
+    console.log("[GeminiImage] Model: " + modelId + ", AspectRatio: " + aspectRatio + ", ImageSize: " + imageSize);
+    console.log("[GeminiImage] Request Body: " + JSON.stringify(requestBody));
+
     SwiftBiu.showLoadingIndicator(context.screenPosition);
 
     SwiftBiu.fetch(url, options,
         (response) => {
-            // On success, the image preview window will automatically replace the indicator.
+            SwiftBiu.hideLoadingIndicator();
+            // Debug: log raw response
+            console.log("[GeminiImage] Response Status: " + response.status);
+            console.log("[GeminiImage] Response Data: " + (response.data || "").substring(0, 500));
             try {
-                const chunks = JSON.parse(response.data);
-                console.log("Streaming response chunks:", chunks);
-                let base64Image = null;
+                // Check HTTP status code first
+                if (response.status && response.status !== 200) {
+                    var errorInfo = response.data || "Unknown error";
+                    try {
+                        var errObj = JSON.parse(errorInfo);
+                        if (errObj.error && errObj.error.message) {
+                            errorInfo = errObj.error.message;
+                        }
+                    } catch (ignored) { }
+                    SwiftBiu.showNotification("API Error (" + response.status + ")", errorInfo);
+                    return;
+                }
 
-                for (const chunk of chunks) {
-                    const part = chunk.candidates?.at(0)?.content?.parts?.at(0);
-                    if (part && part.inlineData && part.inlineData.data) {
-                        base64Image = part.inlineData.data;
-                        break;
+                const responseData = JSON.parse(response.data);
+
+                // Check for top-level API error
+                if (responseData.error) {
+                    SwiftBiu.showNotification("API Error", responseData.error.message || "Unknown API error");
+                    return;
+                }
+
+                let base64Image = null;
+                let textContent = "";
+
+                // Parse non-streaming response: { candidates: [{ content: { parts: [...] } }] }
+                var candidates = responseData.candidates || [];
+                for (var j = 0; j < candidates.length; j++) {
+                    var candidate = candidates[j];
+                    if (!candidate.content || !candidate.content.parts) continue;
+
+                    for (var k = 0; k < candidate.content.parts.length; k++) {
+                        var part = candidate.content.parts[k];
+                        if (part.inlineData && part.inlineData.data) {
+                            base64Image = part.inlineData.data;
+                        } else if (part.text) {
+                            textContent += part.text;
+                        }
                     }
                 }
 
                 if (base64Image) {
-                    // The loading indicator will be hidden by the native side if the image is opened,
-                    // or a notification will be shown if the limit is reached.
-                    // We can hide it here as a fallback.
-                    SwiftBiu.hideLoadingIndicator();
-                    // Call the newly implemented native function.
-                    // The native side will handle usage limits and showing notifications.
                     SwiftBiu.showImage(base64Image);
-
                 } else {
-                    SwiftBiu.hideLoadingIndicator();
-                    console.log("No image data found in the streaming response. Full response:", response.data);
-                    SwiftBiu.showNotification("API Error", "No image data found in response.");
+                    console.log("No image data found. Response:", JSON.stringify(responseData));
+                    var errorMsg = "No image was generated.";
+                    if (textContent) {
+                        errorMsg += " API returned text: " + textContent.substring(0, 100);
+                    }
+                    SwiftBiu.showNotification("API Error", errorMsg);
                 }
             } catch (e) {
-                SwiftBiu.hideLoadingIndicator();
-                console.log("Failed to parse streaming response:", e.message);
-                console.log("Raw response data:", response.data);
-                SwiftBiu.showNotification("API Error", "Could not process image data from the server.");
+                console.log("Failed to parse response:", e.message, "Raw data:", response.data);
+                SwiftBiu.showNotification("Parse Error", "Could not process response: " + e.message);
             }
         },
         (error) => {
-            // On failure, hide the indicator and show a notification.
             SwiftBiu.hideLoadingIndicator();
-            console.log("Fetch error:", error);
-            SwiftBiu.showNotification("Network Error", "Failed to connect to the Gemini API.");
+            console.log("Network error:", JSON.stringify(error));
+            SwiftBiu.showNotification("Network Error", "Failed to connect to the API.");
         }
     );
 }

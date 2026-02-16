@@ -160,6 +160,23 @@ If your plugin needs user-provided settings (like an API key), define them in th
 
 Supported `type` values include: `string`, `secure` (for passwords), `boolean` (for switches), `option` (for dropdowns), and `radioList`.
 
+#### Configuration UI Layout
+Settings are rendered in a **vertical stack**. This design ensures that long labels and detailed descriptions are fully visible.
+*   **Label**: Displayed at the top in a medium font.
+*   **Description**: Displayed immediately below the label in a smaller, secondary font. This is the recommended place for detailed instructions or model-specific notes.
+*   **Control**: The interactive element (text field, switch, etc.) is placed at the bottom.
+
+> **⚠️ Important: All configuration values are returned as strings.**
+>
+> When you read a configuration value via `SwiftBiu.getConfig(key)` (background) or `swiftBiu.storage.get(key)` (UI), the result is **always a string**, regardless of the configuration type. This is by design — all settings are stored uniformly as strings in `UserDefaults` (or Keychain for `secure` type). You must convert them in your JavaScript code:
+>
+> | Type | Returns | How to Use |
+> |------|---------|------------|
+> | `string` / `secure` | The stored string | Use directly |
+> | `boolean` | `"true"` or `"false"` | `SwiftBiu.getConfig("key") === "true"` |
+> | `option` | The `value` of the selected option | Use directly |
+> | `radioList` | JSON string: `[{"enabled":true,"value":"..."}]` | `JSON.parse(SwiftBiu.getConfig("key"))` |
+
 ##### `option`
 *   **UI**: A dropdown selection menu.
 *   **Functionality**: Allows the user to select a value from a predefined set of options.
@@ -200,12 +217,12 @@ SwiftBiu provides two distinct JavaScript contexts for plugins, each with its ow
 1.  **Background Script (`script.js`)**:
     *   **API Object**: `SwiftBiu` (globally available)
     *   **Purpose**: Used for the core logic of your plugin, such as network requests, data processing, and invoking system functions. This environment has **no DOM** and cannot directly manipulate a UI.
-    *   **Key APIs**: `SwiftBiu.displayUI()`, `SwiftBiu.showNotification()`, `SwiftBiu.pasteText()`, `SwiftBiu.writeToClipboard()`, etc.
+     *   **Key APIs**: `SwiftBiu.displayUI()`, `SwiftBiu.showNotification()`, `SwiftBiu.pasteText()`, `SwiftBiu.writeToClipboard()`, etc.
 
 2.  **UI Script (`ui/index.html`)**:
     *   **API Object**: `window.swiftBiu`
     *   **Purpose**: Specifically for controlling and responding to your plugin's web-based UI. This environment has a full browser DOM API.
-    *   **Key APIs**: `window.swiftBiu.copyText()`, `window.swiftBiu.closeWindow()`, `window.swiftBiu.ui.resizeWindow()`, etc.
+    *   **Key APIs**: `window.swiftBiu.copyText()`, `window.swiftBiu.exportFile()`, `window.swiftBiu.openURL()`, `window.swiftBiu.pasteText()`, `window.swiftBiu.closeWindow()`, `window.swiftBiu.ui.resizeWindow()`, etc.
 
 **Key Difference**: `copyText` exists only on the `window.swiftBiu` object in the UI environment, as it's typically associated with user interaction (e.g., clicking a "Copy" button). The background script should use the more fundamental `SwiftBiu.writeToClipboard()` (writes to clipboard only) or `SwiftBiu.pasteText()` (writes and then pastes).
 
@@ -237,6 +254,13 @@ window.swiftBiu_initialize = function(context) {
 
 *   **`swiftBiu.copyText(text)`**:  Copies the given text to the system clipboard.
 
+*   **`swiftBiu.openURL(url)`**: Opens the given URL in the user's default browser.
+    *   **Example**: `swiftBiu.openURL('https://www.google.com');`
+
+*   **`swiftBiu.pasteText(text)`**: Writes the given text to the clipboard and then pastes it into the user's previously active application. The plugin window remains visible (floating) during the paste operation.
+    *   **Permission**: Requires `"paste"` in `manifest.json`.
+    *   **Example**: `swiftBiu.pasteText('Hello from my plugin!');`
+
 *   **`swiftBiu.closeWindow()`**: (Sync) Closes the current plugin UI window.
 
 #### 3. UI Control & Best Practices
@@ -257,7 +281,18 @@ To achieve perfect, smooth resizing, follow this CSS and JavaScript strategy:
 #### 5. System Interactions
 
 *   `swiftBiu.showImage(...)`: Displays an image.
+*   `swiftBiu.showImage(...)`: Displays an image.
 *   `swiftBiu.openFileInPreview(...)`: Opens a file in Preview.
+*   **`window.swiftBiu.exportFile(base64, filename)`**: Triggers a native macOS Save Panel, allowing the user to export data (provided as a base64 string) as a file with the suggested filename.
+
+#### 6. Native File and Folder Selection
+Plugins can now trigger native macOS file and folder selection dialogs directly from their UI.
+
+*   **File Selection**: Use a standard `<input type="file">`.
+*   **Folder Selection**: Add the `webkitdirectory` attribute: `<input type="file" webkitdirectory>`. This is particularly useful for tools like the **Plugin Packager**.
+
+**Best Practices for File Handling:**
+When dealing with multiple files or repeated operations (like packaging), avoid relying on the same `File` object for too long. Instead, use the `FileReader` API to read the file content as an `ArrayBuffer` or `DataURL` as soon as the user selects the files, and cache that data for your tasks.
 
 *   **`swiftBiu.runShellScript(command, context)`**: (Async) Executes a shell command. This API invokes `/bin/zsh` via the main SwiftBiu application's `Process` API.
     *   **Important: Sandbox Restrictions (Primarily for App Store Version)**:
@@ -288,8 +323,12 @@ To achieve perfect, smooth resizing, follow this CSS and JavaScript strategy:
 To ensure your plugin functions correctly, especially in the sandboxed App Store version of SwiftBiu, you must declare the permissions it needs in `manifest.json`.
 
 *   `"network"`: Required for `swiftBiu.fetch`.
+*   `"clipboardRead"`: Required for `SwiftBiu.getClipboard()` — allows the plugin to read the current clipboard content.
 *   `"clipboardWrite"`: Required for `swiftBiu.copyText`.
-*   And others like `"paste"`, `"notifications"`, etc.
+*   `"paste"`: Required for `swiftBiu.pasteText` — allows the plugin to paste text directly into the user's active application.
+*   `"notifications"`: Required for `swiftBiu.showNotification`.
+*   `"runAppleScript"`: Required for `SwiftBiu.runAppleScript()` — allows the plugin to execute AppleScript code. ⚠️ **Not available in the App Store (sandboxed) version.**
+*   `"runShellScript"`: Required for `swiftBiu.runShellScript`. ⚠️ **Not available in the App Store (sandboxed) version.**
 
 ## Debugging & Logging
 

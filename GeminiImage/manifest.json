@@ -1,12 +1,12 @@
 {
     "identifier": "com.swiftbiu.gemini-imageToast",
-    "name": "AI Drawing Toast",
+    "name": "Nano Banana",
     "author": "SwiftBiu",
     "description": "Generates an image based on the selected text using the Gemini API.",
-    "version": "1.0",
+    "version": "1.1",
     "actions": [
         {
-            "title": "AI Drawing Toast",
+            "title": "Nano Banana",
             "script": "script.js"
         }
     ],
@@ -24,6 +24,73 @@
             "placeholder": "Enter your Google AI Studio API Key",
             "description": "Required for generating images.",
             "type": "secure"
+        },
+        {
+            "key": "model",
+            "label": "Model",
+            "type": "option",
+            "description": "Choose the image generation model. Pro version is more capable.",
+            "defaultValue": "gemini-2.5-flash-image",
+            "options": [
+                {
+                    "label": "Gemini 3 Pro Image",
+                    "value": "gemini-3-pro-image-preview"
+                },
+                {
+                    "label": "Nano Banana (2.5 Flash)",
+                    "value": "gemini-2.5-flash-image"
+                }
+            ]
+        },
+        {
+            "key": "aspectRatio",
+            "label": "Aspect Ratio",
+            "type": "option",
+            "description": "Change the aspect ratio of the generated image. Note: Only applicable to the Gemini 3 Pro model.",
+            "defaultValue": "1:1",
+            "options": [
+                {
+                    "label": "1:1 (Square)",
+                    "value": "1:1"
+                },
+                {
+                    "label": "16:9 (Widescreen)",
+                    "value": "16:9"
+                },
+                {
+                    "label": "4:3 (Standard)",
+                    "value": "4:3"
+                },
+                {
+                    "label": "3:4 (Portrait)",
+                    "value": "3:4"
+                },
+                {
+                    "label": "9:16 (Story)",
+                    "value": "9:16"
+                }
+            ]
+        },
+        {
+            "key": "imageSize",
+            "label": "Image Size",
+            "type": "option",
+            "description": "Select high-resolution output. Note: Only applicable to the Gemini 3 Pro model (2K/4K).",
+            "defaultValue": "1K",
+            "options": [
+                {
+                    "label": "1K",
+                    "value": "1K"
+                },
+                {
+                    "label": "2K",
+                    "value": "2K"
+                },
+                {
+                    "label": "4K",
+                    "value": "4K"
+                }
+            ]
         }
     ]
 }

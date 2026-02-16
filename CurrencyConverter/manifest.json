@@ -15,7 +15,8 @@
   "permissions": [
     "network",
     "clipboardWrite",
-    "notifications"
+    "notifications",
+    "paste"
   ],
   "ui": {
     "main": "ui/index.html"

@@ -53,7 +53,7 @@ function performAction(context) {
     const chatModel = model || "gemini-1.5-flash";
     const apiUrl = customApiUrl || `https://generativelanguage.googleapis.com/v1beta/models/${chatModel}:generateContent`;
 
-    
+
     // --- 2. Check for API Key ---
     if (!apiKey) {
         SwiftBiu.showNotification("Configuration Error", "Please set your Gemini API Key in the plugin settings.");
@@ -134,9 +134,9 @@ function performAction(context) {
 
                 // --- Graceful Success Parsing ---
                 // Proceed only if candidates array exists and is not empty.
-                const candidate = responseData.candidates && responseData.candidates.at(0);
-                if (candidate && candidate.content && candidate.content.parts && candidate.content.parts.at(0)) {
-                    const assistantText = candidate.content.parts.at(0).text;
+                const candidate = responseData.candidates && responseData.candidates[0];
+                if (candidate && candidate.content && candidate.content.parts && candidate.content.parts[0]) {
+                    const assistantText = candidate.content.parts[0].text;
                     const assistantMessage = { role: "model", content: assistantText };
 
                     // Add assistant's response to history
@@ -144,7 +144,7 @@ function performAction(context) {
 
                     // Update last chat time
                     lastChatDate = new Date();
-                    
+
                     // Paste response and notify user
                     const newContent = context.selectedText + "\n\n" + assistantText;
                     SwiftBiu.pasteText(newContent);

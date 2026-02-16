@@ -3,7 +3,7 @@
   "name": "Gemini",
   "author": "SwiftBiu",
   "description": "Send the selected text to Google Gemini and get the response.",
-  "version": "1.0",
+  "version": "1.2",
   "actions": [
     {
       "title": "Gemini",
@@ -29,7 +29,7 @@
       "key": "apiurl",
       "label": "API URL",
       "type": "string",
-      "placeholder": "e.g., https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+      "placeholder": "e.g., https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash-preview:generateContent",
       "description": "Custom Gemini API endpoint. Leave blank for default.",
       "isSecure": false
     },
@@ -40,8 +40,20 @@
       "description": "The model to use.",
       "options": [
         {
-          "label": "Gemma 3n-e4b-it",
-          "value": "gemma-3n-e4b-it"
+          "label": "Gemini 3.0 Pro",
+          "value": "gemini-3.0-pro-preview"
+        },
+        {
+          "label": "Gemini 3.0 Flash",
+          "value": "gemini-3.0-flash-preview"
+        },
+        {
+          "label": "Gemini 2.5 Pro",
+          "value": "gemini-2.5-pro"
+        },
+        {
+          "label": "Gemini 2.5 Flash",
+          "value": "gemini-2.5-flash"
         },
         {
           "label": "Gemini 2.0 Flash Lite",
@@ -52,16 +64,12 @@
           "value": "gemini-2.0-flash"
         },
         {
-          "label": "Gemini 2.5 Flash Lite",
-          "value": "gemini-flash-lite-latest"
+          "label": "Gemini 2.0 Pro",
+          "value": "gemini-2.0-pro"
         },
         {
-          "label": "Gemini 2.5 Flash",
-          "value": "gemini-flash-latest"
-        },
-        {
-          "label": "Gemini 2.5 Pro",
-          "value": "gemini-2.5-pro"
+          "label": "Gemma 3n-e4b-it",
+          "value": "gemma-3n-e4b-it"
         }
       ]
     },
@@ -69,7 +77,7 @@
       "key": "contextMessageCount",
       "label": "上下文消息数量",
       "type": "string",
-      "default": "0",
+      "defaultValue": "0",
       "placeholder": "0-10",
       "description": "设置发送给 AI 的历史消息数量。0 表示不带上下文，最高可设置 10 条。"
     },

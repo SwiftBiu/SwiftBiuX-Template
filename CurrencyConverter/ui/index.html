@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,33 +11,44 @@
             --card-bg: #ffffff;
             --text-primary: #1d1d1f;
             --text-secondary: #86868b;
-            --border-color: #d2d2d7;
+            --border-color: rgba(0, 0, 0, 0.1);
             --accent-color: #0071e3;
             --accent-hover: #0077ed;
+            --success-color: #34c759;
             --danger-color: #ff3b30;
-            --radius-l: 12px;
-            --radius-m: 8px;
-            --radius-s: 6px;
+            --row-bg: rgba(0, 0, 0, 0.03);
+            --radius-l: 14px;
+            --radius-m: 10px;
+            --radius-s: 8px;
             --spacing: 16px;
-            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+            --font-display: "SF Pro Display", -apple-system, sans-serif;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
                 --card-bg: #1c1c1e;
                 --text-primary: #f5f5f7;
-                --text-secondary: #86868b;
-                --border-color: #424245;
+                --text-secondary: #8e8e93;
+                --border-color: rgba(255, 255, 255, 0.1);
                 --accent-color: #0a84ff;
                 --accent-hover: #409cff;
-                --shadow: 0 4px 12px rgba(0,0,0,0.2);
+                --row-bg: rgba(255, 255, 255, 0.05);
+                --shadow: 0 8px 32px rgba(0, 0, 0, 0.24);
             }
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: var(--font-main);
             background-color: var(--bg-color);
             color: var(--text-primary);
             padding: var(--spacing);
@@ -44,6 +56,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            overflow: hidden;
         }
 
         .card {
@@ -54,37 +67,41 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
+            position: relative;
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
         .currency-row {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: rgba(128, 128, 128, 0.05);
+            background: var(--row-bg);
             border-radius: var(--radius-m);
-            padding: 8px 12px;
-            border: 1px solid transparent;
-            transition: border-color 0.2s, background-color 0.2s;
+            padding: 10px 14px;
+            border: 1.5px solid transparent;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .currency-row:focus-within {
             border-color: var(--accent-color);
             background: var(--card-bg);
+            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
         }
 
         .input-wrapper {
             flex: 1;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .label {
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 700;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
             margin-bottom: 2px;
         }
 
@@ -92,107 +109,268 @@
             width: 100%;
             border: none;
             background: transparent;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 600;
             color: var(--text-primary);
             outline: none;
-            font-family: "SF Pro Display", -apple-system, sans-serif;
-            -moz-appearance: textfield;
+            font-family: var(--font-display);
+            padding: 2px 0;
         }
-        
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        .result-display {
+            font-size: 24px;
+            font-weight: 600;
+            font-family: var(--font-display);
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-primary);
+        }
 
         select {
             appearance: none;
             background: transparent;
             border: none;
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 15px;
+            font-weight: 700;
             color: var(--text-primary);
             outline: none;
             cursor: pointer;
-            padding-right: 20px;
+            padding: 4px 20px 4px 8px;
             background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2386868b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
             background-repeat: no-repeat;
-            background-position: right 0px center;
+            background-position: right 4px center;
             background-size: 10px;
-            min-width: 60px;
+            min-width: 64px;
             text-align: right;
+            border-radius: var(--radius-s);
+            transition: background-color 0.2s;
+        }
+
+        select:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            select:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
         }
 
         .swap-container {
             display: flex;
             justify-content: center;
-            margin: -8px 0;
-            z-index: 1;
+            margin: -10px 0;
+            position: relative;
+            z-index: 10;
         }
 
         .swap-btn {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--accent-color);
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .swap-btn:hover {
-            transform: scale(1.1);
+            transform: scale(1.15) rotate(180deg);
             border-color: var(--accent-color);
-            background: var(--accent-color);
-            color: white;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
 
-        .result-info {
+        .swap-btn:active {
+            transform: scale(0.95) rotate(180deg);
+        }
+
+        .result-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .action-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center;
+            padding: 0 4px;
+            margin-top: -4px;
+        }
+
+        .action-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        .icon-btn {
+            background: rgba(128, 128, 128, 0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-s);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            background: var(--row-bg);
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+            transform: translateY(-1px);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .icon-btn {
+                background: rgba(255, 255, 255, 0.05);
+            }
+        }
+
+        .icon-btn.primary {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .icon-btn.primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .icon-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .icon-btn .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s;
+            margin-bottom: 6px;
+        }
+
+        .icon-btn:hover .tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-2px);
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-top: 4px;
             padding: 0 4px;
         }
 
-        .rate-text {
+        .rate-info {
             font-size: 12px;
             color: var(--text-secondary);
             font-weight: 500;
+            opacity: 0.8;
         }
-
-        .copy-btn {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 16px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
-        }
-
-        .copy-btn:hover { opacity: 0.9; }
-        .copy-btn:active { transform: scale(0.96); }
 
         .error-msg {
             color: var(--danger-color);
             font-size: 12px;
+            font-weight: 500;
             text-align: center;
             margin-top: 8px;
             display: none;
+            padding: 8px;
+            background: rgba(255, 59, 48, 0.1);
+            border-radius: var(--radius-s);
         }
 
-        .loading { opacity: 0.6; pointer-events: none; }
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(2px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            border-radius: var(--radius-l);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .loading-overlay {
+                background: rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        .loading .loading-overlay {
+            display: flex;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid var(--accent-color);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Success State Animation */
+        @keyframes pulse-success {
+            0% {
+                box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(52, 199, 89, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(52, 199, 89, 0);
+            }
+        }
+
+        .success-flash {
+            animation: pulse-success 0.6s ease-out;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="card" id="mainContainer">
+        <div class="loading-overlay">
+            <div class="spinner"></div>
+        </div>
+
         <!-- From Section -->
         <div class="currency-row">
             <div class="input-wrapper">
@@ -201,35 +379,52 @@
             </div>
             <select id="fromCurrency">
                 <option value="USD">USD</option>
-                <!-- Options populated by JS -->
             </select>
         </div>
 
         <!-- Swap Button -->
         <div class="swap-container">
             <button class="swap-btn" id="swapBtn" title="Swap Currencies">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M7 10V3M7 3L3 7M7 3L11 7M17 14V21M17 21L21 17M17 21L13 17"/>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 10V3M7 3L3 7M7 3L11 7M17 14V21M17 21L21 17M17 21L13 17" />
                 </svg>
             </button>
         </div>
 
         <!-- To Section -->
-        <div class="currency-row">
-            <div class="input-wrapper">
-                <div class="label">To</div>
-                <div id="resultText" style="font-size: 22px; font-weight: 600; font-family: 'SF Pro Display', sans-serif; min-height: 27px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">...</div>
+        <div class="result-section">
+            <div class="currency-row result-row">
+                <div class="input-wrapper">
+                    <div class="label">To</div>
+                    <div id="resultText" class="result-display">...</div>
+                </div>
+                <select id="toCurrency">
+                    <option value="CNY">CNY</option>
+                </select>
             </div>
-            <select id="toCurrency">
-                <option value="CNY">CNY</option>
-                <!-- Options populated by JS -->
-            </select>
-        </div>
 
-        <!-- Footer Info -->
-        <div class="result-info">
-            <div class="rate-text" id="rateText">1 USD ≈ ... CNY</div>
-            <button class="copy-btn" id="copyBtn">Copy</button>
+            <div class="action-row">
+                <div class="rate-info" id="rateText">1 USD ≈ ... CNY</div>
+                <div class="action-controls">
+                    <button class="icon-btn" id="copyBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        </svg>
+                        <span class="tooltip" id="copyTooltip">Copy</span>
+                    </button>
+                    <button class="icon-btn primary" id="pasteBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        <span class="tooltip" id="pasteTooltip">Paste</span>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="error-msg" id="errorMsg"></div>
@@ -240,7 +435,7 @@
         let currencies = {};
         let rates = {};
         let lastFromCurrency = '';
-        
+
         // Elements
         const amountInput = document.getElementById('amountInput');
         const fromSelect = document.getElementById('fromCurrency');
@@ -249,23 +444,26 @@
         const resultText = document.getElementById('resultText');
         const rateText = document.getElementById('rateText');
         const copyBtn = document.getElementById('copyBtn');
+        const pasteBtn = document.getElementById('pasteBtn');
         const errorMsg = document.getElementById('errorMsg');
         const mainContainer = document.getElementById('mainContainer');
+        const copyTooltip = document.getElementById('copyTooltip');
+        const pasteTooltip = document.getElementById('pasteTooltip');
 
         // Initialize
-        window.swiftBiu_initialize = async function(context) {
+        window.swiftBiu_initialize = async function (context) {
             console.log("Currency Converter Initialized", context);
-            
+
             // 1. Parse Input
             const text = context.selectedText || "";
             parseInput(text);
-            
+
             // 2. Fetch Currencies & Rates
             await fetchCurrencies();
-            
+
             // 3. Initial Calculation
             await updateRates();
-            
+
             // 4. Resize Window
             updateHeight();
         };
@@ -274,7 +472,7 @@
         amountInput.addEventListener('input', calculate);
         fromSelect.addEventListener('change', updateRates);
         toSelect.addEventListener('change', calculate);
-        
+
         swapBtn.addEventListener('click', () => {
             const temp = fromSelect.value;
             fromSelect.value = toSelect.value;
@@ -284,24 +482,40 @@
 
         copyBtn.addEventListener('click', () => {
             const text = resultText.innerText;
-            if (text && text !== '...' && text !== '---') {
+            if (isValidResult(text)) {
                 window.swiftBiu.copyText(text);
-                const originalText = copyBtn.innerText;
-                copyBtn.innerText = 'Copied!';
-                copyBtn.style.backgroundColor = '#34c759'; // Green for success
-                setTimeout(() => {
-                    copyBtn.innerText = originalText;
-                    copyBtn.style.backgroundColor = ''; // Reset
-                }, 1500);
+                showFeedback(copyBtn, copyTooltip, 'Copied!');
             }
         });
 
+        pasteBtn.addEventListener('click', () => {
+            const text = resultText.innerText;
+            if (isValidResult(text)) {
+                window.swiftBiu.pasteText(text);
+                showFeedback(pasteBtn, pasteTooltip, 'Pasted!');
+            }
+        });
+
+        function isValidResult(text) {
+            return text && text !== '...' && text !== '---';
+        }
+
+        function showFeedback(btn, tooltip, message) {
+            const originalText = tooltip.innerText;
+            tooltip.innerText = message;
+            btn.classList.add('success-flash');
+
+            setTimeout(() => {
+                tooltip.innerText = originalText;
+                btn.classList.remove('success-flash');
+            }, 1500);
+        }
+
         // Logic
         function parseInput(text) {
-            // Try to find a number
+            // Match numbers (including decimals and commas)
             const numberMatch = text.match(/[\d,]+\.?\d*/);
             if (numberMatch) {
-                // Remove commas for parsing
                 const cleanNum = numberMatch[0].replace(/,/g, '');
                 const val = parseFloat(cleanNum);
                 if (!isNaN(val)) {
@@ -309,18 +523,17 @@
                 }
             }
 
-            // Try to find currency codes (simple check for common ones)
-            const commonCurrencies = ['USD', 'CNY', 'EUR', 'JPY', 'GBP', 'HKD', 'AUD', 'CAD', 'KRW', 'SGD'];
+            // Common currency codes
+            const commonCurrencies = ['USD', 'CNY', 'EUR', 'JPY', 'GBP', 'HKD', 'AUD', 'CAD', 'KRW', 'SGD', 'CHF', 'NZD'];
             const upperText = text.toUpperCase();
-            
+
             for (const code of commonCurrencies) {
                 if (upperText.includes(code)) {
                     fromSelect.value = code;
-                    
-                    // Smart 'to' selection
+                    // Smart defaults
                     if (code === 'CNY') toSelect.value = 'USD';
                     else if (code === 'USD') toSelect.value = 'CNY';
-                    else toSelect.value = 'CNY'; // Default target
+                    else toSelect.value = 'CNY';
                     break;
                 }
             }
@@ -334,8 +547,7 @@
                     populateSelects();
                 }
             } catch (e) {
-                console.error("Failed to fetch currencies", e);
-                showError("Failed to load currency list.");
+                showError("Failed to load currencies.");
             }
         }
 
@@ -343,15 +555,15 @@
             const currentFrom = fromSelect.value;
             const currentTo = toSelect.value;
 
+            const sortedCodes = Object.keys(currencies).sort();
             let optionsHTML = '';
-            Object.keys(currencies).forEach(code => {
+            sortedCodes.forEach(code => {
                 optionsHTML += `<option value="${code}">${code}</option>`;
             });
 
             fromSelect.innerHTML = optionsHTML;
             toSelect.innerHTML = optionsHTML;
 
-            // Restore selection if valid, otherwise default
             if (currencies[currentFrom]) fromSelect.value = currentFrom;
             else fromSelect.value = 'USD';
 
@@ -367,13 +579,13 @@
             }
 
             mainContainer.classList.add('loading');
+            errorMsg.style.display = 'none';
+
             try {
-                // Fetch rates for the 'from' currency
                 const response = await window.swiftBiu.fetch(`https://api.frankfurter.app/latest?from=${from}`);
                 if (response.status === 200) {
                     const data = JSON.parse(response.data);
                     rates = data.rates;
-                    // Add self rate
                     rates[from] = 1.0;
                     lastFromCurrency = from;
                     calculate();
@@ -381,7 +593,6 @@
                     showError("Failed to fetch rates.");
                 }
             } catch (e) {
-                console.error(e);
                 showError("Network error.");
             } finally {
                 mainContainer.classList.remove('loading');
@@ -398,31 +609,22 @@
                 return;
             }
 
-            let rate = 0;
-            if (from === to) {
-                rate = 1;
-            } else if (rates[to]) {
-                rate = rates[to];
-            } else {
-                // Rate not found
+            const rate = (from === to) ? 1 : (rates[to] || 0);
+
+            if (rate === 0) {
                 resultText.innerText = '---';
                 return;
             }
 
             const result = amount * rate;
-            
-            // Formatting
-            const formatter = new Intl.NumberFormat('en-US', {
-                style: 'decimal',
+            const formatter = new Intl.NumberFormat(undefined, {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
-            
+
             resultText.innerText = formatter.format(result);
-            
-            // Rate text
             rateText.innerText = `1 ${from} ≈ ${rate.toFixed(4)} ${to}`;
-            
+
             updateHeight();
         }
 
@@ -433,10 +635,10 @@
         }
 
         function updateHeight() {
-            // Add a larger buffer to account for window chrome and padding
-            const height = mainContainer.offsetHeight + 50;
+            const height = mainContainer.offsetHeight + 40;
             window.swiftBiu.ui.resizeWindow({ height: height });
         }
     </script>
 </body>
+
 </html>
