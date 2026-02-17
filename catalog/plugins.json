@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-16T07:44:49.782Z",
+  "generatedAt": "2026-02-17T13:30:10.848Z",
   "categories": [
     {
       "id": "text-processing",
@@ -64,6 +64,20 @@
       "author": "SwiftBiu Team",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AdvancedTranslator.swiftbiux",
       "categoryId": "online-services"
+    },
+    {
+      "id": "com.swiftbiu.plugin.aggregatetranslator",
+      "name": "Aggregate Translator",
+      "description": {
+        "en": "Simultaneously display translation results from multiple sources (Google, DeepL, Gemini, ChatGPT, etc.). Supports keyless options and custom platforms.",
+        "zh": "Simultaneously display translation results from multiple sources (Google, DeepL, Gemini, ChatGPT, etc.). Supports keyless options and custom platforms."
+      },
+      "icon": "translate",
+      "version": "1.0.0",
+      "type": "Web App",
+      "author": "SwiftBiu Team",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AggregateTranslator.swiftbiux",
+      "categoryId": "utilities"
     },
     {
       "id": "com.SwiftBiu.base64converter",
@@ -220,6 +234,20 @@
       "categoryId": "text-processing"
     },
     {
+      "id": "com.official.mermaidpreviewer",
+      "name": "Mermaid 预览器",
+      "description": {
+        "en": "实时预览选中的 Mermaid 图表文本 (流程图、时序图等)。",
+        "zh": "实时预览选中的 Mermaid 图表文本 (流程图、时序图等)。"
+      },
+      "icon": "diagram.2",
+      "version": "1.0.0",
+      "type": "Web App",
+      "author": "官方",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/MermaidPreviewer.swiftbiux",
+      "categoryId": "devtools"
+    },
+    {
       "id": "app.ikw.swiftbiu.openairewriter",
       "name": "OpenAI Rewriter",
       "description": {
@@ -232,6 +260,20 @@
       "author": "kweizh",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/OpenAIRewriter.swiftbiux",
       "categoryId": "online-services"
+    },
+    {
+      "id": "com.swiftbiu.qrcode",
+      "name": "QR Code Generator",
+      "description": {
+        "en": "Generate custom QR codes instantly.",
+        "zh": "Generate custom QR codes instantly."
+      },
+      "icon": "qrcode",
+      "version": "1.0.0",
+      "type": "Web App",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/QRCodeGenerator.swiftbiux",
+      "categoryId": "data-creative"
     },
     {
       "id": "com.SwiftBiu.regexextractor",
