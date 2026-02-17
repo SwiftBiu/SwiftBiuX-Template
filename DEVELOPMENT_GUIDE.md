@@ -210,6 +210,9 @@ Settings are rendered in a **vertical stack**. This design ensures that long lab
         *   `enabled` (Boolean, Yes): Whether the radio button for this item is selected by default.
         *   `value` (String, Yes): The default content of the text view.
 
+> [!WARNING]
+> **Visibility Requirement**: For a `radioList` to be visible in the settings UI, it **must** have at least one item defined in `defaultItems` or already stored in the preferences. If `defaultItems` is empty (`[]`) and there's no saved data, the setting will not appear.
+
 ### JavaScript API (Dual Environments)
 
 SwiftBiu provides two distinct JavaScript contexts for plugins, each with its own dedicated API object. Understanding their differences is crucial:

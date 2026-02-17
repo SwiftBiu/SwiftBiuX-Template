@@ -247,6 +247,9 @@ function performAction(context) {
         *   `enabled` (Boolean, 是): 该项的单选按钮是否默认选中。
         *   `value` (String, 是): 文本框中的默认内容。
 
+> [!WARNING]
+> **显示要求**: 为了让 `radioList` 在设置界面中可见，它**必须**在 `defaultItems` 中定义至少一个项目，或者在偏好设置中已经存储了数据。如果 `defaultItems` 为空 (`[]`) 且没有保存的数据，该设置项将不会显示。
+
 ### JavaScript API (双环境)
 
 SwiftBiu 为插件提供了两个不同的 JavaScript 上下文，每个上下文都拥有自己专属的 API 对象。理解它们的区别至关重要：

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js"></script>
+    <style>
+        :root {
+            --macos-sidebar-bg: rgba(255, 255, 255, 0.7);
+            --macos-content-bg: #ffffff;
+            --macos-border: rgba(0, 0, 0, 0.08);
+            --macos-text: #1d1d1f;
+            --macos-text-secondary: #86868b;
+            --macos-accent: #007aff;
+            --sidebar-width: 260px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --macos-sidebar-bg: rgba(40, 40, 40, 0.7);
+                --macos-content-bg: #1e1e1e;
+                --macos-border: rgba(255, 255, 255, 0.08);
+                --macos-text: #f5f5f7;
+                --macos-text-secondary: #a1a1a6;
+                --macos-accent: #0a84ff;
+            }
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+            overflow: hidden;
+            color: var(--macos-text);
+        }
+
+        .frosted-glass {
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            background-color: var(--macos-sidebar-bg);
+        }
+
+        .app-layout {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            border-right: 0.5px solid var(--macos-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+            padding: 16px;
+            gap: 16px;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            font-size: 11px;
+            font-weight: 700;
+            opacity: 0.4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .canvas-area {
+            flex-grow: 1;
+            background-color: var(--macos-content-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background-image: radial-gradient(var(--macos-border) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .qr-wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .qr-wrapper:hover {
+            transform: scale(1.02);
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .logo-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 20%;
+            max-height: 20%;
+            pointer-events: none;
+            display: none;
+            /* Hidden by default */
+        }
+
+        /* Controls */
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .mac-textarea {
+            width: 100%;
+            background: rgba(128, 128, 128, 0.08);
+            border: 0.5px solid var(--macos-border);
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 12px;
+            min-height: 80px;
+            outline: none;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .mac-textarea:focus {
+            border-color: var(--macos-accent);
+        }
+
+        .mac-input {
+            width: 100%;
+            background: rgba(128, 128, 128, 0.05);
+            border: 0.5px solid var(--macos-border);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            outline: none;
+            height: 28px;
+        }
+
+        .color-picker-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(128, 128, 128, 0.05);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 0.5px solid var(--macos-border);
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 24px;
+            height: 24px;
+            background: none;
+            cursor: pointer;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 4px;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) inset;
+        }
+
+        .btn-primary {
+            background: var(--macos-accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            width: 100%;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: rgba(128, 128, 128, 0.1);
+            color: var(--macos-text);
+            border: 0.5px solid var(--macos-border);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            flex: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(128, 128, 128, 0.15);
+        }
+
+        .divider {
+            height: 0.5px;
+            background: var(--macos-border);
+            margin: 8px 0;
+        }
+
+        /* Upload Area */
+        .upload-zone {
+            border: 1px dashed var(--macos-border);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--macos-text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--macos-accent);
+            color: var(--macos-accent);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar: Settings -->
+        <aside class="sidebar frosted-glass">
+
+            <div class="control-group">
+                <div class="sidebar-header">Content</div>
+                <textarea id="input-text" class="mac-textarea" placeholder="Enter URL or text..."></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="control-group">
+                <div class="sidebar-header">Style</div>
+
+                <div class="color-picker-row">
+                    <span class="text-[11px]">Foreground</span>
+                    <input type="color" id="color-dark" value="#000000">
+                </div>
+
+                <div class="color-picker-row">
+                    <span class="text-[11px]">Background</span>
+                    <input type="color" id="color-light" value="#ffffff">
+                </div>
+
+                <div class="flex items-center justify-between mt-2">
+                    <span class="text-[11px]">Error Correction</span>
+                    <select id="error-correction" class="mac-input" style="width: 60px;">
+                        <option value="L">L (7%)</option>
+                        <option value="M" selected>M (15%)</option>
+                        <option value="Q">Q (25%)</option>
+                        <option value="H">H (30%)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="control-group">
+                <div class="sidebar-header">Center Logo (Optional)</div>
+                <div id="upload-zone" class="upload-zone">
+                    Click to upload logo...
+                    <input type="file" id="logo-input" accept="image/*" style="display: none;">
+                </div>
+                <button id="clear-logo"
+                    class="text-[10px] text-red-500 hidden text-right w-full mt-1 hover:underline">Remove Logo</button>
+            </div>
+
+            <div class="mt-auto flex flex-col gap-2">
+                <button id="btn-save" class="btn-primary">Save as PNG</button>
+                <div class="flex gap-2">
+                    <button id="btn-copy" class="btn-secondary">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        Copy
+                    </button>
+                    <!-- Future SVG Export -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Area: Preview -->
+        <main class="canvas-area">
+            <div class="qr-wrapper" id="qr-container">
+                <canvas id="qr-canvas"></canvas>
+                <img id="logo-overlay" class="logo-overlay" alt="logo">
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const dom = {
+            input: document.getElementById('input-text'),
+            canvas: document.getElementById('qr-canvas'),
+            container: document.getElementById('qr-container'),
+            colorDark: document.getElementById('color-dark'),
+            colorLight: document.getElementById('color-light'),
+            correction: document.getElementById('error-correction'),
+            btnSave: document.getElementById('btn-save'),
+            btnCopy: document.getElementById('btn-copy'),
+            uploadZone: document.getElementById('upload-zone'),
+            logoInput: document.getElementById('logo-input'),
+            logoOverlay: document.getElementById('logo-overlay'),
+            clearLogo: document.getElementById('clear-logo')
+        };
+
+        const state = {
+            text: 'https://swiftbiu.com',
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correction: 'M',
+            logoSrc: null
+        };
+
+        // Initialize API Integration
+        window.swiftBiu_initialize = function (context) {
+            if (context.selectedText && context.selectedText.trim()) {
+                state.text = context.selectedText.trim();
+                dom.input.value = state.text;
+            } else {
+                dom.input.value = state.text;
+            }
+            generate();
+        };
+
+        // Generation Logic
+        async function generate() {
+            if (!state.text) return;
+
+            try {
+                // Determine size based on text length to keep it sharp
+                const size = 300;
+
+                await QRCode.toCanvas(dom.canvas, state.text, {
+                    width: size,
+                    margin: 1,
+                    color: {
+                        dark: state.colorDark,
+                        light: state.colorLight
+                    },
+                    errorCorrectionLevel: state.correction
+                });
+
+                // Show logo if present
+                if (state.logoSrc) {
+                    dom.logoOverlay.src = state.logoSrc;
+                    dom.logoOverlay.style.display = 'block';
+
+                    // We render logo separately overlay first for preview, 
+                    // but for saving/copying we might need to composite it onto canvas.
+                    // For now, let's keep visual overlay.
+                } else {
+                    dom.logoOverlay.style.display = 'none';
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert('Error generating QR Code: ' + err.message);
+            }
+        }
+
+        // Initialize on load to ensure preview is visible immediately
+        window.addEventListener('DOMContentLoaded', () => {
+            if (typeof QRCode === 'undefined') {
+                dom.container.innerHTML = '<div class="text-red-500 text-xs p-4 text-center">Failed to load QRCode library.<br>Check internet connection.</div>';
+                return;
+            }
+            generate();
+        });
+
+        // Event Listeners
+        let debounceTimer;
+        dom.input.addEventListener('input', (e) => {
+            state.text = e.target.value;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(generate, 200);
+        });
+
+        dom.colorDark.addEventListener('input', (e) => { state.colorDark = e.target.value; generate(); });
+        dom.colorLight.addEventListener('input', (e) => { state.colorLight = e.target.value; generate(); });
+        dom.correction.addEventListener('change', (e) => { state.correction = e.target.value; generate(); });
+
+        // Logo Upload
+        dom.uploadZone.addEventListener('click', () => dom.logoInput.click());
+        dom.logoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    state.logoSrc = evt.target.result;
+                    dom.clearLogo.classList.remove('hidden');
+                    dom.uploadZone.textContent = file.name;
+                    generate();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        dom.clearLogo.addEventListener('click', () => {
+            state.logoSrc = null;
+            dom.clearLogo.classList.add('hidden');
+            dom.uploadZone.textContent = 'Click to upload logo...';
+            dom.logoInput.value = '';
+            generate();
+        });
+
+        // Actions
+        dom.btnSave.addEventListener('click', async () => {
+            const dataUrl = await compositeCanvas();
+            const base64 = dataUrl.split(',')[1];
+            await window.swiftBiu.exportFile(base64, `qrcode-${Date.now()}.png`);
+        });
+
+        dom.btnCopy.addEventListener('click', async () => {
+            const dataUrl = await compositeCanvas();
+            // Assuming copyImage expects base64 without prefix in future, 
+            // but copyText is standard. For images, we need a specific API.
+            // Using a workaround: write to clipboard via Clipboard API if supported inside webview,
+            // otherwise rely on SwiftBiu API if it supports image copying (not standard yet).
+            // Fallback: Copy URL text? No, user wants image.
+
+            // Checking standard clipboard API
+            try {
+                const blob = await (await fetch(dataUrl)).blob();
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                const originalText = dom.btnCopy.innerHTML;
+                dom.btnCopy.textContent = 'Copied!';
+                setTimeout(() => dom.btnCopy.innerHTML = originalText, 2000);
+            } catch (e) {
+                console.error('Clipboard write failed', e);
+                alert('Copying image directly not supported in this version. Use "Save as PNG".');
+            }
+        });
+
+        // Canvas Composition (Merge Logo + QRCode)
+        async function compositeCanvas() {
+            // Create an offscreen canvas
+            const finalCanvas = document.createElement('canvas');
+            finalCanvas.width = dom.canvas.width;
+            finalCanvas.height = dom.canvas.height;
+            const ctx = finalCanvas.getContext('2d');
+
+            // Draw QR Code
+            ctx.drawImage(dom.canvas, 0, 0);
+
+            // Draw Logo if exists
+            if (state.logoSrc) {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const logoSize = finalCanvas.width * 0.2; // 20% size
+                        const x = (finalCanvas.width - logoSize) / 2;
+                        const y = (finalCanvas.height - logoSize) / 2;
+                        ctx.drawImage(img, x, y, logoSize, logoSize);
+                        resolve(finalCanvas.toDataURL('image/png'));
+                    };
+                    img.src = state.logoSrc;
+                });
+            } else {
+                return finalCanvas.toDataURL('image/png');
+            }
+        }
+
+    </script>
+</body>
+
+</html>

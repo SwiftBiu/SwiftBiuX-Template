@@ -1,0 +1,132 @@
+{
+    "identifier": "com.swiftbiu.plugin.aggregatetranslator",
+    "name": "Aggregate Translator",
+    "author": "SwiftBiu Team",
+    "description": "Simultaneously display translation results from multiple sources (Google, DeepL, Gemini, ChatGPT, etc.). Supports keyless options and custom platforms.",
+    "version": "1.0.0",
+    "icon": "translate",
+    "iconType": "sfSymbol",
+    "actions": [
+        {
+            "title": "Translate with Aggregate Translator",
+            "script": "script.js"
+        }
+    ],
+    "permissions": [
+        "ui",
+        "network",
+        "clipboardWrite",
+        "notifications"
+    ],
+    "ui": {
+        "main": "ui/index.html"
+    },
+    "configuration": [
+        {
+            "key": "enable_google_web",
+            "label": "Enable Google Translate (Free Web)",
+            "type": "boolean",
+            "defaultValue": true,
+            "group": "Free Web Aggregation"
+        },
+        {
+            "key": "enable_lingva",
+            "label": "Enable Lingva (Google Proxy)",
+            "type": "boolean",
+            "defaultValue": false,
+            "group": "Free Web Aggregation"
+        },
+        {
+            "key": "enable_mymemory",
+            "label": "Enable MyMemory (Free API)",
+            "type": "boolean",
+            "defaultValue": false,
+            "group": "Free Web Aggregation"
+        },
+        {
+            "key": "deepl_api_key",
+            "label": "DeepL API Key",
+            "type": "secure",
+            "placeholder": "Enter your DeepL API key",
+            "group": "Premium Services (Requires Key)"
+        },
+        {
+            "key": "deepl_plan",
+            "label": "DeepL Plan Type",
+            "type": "option",
+            "defaultValue": "free",
+            "options": [
+                {
+                    "label": "Free",
+                    "value": "free"
+                },
+                {
+                    "label": "Pro",
+                    "value": "pro"
+                }
+            ],
+            "group": "Premium Services (Requires Key)"
+        },
+        {
+            "key": "gemini_api_key",
+            "label": "Gemini API Key",
+            "type": "secure",
+            "placeholder": "Enter your Gemini API key",
+            "group": "Premium Services (Requires Key)"
+        },
+        {
+            "key": "gemini_model",
+            "label": "Gemini Model",
+            "type": "option",
+            "defaultValue": "gemini-1.5-flash",
+            "options": [
+                {
+                    "label": "Gemini 1.5 Flash",
+                    "value": "gemini-1.5-flash"
+                },
+                {
+                    "label": "Gemini 1.5 Pro",
+                    "value": "gemini-1.5-pro"
+                }
+            ],
+            "group": "Premium Services (Requires Key)"
+        },
+        {
+            "key": "openai_api_key",
+            "label": "OpenAI API Key",
+            "type": "secure",
+            "placeholder": "Enter your OpenAI/ChatGPT API key",
+            "group": "Premium Services (Requires Key)"
+        },
+        {
+            "key": "openai_api_url",
+            "label": "OpenAI API URL",
+            "type": "string",
+            "defaultValue": "https://api.openai.com/v1",
+            "group": "Premium Services (Requires Key)"
+        },
+        {
+            "key": "openai_model",
+            "label": "OpenAI Model",
+            "type": "string",
+            "defaultValue": "gpt-4o-mini",
+            "group": "Premium Services (Requires Key)"
+        },
+        {
+            "key": "custom_openai_providers",
+            "label": "Custom AI Providers",
+            "type": "radioList",
+            "description": "Add OpenAI-compatible services (e.g. DeepSeek).",
+            "defaultItems": [],
+            "group": "Custom Platforms"
+        },
+        {
+            "key": "custom_http_providers",
+            "label": "Generic HTTP Providers",
+            "type": "radioList",
+            "description": "Add arbitrary translation APIs.",
+            "defaultItems": [],
+            "group": "Custom Platforms"
+        }
+    ]
+}

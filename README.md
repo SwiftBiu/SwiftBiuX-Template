@@ -48,7 +48,7 @@
 | :---: | :---: | :----------------- | :------------------------------------------------------- | :--- |
 | `[ ]` |  `🎨`  | **颜色助手**       | 预览 Hex/RGB 颜色，并转换为 SwiftUI, UIKit, CSS 等格式。 | 官方 |
 | `[ ]` |  `🎨`  | **JWT 解码器**     | **本地**解码 JWT Token，展示 Payload 和过期时间。        | 官方 |
-| `[ ]` |  `🎨`  | **Mermaid 预览器** | 将 Mermaid 文本直接渲染为流程图/时序图。                 | 官方 |
+| `[x]` |  `🎨`  | **Mermaid 预览器** | 将 Mermaid 文本直接渲染为流程图/时序图 (专业版，支持 SVG 导出)。 | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/MermaidPreviewer.swiftbiux) | 官方 |
 
 ### ⚡️ 生产力与效率 (Productivity)
 *提升日常工作流的连贯性。*
@@ -87,7 +87,7 @@
 | :---: | :---: | :--------------- | :-------------------------------------- | :--- |
 | `[ ]` |  `🎨`  | **迷你图表**     | 将简单的 CSV/数字数据生成柱状图或饼图。 | 官方 |
 | `[ ]` |  `🎨`  | **文本加密胶囊** | AES 加密/解密文本，用于安全传输。       | 官方 |
-| `[ ]` |  `🎨`  | **二维码生成器** | 将选中的文本实时生成二维码。            | 官方 |
+| `[x]` |  `🎨`  | **二维码生成器** | 将选中的文本实时生成二维码 (支持 Logo 嵌入与多色定制)。 | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/QRCodeGenerator.swiftbiux) | 官方 |
 
 ### 🖥️ 系统与应用联动 (System)
 *与 macOS 系统深度集成。*

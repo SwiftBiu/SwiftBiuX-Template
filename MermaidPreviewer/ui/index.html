@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid 预览器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+    <style>
+        :root {
+            --macos-sidebar-bg: rgba(255, 255, 255, 0.7);
+            --macos-content-bg: #ffffff;
+            --macos-border: rgba(0, 0, 0, 0.08);
+            --macos-text: #1d1d1f;
+            --macos-text-secondary: #86868b;
+            --macos-accent: #007aff;
+            --sidebar-width: 260px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --macos-sidebar-bg: rgba(40, 40, 40, 0.7);
+                --macos-content-bg: #1e1e1e;
+                --macos-border: rgba(255, 255, 255, 0.08);
+                --macos-text: #f5f5f7;
+                --macos-text-secondary: #a1a1a6;
+                --macos-accent: #0a84ff;
+            }
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+            overflow: hidden;
+            color: var(--macos-text);
+        }
+
+        .frosted-glass {
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            background-color: var(--macos-sidebar-bg);
+        }
+
+        .app-layout {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            border-right: 0.5px solid var(--macos-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+        }
+
+        .sidebar-header {
+            height: 40px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 0.5px solid var(--macos-border);
+        }
+
+        .editor-workspace {
+            flex-grow: 1;
+            padding: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-editor {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            resize: none;
+            font-family: "SF Mono", "Menlo", "Monaco", monospace;
+            font-size: 11px;
+            line-height: 1.6;
+            color: var(--macos-text);
+            outline: none;
+            padding: 4px;
+        }
+
+        .canvas-area {
+            flex-grow: 1;
+            background-color: var(--macos-content-bg);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .canvas-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            pointer-events: none;
+            /* Let clicks pass through header area */
+            z-index: 10;
+        }
+
+        .canvas-header span {
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0.5;
+        }
+
+        #mermaid-viewer {
+            position: absolute;
+            /* Force absolute positioning */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            /* Lowest level */
+            cursor: grab;
+        }
+
+        #mermaid-viewer:active {
+            cursor: grabbing;
+        }
+
+        .floating-hud {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1px;
+            background: var(--macos-sidebar-bg);
+            backdrop-filter: blur(20px);
+            border: 0.5px solid var(--macos-border);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            z-index: 100;
+            /* Highest level */
+            pointer-events: auto;
+            /* Enable clicks on HUD */
+        }
+
+        /* Container for HUD to prevent blocking clicks outside buttons */
+        .hud-container {
+            position: absolute;
+            bottom: 24px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            pointer-events: none;
+            /* Let clicks pass through the strip */
+            z-index: 100;
+        }
+
+        /* Re-style .floating-hud to be inside .hud-container */
+        .hud-inner {
+            display: flex;
+            gap: 1px;
+            background: var(--macos-sidebar-bg);
+            backdrop-filter: blur(20px);
+            border: 0.5px solid var(--macos-border);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            pointer-events: auto;
+            /* Re-enable clicks on buttons */
+        }
+
+        .hud-action {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--macos-text);
+            transition: all 0.2s;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+        }
+
+        .hud-action:hover {
+            background: rgba(128, 128, 128, 0.1);
+            color: var(--macos-accent);
+        }
+
+        .hud-action:active {
+            background: rgba(128, 128, 128, 0.2);
+        }
+
+        .hud-divider {
+            width: 0.5px;
+            height: 20px;
+            background: var(--macos-border);
+            margin: auto 0;
+        }
+
+        .close-corner {
+            pointer-events: auto;
+            /* Re-enable for button */
+        }
+
+        .status-pill {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .valid {
+            background: rgba(52, 199, 89, 0.15);
+            color: #34c759;
+        }
+
+        .invalid {
+            background: rgba(255, 59, 48, 0.15);
+            color: #ff3b30;
+        }
+
+        .sidebar-footer {
+            padding: 12px;
+            border-top: 0.5px solid var(--macos-border);
+            background: rgba(128, 128, 128, 0.05);
+        }
+
+        .mac-input {
+            width: 100%;
+            background: rgba(128, 128, 128, 0.08);
+            border: 0.5px solid var(--macos-border);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            margin-bottom: 12px;
+            outline: none;
+        }
+
+        .btn-stack {
+            display: flex;
+            gap: 8px;
+        }
+
+        .primary-btn {
+            background: var(--macos-accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .secondary-btn {
+            background: rgba(128, 128, 128, 0.1);
+            color: var(--macos-text);
+            border: 0.5px solid var(--macos-border);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        /* Scrollbar */
+        .code-editor::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .code-editor::-webkit-scrollbar-thumb {
+            background: rgba(128, 128, 128, 0.2);
+            border-radius: 2px;
+        }
+
+        /* Force SVG to fill container */
+        .svg-pan-zoom_viewport {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar frosted-glass">
+            <header class="sidebar-header">
+                <span class="text-[10px] font-bold opacity-40 uppercase tracking-widest">Mermaid Editor</span>
+                <div id="status" class="status-pill valid">OK</div>
+            </header>
+            <div class="editor-workspace">
+                <textarea id="editor" class="code-editor" spellcheck="false"
+                    placeholder="Enter Mermaid code..."></textarea>
+            </div>
+            <footer class="sidebar-footer">
+                <label class="text-[9px] font-bold opacity-30 uppercase mb-1 block">Diagram Theme</label>
+                <select id="theme" class="mac-input">
+                    <option value="default">Default</option>
+                    <option value="dark">Dark</option>
+                    <option value="forest">Forest</option>
+                    <option value="neutral">Neutral</option>
+                    <option value="base">Base</option>
+                </select>
+                <div class="btn-stack">
+                    <button id="copy" class="secondary-btn">Copy SVG</button>
+                    <button id="export" class="primary-btn">Export</button>
+                </div>
+            </footer>
+        </aside>
+
+        <main class="canvas-area">
+            <header class="canvas-header">
+                <span>PREVIEW</span>
+                <div class="close-corner">
+                    <button id="close" class="hud-action opacity-40 hover:opacity-100 hover:text-red-500">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <div id="mermaid-viewer">
+                <!-- SVG injected here -->
+            </div>
+
+            <div class="hud-container">
+                <div class="hud-inner">
+                    <button title="Zoom Out" onclick="pz.zoomOut()" class="hud-action">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <div class="hud-divider"></div>
+                    <button title="Fit to View" onclick="pz.reset(); pz.fit(); pz.center();"
+                        class="hud-action px-4 w-auto text-xs font-semibold">100%</button>
+                    <div class="hud-divider"></div>
+                    <button title="Zoom In" onclick="pz.zoomIn()" class="hud-action">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const dom = {
+            editor: document.getElementById('editor'),
+            viewer: document.getElementById('mermaid-viewer'),
+            status: document.getElementById('status'),
+            copy: document.getElementById('copy'),
+            export: document.getElementById('export'),
+            theme: document.getElementById('theme'),
+            close: document.getElementById('close')
+        };
+
+        let pz = null;
+        let lastText = '';
+        let currentSvg = '';
+
+        mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif'
+        });
+
+        window.swiftBiu_initialize = (context) => {
+            const text = context.selectedText || 'graph TD\n  A[Start] --> B(Process)\n  B --> C{Decision}\n  C -->|Yes| D[Done]';
+            dom.editor.value = text;
+            render(text);
+        };
+
+        async function render(text) {
+            if (!text.trim()) {
+                dom.viewer.innerHTML = '<div class="flex items-center justify-center h-full opacity-10 text-xs">Waiting for data...</div>';
+                return;
+            }
+
+            try {
+                let clean = text.trim();
+                // Strip markdown code blocks if present
+                if (clean.startsWith('```')) {
+                    const lines = clean.split('\n');
+                    clean = (lines[0].includes('mermaid')) ? lines.slice(1, -1).join('\n') : lines.slice(1, -1).join('\n');
+                }
+
+                mermaid.initialize({ theme: dom.theme.value });
+                const id = 'v_' + Date.now();
+                const { svg } = await mermaid.render(id, clean);
+
+                dom.viewer.innerHTML = svg;
+                currentSvg = svg;
+
+                dom.status.textContent = 'OK';
+                dom.status.className = 'status-pill valid';
+
+                initPanZoom();
+            } catch (e) {
+                console.error(e);
+                dom.status.textContent = 'ERROR';
+                dom.status.className = 'status-pill invalid';
+            }
+        }
+
+        function initPanZoom() {
+            const svg = dom.viewer.querySelector('svg');
+            if (!svg) return;
+
+            // FINAL FIX for blank area: 
+            // 1. Remove inline styles first (Mermaid adds max-width usually)
+            // 2. Force 100% width/height and NO max-width
+            svg.removeAttribute('style');
+
+            Object.assign(svg.style, {
+                maxWidth: 'none',
+                width: '100%',
+                height: '100%',
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                display: 'block', // prevent line-height gaps
+                margin: '0',
+                padding: '0'
+            });
+
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+
+            if (pz) pz.destroy();
+            pz = svgPanZoom(svg, {
+                zoomEnabled: true,
+                controlIconsEnabled: false,
+                fit: true,
+                center: true,
+                minZoom: 0.01,
+                maxZoom: 100, // Increased max zoom
+                zoomScaleSensitivity: 0.3
+            });
+
+            // Force reflow and resize
+            pz.resize();
+            pz.fit();
+            pz.center();
+        }
+
+        let timer;
+        dom.editor.oninput = () => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                if (dom.editor.value !== lastText) {
+                    lastText = dom.editor.value;
+                    render(lastText);
+                }
+            }, 300);
+        };
+
+        dom.theme.onchange = () => render(dom.editor.value);
+
+        dom.copy.onclick = async () => {
+            if (currentSvg) {
+                await window.swiftBiu.copyText(currentSvg);
+                const txt = dom.copy.textContent;
+                dom.copy.textContent = 'Done!';
+                setTimeout(() => dom.copy.textContent = txt, 1500);
+            }
+        };
+
+        dom.export.onclick = async () => {
+            if (currentSvg) {
+                const b64 = btoa(unescape(encodeURIComponent(currentSvg)));
+                await window.swiftBiu.exportFile(b64, `mermaid-${Date.now()}.svg`);
+            }
+        };
+
+        dom.close.onclick = () => window.swiftBiu.closeWindow();
+
+        window.onresize = () => {
+            if (pz) {
+                pz.resize();
+                pz.fit();
+                pz.center();
+            }
+        };
+    </script>
+</body>
+
+</html>

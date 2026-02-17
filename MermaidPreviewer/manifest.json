@@ -1,0 +1,22 @@
+{
+    "identifier": "com.official.mermaidpreviewer",
+    "name": "Mermaid 预览器",
+    "author": "官方",
+    "description": "实时预览选中的 Mermaid 图表文本 (流程图、时序图等)。",
+    "version": "1.0.0",
+    "icon": "diagram.2",
+    "iconType": "sfSymbol",
+    "actions": [
+        {
+            "title": "Mermaid 预览",
+            "script": "script.js"
+        }
+    ],
+    "permissions": [
+        "network",
+        "clipboardWrite"
+    ],
+    "ui": {
+        "main": "ui/index.html"
+    }
+}
