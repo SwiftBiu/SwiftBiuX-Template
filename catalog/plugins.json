@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-16T07:33:19.403Z",
+  "generatedAt": "2026-02-16T07:44:49.782Z",
   "categories": [
     {
       "id": "text-processing",
@@ -157,7 +157,7 @@
         "zh": "Send the selected text to Google Gemini and get the response."
       },
       "icon": "gemini.png",
-      "version": "1.2",
+      "version": "1.3",
       "type": "Network",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/Gemini.swiftbiux",
