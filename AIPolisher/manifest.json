@@ -1,0 +1,189 @@
+{
+    "identifier": "com.swiftbiu.aipolisher",
+    "name": {
+        "en": "AI Polisher",
+        "zh": "AI 润色助手"
+    },
+    "author": "SwiftBiu",
+    "description": {
+        "en": "Polish, rewrite, and refine your text using AI.",
+        "zh": "使用 AI 润色、重写并优化您的文本。"
+    },
+    "version": "1.1.0",
+    "icon": "vibrant.text.highlighter",
+    "iconType": "sfSymbol",
+    "actions": [
+        {
+            "title": {
+                "en": "AI Polisher",
+                "zh": "AI 润色"
+            },
+            "description": {
+                "en": "Open the AI Polisher rich UI",
+                "zh": "打开 AI 润色增强面板"
+            },
+            "script": "script.js"
+        }
+    ],
+    "permissions": [
+        "network",
+        "notifications",
+        "paste",
+        "clipboardWrite",
+        "ui"
+    ],
+    "configuration": [
+        {
+            "key": "apikey",
+            "label": {
+                "en": "Gemini API Key",
+                "zh": "Gemini API 密钥"
+            },
+            "type": "secure",
+            "placeholder": {
+                "en": "Enter your Gemini API key",
+                "zh": "输入您的 Gemini API 密钥"
+            },
+            "description": {
+                "en": "Obtain an API key from Google AI Studio.",
+                "zh": "从 Google AI Studio 获取 API 密钥。"
+            }
+        },
+        {
+            "key": "model",
+            "label": {
+                "en": "AI Model",
+                "zh": "AI 模型"
+            },
+            "type": "option",
+            "defaultValue": "gemini-3-flash-preview",
+            "options": [
+                {
+                    "label": "Gemini 3.0 Pro",
+                    "value": "gemini-3-pro-preview"
+                },
+                {
+                    "label": "Gemini 3.0 Flash",
+                    "value": "gemini-3-flash-preview"
+                },
+                {
+                    "label": "Gemini 2.5 Pro",
+                    "value": "gemini-2.5-pro"
+                },
+                {
+                    "label": "Gemini 2.5 Flash",
+                    "value": "gemini-2.5-flash"
+                },
+                {
+                    "label": "Gemini 2.0 Flash Lite",
+                    "value": "gemini-2.0-flash-lite"
+                },
+                {
+                    "label": "Gemini 2.0 Flash",
+                    "value": "gemini-2.0-flash"
+                },
+                {
+                    "label": "Gemini 2.0 Pro",
+                    "value": "gemini-2.0-pro"
+                },
+                {
+                    "label": "Gemma 3n-e4b-it",
+                    "value": "gemma-3n-e4b-it"
+                }
+            ]
+        },
+        {
+            "key": "defaultMode",
+            "label": {
+                "en": "Default Action",
+                "zh": "默认启动模式"
+            },
+            "type": "option",
+            "defaultValue": "grammar",
+            "options": [
+                {
+                    "label": {
+                        "en": "Select Manually",
+                        "zh": "手动选择"
+                    },
+                    "value": "none"
+                },
+                {
+                    "label": {
+                        "en": "Fix Grammar",
+                        "zh": "语法纠错"
+                    },
+                    "value": "grammar"
+                },
+                {
+                    "label": {
+                        "en": "Professional",
+                        "zh": "专业职场"
+                    },
+                    "value": "professional"
+                },
+                {
+                    "label": {
+                        "en": "Casual",
+                        "zh": "轻松休闲"
+                    },
+                    "value": "casual"
+                },
+                {
+                    "label": {
+                        "en": "Concise",
+                        "zh": "精炼表达"
+                    },
+                    "value": "shorten"
+                },
+                {
+                    "label": {
+                        "en": "Expand",
+                        "zh": "润色丰富"
+                    },
+                    "value": "expand"
+                },
+                {
+                    "label": {
+                        "en": "Add Emojis",
+                        "zh": "添加表情"
+                    },
+                    "value": "emoji"
+                }
+            ],
+            "description": {
+                "en": "Choose which polishing mode runs automatically when the plugin starts.",
+                "zh": "选择插件启动时自动运行的润色模式。"
+            }
+        },
+        {
+            "key": "apiurl",
+            "label": {
+                "en": "Custom API URL",
+                "zh": "自定义 API 地址"
+            },
+            "type": "string",
+            "placeholder": "https://api.example.com/...",
+            "description": {
+                "en": "Optional. Custom endpoint for Gemini API.",
+                "zh": "可选。自定义 Gemini API 端点地址。"
+            }
+        },
+        {
+            "key": "autoTrigger",
+            "label": {
+                "en": "Auto-Polish on Start & Switch",
+                "zh": "自动润色"
+            },
+            "type": "boolean",
+            "defaultValue": true,
+            "description": {
+                "en": "If enabled, polishing starts immediately when the window opens or mode changes.",
+                "zh": "启用后，打开窗口或切换模式时将立即开始润色。"
+            }
+        }
+    ],
+    "ui": {
+        "main": "ui/index.html"
+    }
+}

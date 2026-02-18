@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-16T07:44:49.782Z",
+  "generatedAt": "2026-02-18T13:04:46.611Z",
   "categories": [
     {
       "id": "text-processing",
@@ -52,8 +52,28 @@
   ],
   "plugins": [
     {
+      "id": "com.swiftbiu.aipolisher",
+      "name": {
+        "en": "AI Polisher",
+        "zh": "AI 润色助手"
+      },
+      "description": {
+        "en": "Polish, rewrite, and refine your text using AI.",
+        "zh": "使用 AI 润色、重写并优化您的文本。"
+      },
+      "icon": "vibrant.text.highlighter",
+      "version": "1.1.0",
+      "type": "Web App",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AIPolisher.swiftbiux",
+      "categoryId": "utilities"
+    },
+    {
       "id": "com.swiftbiu.plugin.advancedtranslator",
-      "name": "Advanced Translator",
+      "name": {
+        "en": "Advanced Translator",
+        "zh": "Advanced Translator"
+      },
       "description": {
         "en": "A powerful translation plugin that uses custom UI and supports multiple translation services.",
         "zh": "A powerful translation plugin that uses custom UI and supports multiple translation services."
@@ -67,7 +87,10 @@
     },
     {
       "id": "com.SwiftBiu.base64converter",
-      "name": "Base64 编解码",
+      "name": {
+        "en": "Base64 编解码",
+        "zh": "Base64 编解码"
+      },
       "description": {
         "en": "智能 Base64 编码与解码。",
         "zh": "智能 Base64 编码与解码。"
@@ -81,7 +104,10 @@
     },
     {
       "id": "com.SwiftBiu.caseconverter",
-      "name": "大小写转换",
+      "name": {
+        "en": "大小写转换",
+        "zh": "大小写转换"
+      },
       "description": {
         "en": "英文字母大小写转换 (Cycle: Lower -> Upper -> Title -> Camel -> Snake -> Kebab)。",
         "zh": "英文字母大小写转换 (Cycle: Lower -> Upper -> Title -> Camel -> Snake -> Kebab)。"
@@ -95,7 +121,10 @@
     },
     {
       "id": "com.swiftbiu.plugin.currencyconverter",
-      "name": "Currency Converter",
+      "name": {
+        "en": "Currency Converter",
+        "zh": "Currency Converter"
+      },
       "description": {
         "en": "Real-time currency conversion with support for multiple currencies.",
         "zh": "Real-time currency conversion with support for multiple currencies."
@@ -109,7 +138,10 @@
     },
     {
       "id": "com.swiftbiu.plugin.currencyconverterlite",
-      "name": "Currency Converter (Lite)",
+      "name": {
+        "en": "Currency Converter (Lite)",
+        "zh": "Currency Converter (Lite)"
+      },
       "description": {
         "en": "Convert currency instantly and copy the result. (Pure JS)",
         "zh": "Convert currency instantly and copy the result. (Pure JS)"
@@ -123,7 +155,10 @@
     },
     {
       "id": "com.swiftbiu.plugin.doubaoimage",
-      "name": "豆包图像生成",
+      "name": {
+        "en": "豆包图像生成",
+        "zh": "豆包图像生成"
+      },
       "description": {
         "en": "使用豆包文生图模型生成图像，并直接预览。",
         "zh": "使用豆包文生图模型生成图像，并直接预览。"
@@ -137,7 +172,10 @@
     },
     {
       "id": "com.swiftbiu.plugin.doubaotext",
-      "name": "豆包问答AI",
+      "name": {
+        "en": "豆包问答AI",
+        "zh": "豆包问答AI"
+      },
       "description": {
         "en": "使用豆包大语言模型生成文本，并将结果直接粘贴。",
         "zh": "使用豆包大语言模型生成文本，并将结果直接粘贴。"
@@ -151,7 +189,10 @@
     },
     {
       "id": "com.SwiftBiu.gemini",
-      "name": "Gemini",
+      "name": {
+        "en": "Gemini",
+        "zh": "Gemini"
+      },
       "description": {
         "en": "Send the selected text to Google Gemini and get the response.",
         "zh": "Send the selected text to Google Gemini and get the response."
@@ -165,7 +206,10 @@
     },
     {
       "id": "com.swiftbiu.gemini-imageToast",
-      "name": "Nano Banana",
+      "name": {
+        "en": "Nano Banana",
+        "zh": "Nano Banana"
+      },
       "description": {
         "en": "Generates an image based on the selected text using the Gemini API.",
         "zh": "Generates an image based on the selected text using the Gemini API."
@@ -179,7 +223,10 @@
     },
     {
       "id": "com.SwiftBiu.hashcalculator",
-      "name": "哈希计算器",
+      "name": {
+        "en": "哈希计算器",
+        "zh": "哈希计算器"
+      },
       "description": {
         "en": "计算选中文本的 MD5, SHA-1, SHA-256 摘要。",
         "zh": "计算选中文本的 MD5, SHA-1, SHA-256 摘要。"
@@ -193,7 +240,10 @@
     },
     {
       "id": "com.SwiftBiu.jsonformatter",
-      "name": "JSON 格式化",
+      "name": {
+        "en": "JSON 格式化",
+        "zh": "JSON 格式化"
+      },
       "description": {
         "en": "美化和验证 JSON 字符串。",
         "zh": "美化和验证 JSON 字符串。"
@@ -207,7 +257,10 @@
     },
     {
       "id": "com.SwiftBiu.markdowntableformatter",
-      "name": "Markdown 表格格式化",
+      "name": {
+        "en": "Markdown 表格格式化",
+        "zh": "Markdown 表格格式化"
+      },
       "description": {
         "en": "将杂乱的文本一键整理为对齐的 Markdown 表格。",
         "zh": "将杂乱的文本一键整理为对齐的 Markdown 表格。"
@@ -220,8 +273,28 @@
       "categoryId": "text-processing"
     },
     {
+      "id": "com.official.mermaidpreviewer",
+      "name": {
+        "en": "Mermaid 预览器",
+        "zh": "Mermaid 预览器"
+      },
+      "description": {
+        "en": "实时预览选中的 Mermaid 图表文本 (流程图、时序图等)。",
+        "zh": "实时预览选中的 Mermaid 图表文本 (流程图、时序图等)。"
+      },
+      "icon": "diagram.2",
+      "version": "1.0.0",
+      "type": "Web App",
+      "author": "官方",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/MermaidPreviewer.swiftbiux",
+      "categoryId": "devtools"
+    },
+    {
       "id": "app.ikw.swiftbiu.openairewriter",
-      "name": "OpenAI Rewriter",
+      "name": {
+        "en": "OpenAI Rewriter",
+        "zh": "OpenAI Rewriter"
+      },
       "description": {
         "en": "Use preset prompt to rewrite the selected text by OpenAI Compatible API",
         "zh": "Use preset prompt to rewrite the selected text by OpenAI Compatible API"
@@ -234,8 +307,45 @@
       "categoryId": "online-services"
     },
     {
+      "id": "com.swiftbiu.packager",
+      "name": {
+        "en": "Packager",
+        "zh": "Packager"
+      },
+      "description": {
+        "en": "Sandbox-compatible SwiftBiuX plugin packager. Uses JSZip and native Save Panel.",
+        "zh": "Sandbox-compatible SwiftBiuX plugin packager. Uses JSZip and native Save Panel."
+      },
+      "icon": "shippingbox.fill",
+      "version": "2.0",
+      "type": "Web App",
+      "author": "Antigravity",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/PluginPackager.swiftbiux",
+      "categoryId": "utilities"
+    },
+    {
+      "id": "com.swiftbiu.qrcode",
+      "name": {
+        "en": "QR Code Generator",
+        "zh": "QR Code Generator"
+      },
+      "description": {
+        "en": "Generate custom QR codes instantly.",
+        "zh": "Generate custom QR codes instantly."
+      },
+      "icon": "qrcode",
+      "version": "1.0.0",
+      "type": "Web App",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/QRCodeGenerator.swiftbiux",
+      "categoryId": "data-creative"
+    },
+    {
       "id": "com.SwiftBiu.regexextractor",
-      "name": "正则提取器",
+      "name": {
+        "en": "正则提取器",
+        "zh": "正则提取器"
+      },
       "description": {
         "en": "使用正则表达式批量提取文本中的关键信息（如邮箱、URL、手机号等）。",
         "zh": "使用正则表达式批量提取文本中的关键信息（如邮箱、URL、手机号等）。"
@@ -249,7 +359,10 @@
     },
     {
       "id": "com.SwiftBiu.sluggenerator",
-      "name": "Slug 生成器",
+      "name": {
+        "en": "Slug 生成器",
+        "zh": "Slug 生成器"
+      },
       "description": {
         "en": "将标题文本转换为 URL 友好的 Slug。",
         "zh": "将标题文本转换为 URL 友好的 Slug。"
@@ -263,7 +376,10 @@
     },
     {
       "id": "com.SwiftBiu.textcleaner",
-      "name": "文本清洗工",
+      "name": {
+        "en": "文本清洗工",
+        "zh": "文本清洗工"
+      },
       "description": {
         "en": "针对多行文本的处理工具：可按行去重、排序、去除空行/空格、全角转半角等（可在设置中配置）。",
         "zh": "针对多行文本的处理工具：可按行去重、排序、去除空行/空格、全角转半角等（可在设置中配置）。"
@@ -277,7 +393,10 @@
     },
     {
       "id": "com.SwiftBiu.timestampconverter",
-      "name": "时间戳转换",
+      "name": {
+        "en": "时间戳转换",
+        "zh": "时间戳转换"
+      },
       "description": {
         "en": "时间戳和日期时间格式互相转换。",
         "zh": "时间戳和日期时间格式互相转换。"
@@ -291,7 +410,10 @@
     },
     {
       "id": "com.SwiftBiu.wordcount",
-      "name": "单词/字符统计",
+      "name": {
+        "en": "单词/字符统计",
+        "zh": "单词/字符统计"
+      },
       "description": {
         "en": "统计选中内容的单词数、字符数、行数等。",
         "zh": "统计选中内容的单词数、字符数、行数等。"
@@ -305,7 +427,10 @@
     },
     {
       "id": "com.SwiftBiu.rmbconverter",
-      "name": "CNY",
+      "name": {
+        "en": "CNY",
+        "zh": "CNY"
+      },
       "description": {
         "en": "将选中的数字金额转换为大写人民币并复制到剪贴板。",
         "zh": "将选中的数字金额转换为大写人民币并复制到剪贴板。"

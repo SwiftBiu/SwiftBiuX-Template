@@ -21,7 +21,7 @@ const categoryIcons = {
 function parseReadmeCategories() {
     const readmePath = path.join(rootDir, 'README.md');
     let content = '';
-    
+
     try {
         content = fs.readFileSync(readmePath, 'utf8');
     } catch (e) {
@@ -31,41 +31,41 @@ function parseReadmeCategories() {
 
     const categoryMap = {};
     const categories = [];
-    
+
     // Split content by H3 headers (### )
     // This assumes the README structure is: ### Icon Chinese (English)
     const sections = content.split(/^###\s+/m);
-    
+
     // Skip the first chunk (intro text before first H3)
     for (let i = 1; i < sections.length; i++) {
         const section = sections[i];
         const firstLineEnd = section.indexOf('\n');
         const headerLine = section.substring(0, firstLineEnd).trim();
-        
+
         // Regex to parse header: "✍️ 文本处理与转换 (Text Processing)"
         // Captures: 1. Chinese Title (with icon), 2. English Title
         const headerMatch = headerLine.match(/^(?:.\s+)?(.+?)\s+\((.+?)\)$/);
-        
+
         if (headerMatch) {
             // Clean up titles
             let zhTitle = headerMatch[1].trim();
             // Remove emoji if it's at the start of zhTitle (simple check)
             zhTitle = zhTitle.replace(/^[\u{1F300}-\u{1F9FF}|[\u2600-\u26FF]\s*/u, '');
-            
+
             const enTitle = headerMatch[2].trim();
-            
+
             // Generate ID from English title: "Text Processing" -> "text-processing"
             const id = enTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-            
+
             // Determine icon
             const icon = categoryIcons[id] || 'extension';
-            
+
             categories.push({
                 id: id,
                 title: { en: enTitle, zh: zhTitle },
                 icon: icon
             });
-            
+
             // Find all download links in this section to map plugins to this category
             // Looking for: .../releases/latest/download/{pluginDirName}.swiftbiux
             const linkRegex = /releases\/latest\/download\/(.+?)\.swiftbiux/g;
@@ -76,7 +76,7 @@ function parseReadmeCategories() {
             }
         }
     }
-    
+
     return { categoryMap, categories };
 }
 
@@ -99,7 +99,7 @@ files.forEach(file => {
     if (fs.statSync(pluginDir).isDirectory() && fs.existsSync(manifestPath)) {
         try {
             const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-            
+
             // Infer Type based on permissions and UI
             let type = 'Local';
             if (manifest.ui) {
@@ -112,16 +112,25 @@ files.forEach(file => {
             // Fallback to 'utilities' if not found in README
             const categoryId = categoryMap[file] || 'utilities';
 
+            // Helper to ensure multi-language consistency
+            const toTranslatable = (val) => {
+                if (typeof val === 'string') {
+                    return { en: val, zh: val };
+                }
+                if (val && typeof val === 'object') {
+                    // Ensure at least English is present
+                    const en = val.en || val.zh || Object.values(val)[0] || '';
+                    const zh = val.zh || en;
+                    return { en, zh };
+                }
+                return { en: '', zh: '' };
+            };
+
             // Construct Plugin Object
             const plugin = {
                 id: manifest.identifier,
-                name: manifest.name,
-                description: {
-                    en: manifest.description,
-                    // Fallback to English if no Chinese description is available in manifest
-                    // TODO: Update manifests to support multi-language descriptions
-                    zh: manifest.description 
-                },
+                name: toTranslatable(manifest.name),
+                description: toTranslatable(manifest.description),
                 icon: manifest.icon || 'extension',
                 version: manifest.version,
                 type: type,
@@ -150,7 +159,7 @@ const catalog = {
 };
 
 // Ensure catalog directory exists
-if (!fs.existsSync(catalogDir)){
+if (!fs.existsSync(catalogDir)) {
     fs.mkdirSync(catalogDir, { recursive: true });
 }
 

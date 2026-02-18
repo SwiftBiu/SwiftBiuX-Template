@@ -333,6 +333,50 @@ To ensure your plugin functions correctly, especially in the sandboxed App Store
 *   `"runAppleScript"`: Required for `SwiftBiu.runAppleScript()` — allows the plugin to execute AppleScript code. ⚠️ **Not available in the App Store (sandboxed) version.**
 *   `"runShellScript"`: Required for `swiftBiu.runShellScript`. ⚠️ **Not available in the App Store (sandboxed) version.**
 
+## Internationalization (i18n)
+
+SwiftBiu supports multi-language plugins. Key fields in `manifest.json` can be provided as either a simple string or a dictionary of translations.
+
+### Supported Fields
+The following fields support the `TranslatableString` format:
+- Root-level: `name`, `description`
+- Actions: `title`
+- Configuration items: `label`, `description`
+- Configuration options: `label`
+
+### Formatting Translations
+To provide multiple languages, use a dictionary where keys are [ISO 639-1 language codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) (e.g., `en`, `zh`).
+
+**Example:**
+```json
+{
+  "name": {
+    "en": "AI Polisher",
+    "zh": "AI 润色"
+  },
+  "description": {
+    "en": "Advanced text polishing using AI models.",
+    "zh": "使用 AI 模型进行高级文本润色。"
+  },
+  "actions": [
+    {
+      "title": {
+        "en": "Polish Text",
+        "zh": "润色文本"
+      },
+      "script": "script.js"
+    }
+  ]
+}
+```
+
+### Fallback Logic
+The system selects the best string based on the user's system language:
+1. Matches the current system language code (e.g., `zh`).
+2. Falls back to English (`en`).
+3. Falls back to the first available translation in the dictionary.
+4. If a simple string is provided, it is used for all languages.
+
 ## Debugging & Logging
 
 Any `console.log()` message from your UI's JavaScript is automatically bridged to SwiftBiu's native logging system. You can view these logs in SwiftBiu's "Log Viewer". They will be prefixed with `[UI]` and your plugin's identifier, making end-to-end debugging much easier.

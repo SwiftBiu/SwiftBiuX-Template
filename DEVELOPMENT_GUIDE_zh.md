@@ -370,6 +370,50 @@ window.swiftBiu_initialize = function(context) {
 *   `"runAppleScript"`: `SwiftBiu.runAppleScript()` 需要此权限 — 允许插件执行 AppleScript 代码。⚠️ **在 App Store（沙盒）版本中不可用。**
 *   `"runShellScript"`: `swiftBiu.runShellScript` 需要此权限。⚠️ **在 App Store（沙盒）版本中不可用。**
 
+## 多语言支持 (Internationalization / i18n)
+
+SwiftBiu 支持开发多语言插件。`manifest.json` 中的关键字段可以提供为简单的字符串，也可以提供为包含多种语言翻译的字典。
+
+### 支持的字段
+以下字段支持 `TranslatableString` 格式（即支持多语言字典）：
+- 根级别：`name`, `description`
+- 动作 (Actions)：`title`
+- 配置项 (Configuration)：`label`, `description`
+- 配置选项 (Options)：`label`
+
+### 翻译格式
+要提供多种语言，请使用一个字典，其中键是 [ISO 639-1 语言代码](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)（例如 `en`, `zh`）。
+
+**示例：**
+```json
+{
+  "name": {
+    "en": "AI Polisher",
+    "zh": "AI 润色"
+  },
+  "description": {
+    "en": "Advanced text polishing using AI models.",
+    "zh": "使用 AI 模型进行高级文本润色。"
+  },
+  "actions": [
+    {
+      "title": {
+        "en": "Polish Text",
+        "zh": "润色文本"
+      },
+      "script": "script.js"
+    }
+  ]
+}
+```
+
+### 回退逻辑 (Fallback Logic)
+系统会根据用户的系统语言选择最合适的字符串：
+1. 匹配当前的系统语言代码（如 `zh`）。
+2. 如果没匹配到，回退到英语 (`en`)。
+3. 如果还是没有，回退到字典中定义的第一个翻译。
+4. 如果只提供了一个简单的字符串，则在所有语言下都显示该字符串。
+
 ## 调试与日志
 
 您 UI 的 JavaScript 中的任何 `console.log()` 信息都会被自动桥接到 SwiftBiu 的原生日志系统中。您可以在 SwiftBiu 的“日志查看器”中查看这些日志。它们会以 `[UI]` 和您的插件标识符作为前缀，极大地简化了端到端的调试过程。

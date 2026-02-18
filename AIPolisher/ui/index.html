@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Writing Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --macos-sidebar-bg: rgba(255, 255, 255, 0.7);
+            --macos-content-bg: #ffffff;
+            --macos-border: rgba(0, 0, 0, 0.08);
+            --macos-text: #1d1d1f;
+            --macos-text-secondary: #86868b;
+            --macos-accent: #007aff;
+            --sidebar-width: 240px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --macos-sidebar-bg: rgba(40, 40, 40, 0.7);
+                --macos-content-bg: #1e1e1e;
+                --macos-border: rgba(255, 255, 255, 0.08);
+                --macos-text: #f5f5f7;
+                --macos-text-secondary: #a1a1a6;
+                --macos-accent: #0a84ff;
+            }
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+            overflow: hidden;
+            color: var(--macos-text);
+        }
+
+        .frosted-glass {
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            background-color: var(--macos-sidebar-bg);
+        }
+
+        .app-layout {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            border-right: 0.5px solid var(--macos-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+            padding: 12px;
+            gap: 12px;
+        }
+
+        .sidebar-title {
+            font-size: 10px;
+            font-weight: 700;
+            opacity: 0.4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 4px 8px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--macos-text);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+
+        .action-btn:hover {
+            background: rgba(128, 128, 128, 0.1);
+        }
+
+        .action-btn:active {
+            background: rgba(128, 128, 128, 0.2);
+        }
+
+        .action-btn.active {
+            background: var(--macos-accent);
+            color: white;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--macos-content-bg);
+            min-height: 0;
+            /* Allow content to shrink */
+        }
+
+        .text-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+            overflow-y: auto;
+            min-height: 0;
+            /* Allow content to shrink */
+        }
+
+        .text-box {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+            position: relative;
+            min-height: 0;
+            /* Allow textareas to shrink */
+        }
+
+        .label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--macos-text-secondary);
+            text-transform: uppercase;
+        }
+
+        .editor {
+            width: 100%;
+            height: 100%;
+            background: rgba(128, 128, 128, 0.05);
+            border: 0.5px solid var(--macos-border);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--macos-text);
+            outline: none;
+            resize: none;
+            transition: all 0.2s;
+        }
+
+        .editor:focus {
+            border-color: var(--macos-accent);
+            background: var(--macos-content-bg);
+        }
+
+        .footer {
+            height: 60px;
+            padding: 0 20px;
+            border-top: 0.5px solid var(--macos-border);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .primary-btn {
+            background: var(--macos-accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .secondary-btn {
+            background: rgba(128, 128, 128, 0.1);
+            color: var(--macos-text);
+            border: 0.5px solid var(--macos-border);
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.05);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(2px);
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top: 3px solid var(--macos-accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Debug Console Styles */
+        .debug-console {
+            margin: 0 12px 12px 12px;
+            border: 0.5px solid var(--macos-border);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.02);
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .debug-header {
+            padding: 6px 12px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--macos-text-secondary);
+            background: rgba(128, 128, 128, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .debug-header:hover {
+            background: rgba(128, 128, 128, 0.1);
+        }
+
+        .debug-body {
+            padding: 10px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            /* Hidden by default */
+            white-space: pre-wrap;
+            word-break: break-all;
+            background: var(--macos-content-bg);
+            border-top: 0.5px solid var(--macos-border);
+        }
+
+        .debug-body.open {
+            display: block;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            border-bottom: 0.5px dashed var(--macos-border);
+            padding-bottom: 4px;
+        }
+
+        .log-label {
+            font-weight: bold;
+            color: var(--macos-accent);
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .log-content {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar frosted-glass">
+            <div class="sidebar-title" data-t="modesTitle">Polishing Modes</div>
+            <button class="action-btn" data-mode="grammar">✨ <span class="mode-name">Fix Grammar</span></button>
+            <button class="action-btn" data-mode="professional">💼 <span class="mode-name">Professional</span></button>
+            <button class="action-btn" data-mode="casual">☕️ <span class="mode-name">Casual</span></button>
+            <button class="action-btn" data-mode="shorten">✂️ <span class="mode-name">Concise</span></button>
+            <button class="action-btn" data-mode="expand">📝 <span class="mode-name">Expand</span></button>
+            <button class="action-btn" data-mode="emoji">🌈 <span class="mode-name">Emojis</span></button>
+
+            <div class="mt-auto p-2">
+                <input id="custom-command"
+                    class="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-md p-2 text-xs outline-none"
+                    placeholder="Custom command..." data-t="placeholderCustom">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="text-container">
+                <div class="text-box">
+                    <div class="label" data-t="originalLabel">Original Text</div>
+                    <textarea id="original-text" class="editor" placeholder="Selected text will appear here..."
+                        data-t="placeholderSelected"></textarea>
+                </div>
+                <div class="text-box">
+                    <div class="label" data-t="polishedLabel">Polished Result</div>
+                    <textarea id="result-text" class="editor" placeholder="Result will appear here..."
+                        data-t="placeholderResult"></textarea>
+                    <div id="loading" class="loading-overlay rounded-xl">
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="spinner"></div>
+                            <div id="loading-status"
+                                class="text-[11px] font-medium text-blue-500 animate-pulse text-center"
+                                data-t="statusStarting">Polishing in progress...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <div class="mr-auto text-[10px] opacity-40 flex items-center gap-1">
+                    <kbd class="px-1 py-0.5 bg-black/10 dark:bg-white/10 rounded">Enter</kbd> to run custom command
+                </div>
+                <button id="btn-regenerate" class="secondary-btn" data-t="btnRegenerate">Regenerate</button>
+                <button id="btn-copy" class="secondary-btn" data-t="btnCopy">Copy</button>
+                <button id="btn-replace" class="primary-btn" data-t="btnReplace">Replace Selection</button>
+            </footer>
+
+            <div id="debug-console" class="debug-console">
+                <div id="debug-header" class="debug-header">
+                    <span data-t="debugTitle">Debug Log</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-chevron-down">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </div>
+                <div id="debug-body" class="debug-body">
+                    <!-- Log entries will be appended here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="locales.js"></script>
+    <script>
+        let i18n = translations.en; // Default
+        function t(key) { return i18n[key] || translations.en[key] || key; }
+
+        function updateUI() {
+            document.querySelectorAll('[data-t]').forEach(el => {
+                const key = el.dataset.t;
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = t(key);
+                } else {
+                    el.textContent = t(key);
+                }
+            });
+            // Update sidebar mode buttons if they have span
+            dom.actionBtns.forEach(btn => {
+                const mode = btn.dataset.mode;
+                const key = `mode${mode.charAt(0).toUpperCase() + mode.slice(1)}`;
+                const span = btn.querySelector('.mode-name');
+                if (span) span.textContent = t(key);
+            });
+
+            // Special cases
+            document.title = t('title');
+        }
+
+        const dom = {
+            original: document.getElementById('original-text'),
+            result: document.getElementById('result-text'),
+            loading: document.getElementById('loading'),
+            btnReplace: document.getElementById('btn-replace'),
+            btnCopy: document.getElementById('btn-copy'),
+            btnRegenerate: document.getElementById('btn-regenerate'),
+            customCommand: document.getElementById('custom-command'),
+            actionBtns: document.querySelectorAll('.action-btn'),
+            debugHeader: document.getElementById('debug-header'),
+            debugBody: document.getElementById('debug-body')
+        };
+
+        const state = {
+            currentMode: 'grammar',
+            lastCustomPrompt: ''
+        };
+
+        const prompts = {
+            grammar: "Please fix all grammar, spelling, and punctuation errors in the text below. Keep the meaning identical but make it perfect.",
+            professional: "Rewrite the following text to be more professional, formal, and suitable for business communication or emails.",
+            casual: "Rewrite the following text to be casual, friendly, and natural for social media or informal chat.",
+            shorten: "Please shorten the following text to be as concise as possible while retaining all core information. Think 'TL;DR'.",
+            expand: "Please expand the following text with more details, better vocabulary, and descriptive language while maintaining the original intent.",
+            emoji: "Keep the text as is, but insert relevant emojis into appropriate places to make it vibrant and engaging for social media."
+        };
+
+        function addLog(label, content) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+
+            const labelEl = document.createElement('span');
+            labelEl.className = 'log-label';
+            labelEl.textContent = `[${new Date().toLocaleTimeString()}] ${label}`;
+
+            const contentEl = document.createElement('pre');
+            contentEl.className = 'log-content';
+            contentEl.textContent = typeof content === 'object' ? JSON.stringify(content, null, 2) : content;
+
+            entry.appendChild(labelEl);
+            entry.appendChild(contentEl);
+            dom.debugBody.prepend(entry);
+        }
+
+        window.swiftBiu_initialize = async (context) => {
+            // Set locale and update UI
+            i18n = getTranslation(context.locale);
+            updateUI();
+
+            if (context.selectedText) {
+                dom.original.value = context.selectedText;
+
+                // Fixed: Use swiftBiu.storage.get
+                const defaultModeResp = await swiftBiu.storage.get('defaultMode');
+                const defaultMode = defaultModeResp.result || 'grammar';
+
+                const autoTriggerResp = await swiftBiu.storage.get('autoTrigger');
+                const autoTrigger = autoTriggerResp.result !== 'false'; // Default to true
+
+                if (autoTrigger) {
+                    if (defaultMode === 'none') {
+                        addLog('System', t('autoTriggerLog'));
+                        return;
+                    }
+                    const defaultBtn = document.querySelector(`[data-mode="${defaultMode}"]`);
+                    if (defaultBtn) {
+                        defaultBtn.classList.add('active');
+                        state.currentMode = defaultMode;
+                        generate(defaultMode);
+                    }
+                } else {
+                    addLog('System', t('autoTriggerLog'));
+                    // Still highlight the default button but don't generate
+                    const defaultBtn = document.querySelector(`[data-mode="${defaultMode}"]`);
+                    if (defaultBtn && defaultMode !== 'none') {
+                        defaultBtn.classList.add('active');
+                        state.currentMode = defaultMode;
+                    }
+                }
+            }
+        };
+
+        async function generate(mode, customPrompt = '') {
+            const text = dom.original.value.trim();
+            if (!text) return;
+
+            if (mode) state.currentMode = mode;
+            if (customPrompt) state.lastCustomPrompt = customPrompt;
+
+            // Updated: Use async storage.get
+            const apiKey = (await swiftBiu.storage.get('apikey')).result;
+            const model = (await swiftBiu.storage.get('model')).result || 'gemini-1.5-flash';
+            const customApiUrl = (await swiftBiu.storage.get('apiurl')).result;
+
+            if (!apiKey) {
+                alert(t('statusError') + ' (API Key Missing)');
+                return;
+            }
+
+            const apiUrl = customApiUrl || `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            const systemPrompt = customPrompt || prompts[mode] || prompts[state.currentMode];
+
+            const requestBody = {
+                contents: [{
+                    parts: [{
+                        text: `${systemPrompt}\n\nContent to process:\n"${text}"\n\nReturn ONLY the processed text, no extra commentary.`
+                    }]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 2048,
+                }
+            };
+
+            dom.loading.style.display = 'flex';
+            dom.result.placeholder = t('statusStarting');
+
+            // Log Request
+            addLog('API Request', {
+                url: apiUrl.replace(/key=.*$/, 'key=***'),
+                model: model,
+                prompt: systemPrompt,
+                text_length: text.length
+            });
+
+            // FIXED: Use swiftBiu.fetch (Promise-based)
+            try {
+                const response = await swiftBiu.fetch(
+                    apiUrl,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestBody)
+                    }
+                );
+
+                dom.loading.style.display = 'none';
+
+                const data = JSON.parse(response.data);
+                addLog('API Response', data);
+
+                if (data.error) throw new Error(data.error.message);
+
+                const result = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (result) {
+                    dom.result.value = result.trim();
+                } else {
+                    throw new Error('Invalid response from AI');
+                }
+            } catch (err) {
+                dom.loading.style.display = 'none';
+                addLog('Error', err.message || err);
+                alert(t('statusError') + ': ' + (err.message || err));
+                dom.result.placeholder = t('statusError');
+            }
+        }
+
+        // Event Listeners
+        dom.actionBtns.forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const mode = btn.dataset.mode;
+                dom.actionBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.lastCustomPrompt = '';
+
+                // Track current mode immediately
+                state.currentMode = mode;
+
+                const autoTriggerResp = await swiftBiu.storage.get('autoTrigger');
+                const autoTrigger = autoTriggerResp.result !== 'false';
+
+                if (autoTrigger) {
+                    generate(mode);
+                } else {
+                    addLog('System', t('clickToStart'));
+                }
+            });
+        });
+
+        dom.customCommand.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && dom.customCommand.value) {
+                dom.actionBtns.forEach(b => b.classList.remove('active'));
+                generate(null, dom.customCommand.value);
+            }
+        });
+
+        dom.btnRegenerate.onclick = () => {
+            generate(state.currentMode, state.lastCustomPrompt);
+        };
+
+        dom.btnCopy.onclick = async () => {
+            if (dom.result.value) {
+                await swiftBiu.copyText(dom.result.value);
+                const original = dom.btnCopy.textContent;
+                dom.btnCopy.textContent = i18n.copied || 'Copied!';
+                setTimeout(() => dom.btnCopy.textContent = original, 1500);
+            }
+        };
+
+        dom.btnReplace.onclick = async () => {
+            if (dom.result.value) {
+                await swiftBiu.pasteText(dom.result.value);
+                swiftBiu.closeWindow();
+            }
+        };
+
+        dom.debugHeader.onclick = () => {
+            dom.debugBody.classList.toggle('open');
+            dom.debugHeader.querySelector('svg').style.transform =
+                dom.debugBody.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+        };
+    </script>
+</body>
+
+</html>
