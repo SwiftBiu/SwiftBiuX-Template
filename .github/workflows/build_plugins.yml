@@ -58,6 +58,7 @@ jobs:
             echo "No changes to catalog."
           else
             git commit -m "chore: Update plugin catalog [skip ci]"
+            git pull --rebase origin main
             git push origin HEAD:main
           fi
 

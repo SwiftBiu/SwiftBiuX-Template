@@ -18,6 +18,20 @@
 *   `⚡️` - **Script (Local)**: 纯本地逻辑插件。无需联网，安全快速，通常无 UI。
 *   `🌐` - **Script (Network)**: 联网脚本插件。需要调用外部 API 或访问网络资源。
 *   `🎨` - **Web App**: 富 Web 应用插件。拥有完全自定义的 HTML/CSS/JS 界面，交互丰富。
+*   `🌍` - **i18n Support**: 国际化支持。插件名称、描述和配置项支持根据系统语言自动切换。
+
+---
+
+## 🌍 国际化支持 (Internationalization)
+
+本项目现已全面支持插件国际化！开发者可以在 `manifest.json` 中为插件名称、描述和设置项提供多种语言的翻译。
+
+*   **智能切换**：系统会根据用户的 macOS 系统语言自动选择最合适的显示文本。
+*   **回退机制**：如果未找到匹配语言，会自动回退至英文或默认翻译。
+*   **一文多语**：同一个插件包即可服务于全球用户。
+
+> [!TIP]
+> 了解更多详情，请参阅 **[开发指南 - 国际化部分](DEVELOPMENT_GUIDE_zh.md#多语言支持-internationalization--i18n)**。
 
 ---
 
@@ -48,6 +62,7 @@
 | :---: | :---: | :----------------- | :------------------------------------------------------- | :--- |
 | `[ ]` |  `🎨`  | **颜色助手**       | 预览 Hex/RGB 颜色，并转换为 SwiftUI, UIKit, CSS 等格式。 | 官方 |
 | `[ ]` |  `🎨`  | **JWT 解码器**     | **本地**解码 JWT Token，展示 Payload 和过期时间。        | 官方 |
+| `[x]` |  `🎨`  | **Packager**       | 官方插件打包工具，支持生成 `.swiftbiux` 安装包。         | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/PluginPackager.swiftbiux) | 官方 |
 | `[x]` |  `🎨`  | **Mermaid 预览器** | 将 Mermaid 文本直接渲染为流程图/时序图 (专业版，支持 SVG 导出)。 | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/MermaidPreviewer.swiftbiux) | 官方 |
 
 ### ⚡️ 生产力与效率 (Productivity)
@@ -64,6 +79,7 @@
 
 | 状态  | 类型  | 插件名称               | 描述                                                       | 下载 | 作者                                  |
 | :---: | :---: | :--------------------- | :--------------------------------------------------------- | :---: | :------------------------------------ |
+| `[x]` |  `🎨`  | **AI 润色助手**        | 使用 AI 润色、重写并优化您的文本。                         | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AIPolisher.swiftbiux) | 官方                                  |
 | `[x]` |  `🌐`  | **Gemini**             | 集成 Google Gemini 模型的 AI 插件。                        | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/Gemini.swiftbiux) | 官方                                  |
 | `[x]` |  `🎨`  | **GeminiImage**        | 使用 Nano Banana 模型进行文生图。                          | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/GeminiImage.swiftbiux) | 官方                                  |
 | `[x]` |  `🌐`  | **豆包文本生成**       | 使用豆包大语言模型生成文本，并将结果直接粘贴。             | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DoubaoText-Plugin.swiftbiux) | 官方                                  |
