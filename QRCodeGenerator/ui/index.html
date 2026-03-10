@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>QR Code Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js"></script>
@@ -159,6 +160,7 @@
         }
 
         input[type="color"] {
+            appearance: none;
             -webkit-appearance: none;
             border: none;
             width: 24px;
@@ -235,6 +237,75 @@
         .upload-zone:hover {
             border-color: var(--macos-accent);
             color: var(--macos-accent);
+        }
+
+        /* 📱 iOS/Mobile Responsive Styles */
+        @media (max-width: 600px) {
+            .app-layout {
+                flex-direction: column-reverse;
+                /* Put canvas on top, controls on bottom */
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-top: 0.5px solid var(--macos-border);
+                flex-shrink: 0;
+                /* Limit height and allow scroll inside if keyboard pops up */
+                max-height: 50vh;
+            }
+
+            .canvas-area {
+                flex-grow: 1;
+                /* Shrink padding to fit QR code better on mobile */
+                padding: 20px;
+                min-height: 300px;
+            }
+
+            .sidebar-header {
+                display: none;
+                /* Hide group headers to save vertical space */
+            }
+
+            .btn-primary,
+            .btn-secondary,
+            .upload-zone,
+            .mac-input {
+                min-height: 44px;
+                /* HIG Touch Target */
+                font-size: 14px;
+            }
+
+            .mac-textarea {
+                font-size: 16px !important;
+                /* Prevent iOS zoom */
+                min-height: 60px;
+                /* Slightly shorter default */
+            }
+
+            .color-picker-row {
+                min-height: 44px;
+            }
+
+            /* Stack specific buttons */
+            .mt-auto.flex.flex-col.gap-2 {
+                margin-top: 12px;
+            }
+
+            /* Make the QR wrapper size responsive */
+            .qr-wrapper {
+                width: 100%;
+                max-width: 300px;
+                aspect-ratio: 1 / 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100% !important;
+                height: auto !important;
+            }
         }
     </style>
 </head>

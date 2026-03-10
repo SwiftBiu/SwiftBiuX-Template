@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Advanced Translator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -61,6 +62,53 @@
 
         .dark .section-title {
             color: #9ca3af;
+        }
+
+        /* 📱 iOS/Mobile Responsive Styles */
+        @media (max-width: 600px) {
+            .app-layout {
+                border-radius: 0;
+                /* Full screen on mobile */
+            }
+
+            /* Enlarge top language selectors for tapability */
+            .flex-shrink-0.p-2 {
+                padding: 12px 8px;
+            }
+
+            #source-lang-select,
+            #target-lang-select {
+                font-size: 16px;
+                min-height: 44px;
+                /* HIG Touch Target */
+            }
+
+            #swap-lang-btn {
+                padding: 12px;
+                margin: 0 4px;
+            }
+
+            /* Enlarge the input area to prevent zoom and give more room */
+            #original-text {
+                font-size: 16px !important;
+                min-height: 60px;
+                padding: 8px 0;
+            }
+
+            /* Make sure translated text area allows scrolling naturally */
+            #translated-text {
+                font-size: 16px;
+            }
+
+            /* Enlarge the copy button */
+            #copy-btn {
+                padding: 12px;
+            }
+
+            #copy-btn svg {
+                width: 24px;
+                height: 24px;
+            }
         }
     </style>
 </head>
@@ -228,7 +276,7 @@
             const model = customModel || 'gemini-flash-latest';
             // Use the human-readable language name for better AI instruction adherence
             const targetLangName = languages[targetLang] || targetLang;
-            
+
             const prompt = promptTemplate
                 ? `IMPORTANT: You MUST provide all explanations, definitions, and analysis in ${targetLangName}. The JSON keys must remain in English, but the values must be in ${targetLangName}. ${promptTemplate} My content is: ${text}.`
                 : `IMPORTANT: You MUST provide all explanations, definitions, and analysis in ${targetLangName}. The JSON keys must remain in English, but the values must be in ${targetLangName}. Analyze the content.
@@ -273,7 +321,7 @@ My content is: ${text}. Remember: All values in the JSON must be in ${targetLang
             });
             console.log("[UI] API Response:", response);
             if (response.status !== 200) throw new Error(`API request failed: ${response.status}`);
-            
+
             const serviceResponse = JSON.parse(response.data);
             const aiOutputText = serviceResponse?.candidates?.at(0)?.content?.parts?.at(0)?.text;
             if (!aiOutputText) throw new Error("Failed to parse translation from API response.");
@@ -295,7 +343,7 @@ My content is: ${text}. Remember: All values in the JSON must be in ${targetLang
             }
 
             if (!jsonString) {
-                 throw new Error("Could not find any valid JSON in the AI's response.");
+                throw new Error("Could not find any valid JSON in the AI's response.");
             }
 
             try {
@@ -520,7 +568,7 @@ My content is: ${text}. Remember: All values in the JSON must be in ${targetLang
             const isErrorVisible = !dom.errorDisplay.classList.contains('hidden');
             const contentElement = isErrorVisible ? dom.errorDisplay : dom.translatedText;
             const contentHeight = contentElement.scrollHeight;
-            
+
             const containerStyle = window.getComputedStyle(translatedContainer);
             const containerPadding = parseFloat(containerStyle.paddingTop) + parseFloat(containerStyle.paddingBottom);
             const totalContentHeight = contentHeight + containerPadding;

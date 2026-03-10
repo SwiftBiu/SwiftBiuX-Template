@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Mermaid 预览器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
@@ -297,6 +298,68 @@
         .svg-pan-zoom_viewport {
             width: 100%;
             height: 100%;
+        }
+
+        /* 📱 iOS/Mobile Responsive Styles */
+        @media (max-width: 600px) {
+            .app-layout {
+                flex-direction: column-reverse;
+                /* Put canvas on top, editor on bottom */
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-top: 0.5px solid var(--macos-border);
+                flex-shrink: 0;
+                /* Limit height to allow scroll inside if keyboard pops up */
+                max-height: 50vh;
+            }
+
+            .editor-workspace {
+                min-height: 120px;
+            }
+
+            .code-editor {
+                font-size: 14px;
+                /* Essential to prevent iOS auto-zoom on textarea */
+            }
+
+            .sidebar-header {
+                display: none;
+                /* Save space on mobile */
+            }
+
+            .sidebar-footer {
+                padding: 12px;
+            }
+
+            .mac-input,
+            .primary-btn,
+            .secondary-btn {
+                min-height: 44px;
+                /* HIG Touch Target */
+                font-size: 14px;
+            }
+
+            .btn-stack {
+                gap: 12px;
+            }
+
+            .canvas-area {
+                flex-grow: 1;
+                min-height: 250px;
+            }
+
+            .hud-inner {
+                /* Make the bottom floating control touch-friendly */
+                transform: scale(1.1);
+            }
+
+            .hud-action {
+                width: 44px;
+                height: 44px;
+            }
         }
     </style>
 </head>

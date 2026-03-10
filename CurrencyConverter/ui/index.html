@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Currency Converter</title>
     <style>
         :root {
@@ -360,6 +361,74 @@
 
         .success-flash {
             animation: pulse-success 0.6s ease-out;
+        }
+
+        /* 📱 iOS/Mobile Responsive Styles */
+        @media (max-width: 600px) {
+            body {
+                padding: 0;
+            }
+
+            .card {
+                border-radius: 0;
+                border: none;
+                box-shadow: none;
+                min-height: 100vh;
+                padding: 24px 16px;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+            }
+
+            /* Ensure touch targets are at least 44px high */
+            .currency-row {
+                min-height: 72px;
+            }
+
+            select {
+                min-height: 44px;
+                font-size: 16px;
+                /* Essential to prevent iOS auto-zoom */
+            }
+
+            input[type="number"] {
+                font-size: 32px;
+                /* Bigger type for numbers on mobile */
+            }
+
+            .result-display {
+                font-size: 32px;
+            }
+
+            .swap-btn {
+                width: 44px;
+                height: 44px;
+                margin: 4px 0;
+            }
+
+            .icon-btn {
+                width: 44px;
+                height: 44px;
+            }
+
+            .icon-btn svg {
+                width: 22px;
+                height: 22px;
+            }
+
+            .action-row {
+                margin-top: 12px;
+                padding: 0 8px;
+            }
+
+            .rate-info {
+                font-size: 14px;
+            }
+
+            /* Tooltips are not useful on touch devices, hide them to avoid glitches */
+            .icon-btn .tooltip {
+                display: none;
+            }
         }
     </style>
 </head>

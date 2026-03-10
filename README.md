@@ -6,6 +6,8 @@
 
 **➡️ 想要学习如何开发插件？请查看我们的 [插件开发指南](DEVELOPMENT_GUIDE.md)** ([中文版](DEVELOPMENT_GUIDE_zh.md))
 
+🤖 **觉得从头开发太繁琐？** 本仓库内置了全套 [AI Agent Skill 体系](AI_SKILL.md)，直接通过 Cursor/Gemini 等大模型引入，即可一句话让 AI 全自动生成完美适配的满血插件代码！
+
 ## 🧩 图例说明 (Legend)
 
 **状态 (Status)**
