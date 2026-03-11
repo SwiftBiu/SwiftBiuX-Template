@@ -1,7 +1,7 @@
 # SwiftBiuX plugin packages
 *.swiftbiux
 PluginPackager  
-catalog/plugins.json
+# catalog/plugins.json
 
 # macOS
 .DS_Store
