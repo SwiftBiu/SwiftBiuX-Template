@@ -9,7 +9,7 @@ function isAvailable(context) {
     return context.selectedText.trim().length > 0;
 }
 
-// An array to hold the history of the conversation in OpenAI's format for simplicity.
+// An array to hold the history of the conversation in standard format for simplicity.
 // We will convert it to Gemini's format on the fly.
 const messages = [];
 

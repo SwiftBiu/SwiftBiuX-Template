@@ -69,6 +69,23 @@
       "categoryId": "online-services"
     },
     {
+      "id": "app.ikw.swiftbiu.airewriter",
+      "name": {
+        "en": "AI Rewriter",
+        "zh": "AI Rewriter"
+      },
+      "description": {
+        "en": "Use preset prompt to rewrite the selected text by AI Compatible API",
+        "zh": "Use preset prompt to rewrite the selected text by AI Compatible API"
+      },
+      "icon": "extension",
+      "version": "1.0",
+      "type": "Network",
+      "author": "kweizh",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AIRewriter.swiftbiux",
+      "categoryId": "online-services"
+    },
+    {
       "id": "com.swiftbiu.plugin.advancedtranslator",
       "name": {
         "en": "Advanced Translator",
@@ -185,6 +202,40 @@
       "type": "Network",
       "author": "SwiftBiu Team",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DoubaoText-Plugin.swiftbiux",
+      "categoryId": "online-services"
+    },
+    {
+      "id": "com.SwiftBiu.gemini",
+      "name": {
+        "en": "Gemini",
+        "zh": "Gemini"
+      },
+      "description": {
+        "en": "Send the selected text to Google Gemini and get the response.",
+        "zh": "Send the selected text to Google Gemini and get the response."
+      },
+      "icon": "gemini.png",
+      "version": "1.4",
+      "type": "Network",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/Gemini.swiftbiux",
+      "categoryId": "online-services"
+    },
+    {
+      "id": "com.swiftbiu.gemini-imageToast",
+      "name": {
+        "en": "Nano Banana",
+        "zh": "Nano Banana"
+      },
+      "description": {
+        "en": "Generates an image based on the selected text using the Gemini API.",
+        "zh": "Generates an image based on the selected text using the Gemini API."
+      },
+      "icon": "nano-banana.png",
+      "version": "1.2",
+      "type": "Network",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/GeminiImage.swiftbiux",
       "categoryId": "online-services"
     },
     {

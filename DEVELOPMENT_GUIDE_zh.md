@@ -13,7 +13,7 @@
 我们在这个模板仓库中内置了专门面向大模型的 **AI Skill** 文件，路径为 `AI_SKILL.md`。这个文件包含了 SwiftBiuX 插件开发的全部规范（包括跨端 UI 响应式法则、权限机制、API 降级策略等）。
 
 **如何使用？**
-只需将该 `AI_SKILL.md` 文件作为上下文提供给您常用的 AI 代码助手（如 **Cursor**, **GitHub Copilot**, 或 **Gemini**），然后直接通过自然语言描述您的需求。
+只需将该 `AI_SKILL.md` 文件作为上下文提供给您常用的 AI 代码助手（如 **Cursor**, **GitHub Copilot**, 或 **Smart AI**），然后直接通过自然语言描述您的需求。
 *Prompt 示例:*
 > "阅读规范：`AI_SKILL.md`。帮我创建一个名为 `TextCounter` 的 Web App 插件，实现实时的字符和单词统计功能。"
 

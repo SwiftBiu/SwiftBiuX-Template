@@ -29,8 +29,8 @@
       "description": "Choose your preferred translation service.",
       "options": [
         {
-          "label": "Gemini",
-          "value": "gemini"
+          "label": "Smart AI",
+          "value": "AI"
         }
       ]
     },
@@ -45,8 +45,8 @@
       "key": "apiurl",
       "label": "API URL",
       "type": "string",
-      "placeholder": "e.g., https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
-      "description": "Custom Gemini API endpoint. Leave blank for default.",
+      "placeholder": "e.g., https://generativelanguage.googleapis.com/v1beta/models/AI-1.5-flash:generateContent",
+      "description": "Custom Smart AI API endpoint. Leave blank for default.",
       "isSecure": false
     },
     {
@@ -56,28 +56,28 @@
       "description": "The model to use.",
       "options": [
         {
-          "label": "Gemini 2.5 Flash Lite",
-          "value": "gemini-flash-lite-latest"
+          "label": "Smart 2.5 Flash Lite",
+          "value": "AI-flash-lite-latest"
         },
         {
           "label": "Gemma 3n-e4b-it",
           "value": "gemma-3n-e4b-it"
         },
         {
-          "label": "Gemini 2.0 Flash Lite",
-          "value": "gemini-2.0-flash-lite"
+          "label": "Smart 2.0 Flash Lite",
+          "value": "AI-2.0-flash-lite"
         },
         {
-          "label": "Gemini 2.0 Flash",
-          "value": "gemini-2.0-flash"
+          "label": "Smart 2.0 Flash",
+          "value": "AI-2.0-flash"
         },
         {
-          "label": "Gemini 2.5 Flash",
-          "value": "gemini-flash-latest"
+          "label": "Smart 2.5 Flash",
+          "value": "AI-flash-latest"
         },
         {
-          "label": "Gemini 2.5 Pro",
-          "value": "gemini-2.5-pro"
+          "label": "Smart 2.5 Pro",
+          "value": "AI-2.5-pro"
         }
       ]
     },

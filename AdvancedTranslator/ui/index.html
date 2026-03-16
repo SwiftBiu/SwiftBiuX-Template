@@ -183,7 +183,7 @@
         let currentTargetLang = 'zh-CN';
         let settings = {
             apiKey: null,
-            service: 'gemini',
+            service: 'AI',
             customApiUrl: null,
             customModel: null,
             promptTemplate: null
@@ -218,7 +218,7 @@
                 ]);
 
                 settings.apiKey = apiKeyResponse.result;
-                settings.service = serviceResponse.result || 'gemini';
+                settings.service = serviceResponse.result || 'AI';
                 settings.customApiUrl = apiUrlResponse.result;
                 settings.customModel = modelResponse.result;
 
@@ -273,7 +273,7 @@
         // --- Core Logic ---
         async function performTranslation(service, text, apiKey, targetLang, customApiUrl, customModel, promptTemplate) {
             let url, body;
-            const model = customModel || 'gemini-flash-latest';
+            const model = customModel || 'AI-flash-latest';
             // Use the human-readable language name for better AI instruction adherence
             const targetLangName = languages[targetLang] || targetLang;
 
@@ -306,7 +306,7 @@ IMPORTANT: You MUST wrap your response in a markdown code block like this:
 My content is: ${text}. Remember: All values in the JSON must be in ${targetLangName}.`;
 
             switch (service) {
-                case 'gemini':
+                case 'AI':
                     url = customApiUrl || `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
                     body = { contents: [{ parts: [{ text: prompt }] }] };
                     break;

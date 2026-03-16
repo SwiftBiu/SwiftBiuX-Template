@@ -163,6 +163,27 @@ if (!fs.existsSync(catalogDir)) {
     fs.mkdirSync(catalogDir, { recursive: true });
 }
 
-// Write the catalog file
-fs.writeFileSync(path.join(catalogDir, 'plugins.json'), JSON.stringify(catalog, null, 2));
-console.log(`Successfully generated catalog with ${plugins.length} plugins at catalog/plugins.json`);
+// 3. Generate two versions of the catalog
+
+// Version A: webPlugins.json - FULL (Includes all plugins)
+fs.writeFileSync(path.join(catalogDir, 'webPlugins.json'), JSON.stringify(catalog, null, 2));
+console.log(`Successfully generated FULL catalog with ${plugins.length} plugins at catalog/webPlugins.json`);
+
+// Version B: plugins.json - APP STORE COMPLIANT (Filters out non-compliant AI plugins)
+// IDs to exclude: AIRewriter, Gemini, GeminiImage
+const excludedIds = [
+    'app.ikw.swiftbiu.airewriter',
+    'com.SwiftBiu.gemini',
+    'com.swiftbiu.gemini-imageToast'
+];
+
+const filteredPlugins = plugins.filter(p => !excludedIds.includes(p.id));
+
+const filteredCatalog = {
+    ...catalog,
+    plugins: filteredPlugins
+};
+
+fs.writeFileSync(path.join(catalogDir, 'plugins.json'), JSON.stringify(filteredCatalog, null, 2));
+console.log(`Successfully generated COMPLIANT catalog with ${filteredPlugins.length} plugins at catalog/plugins.json`);
+console.log(`(Excluded ${plugins.length - filteredPlugins.length} AI plugins: ${excludedIds.join(', ')})`);

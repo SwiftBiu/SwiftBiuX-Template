@@ -10,7 +10,7 @@
  * @returns {{isAvailable: boolean, isContextMatch: boolean}}
  */
 function isAvailable(context) {
-  // 默认情况下，Gemini 插件对任何选中的文本都可用。
+  // 默认情况下，Smart AI 插件对任何选中的文本都可用。
   const isTextSelected = context.selectedText && context.selectedText.trim().length > 0;
   // isContextMatch 表示上下文是否精确匹配（例如，是否是代码、URL等），这里我们简单地等同于 isAvailable
   return {

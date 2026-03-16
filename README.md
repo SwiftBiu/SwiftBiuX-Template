@@ -87,7 +87,7 @@
 | `[x]` |  `🌐`  | **豆包文本生成**       | 使用豆包大语言模型生成文本，并将结果直接粘贴。             | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DoubaoText-Plugin.swiftbiux) | 官方                                  |
 | `[x]` |  `🌐`  | **豆包图像生成**       | 使用豆包文生图模型生成图像，并直接预览。                   | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DoubaoImage-Plugin.swiftbiux) | 官方                                  |
 | `[x]` |  `🌐`  | **MultiSearch**        | 同时在多个搜索引擎中搜索选中的文本。                       | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/MultiSearch.swiftbiux) | 官方                                  |
-| `[x]` |  `🌐`  | **OpenAIRewriter**     | 使用 OpenAI 模型来润色和改写文本。                         | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/OpenAIRewriter.swiftbiux) | [zwpaper](https://github.com/zwpaper) |
+| `[x]` |  `🌐`  | **AIRewriter**     | 使用 AI 模型来润色和改写文本。                         | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AIRewriter.swiftbiux) | [zwpaper](https://github.com/zwpaper) |
 | `[x]` |  `🎨`  | **AdvancedTranslator** | 一个功能强大的翻译插件 (富 Web 应用范例)。                 | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AdvancedTranslator.swiftbiux) | 官方                                  |
 | `[ ]` |  `🎨`  | **AI 工具箱**          | 一个通用的 AI 平台，允许用户自定义 Prompt 对接多种大模型。 | | 官方                                  |
 | `[ ]` |  `🎨`  | **IP 地址信息**        | 查询 IP 地址的地理位置和详细信息。                         | | 官方                                  |
@@ -95,7 +95,7 @@
 | `[x]` |  `🎨`  | **实时汇率/加密货币**  | 实时查询法币汇率和加密货币价格。                           | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/CurrencyConverter.swiftbiux) | 官方                                  |
 | `[x]` |  `🌐`  | **汇率转换 (Lite)**    | 选中金额直接转换并复制，无界面纯脚本版。                   | [Download](https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/CurrencyConverterLite.swiftbiux) | 官方                                  |
 | `[ ]` |  `🌐`  | **代码分享 (Gist)**    | 一键上传代码到 GitHub Gist 或 Pastebin。                   | 官方                                  |
-| `[ ]` |  `🎨`  | **聚合翻译**           | 同时展示 Google, DeepL, ChatGPT 等多源翻译结果。           | 官方                                  |
+| `[ ]` |  `🎨`  | **聚合翻译**           | 同时展示 Google, DeepL, AI 等多源翻译结果。           | 官方                                  |
 | `[ ]` |  `🎨`  | **链接元数据预览**     | 抓取 URL 的 Open Graph 信息（标题、摘要、缩略图）。        | 官方                                  |
 
 ### 🎨 数据与创意 (Data & Creative)

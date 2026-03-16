@@ -4,7 +4,7 @@
  * @returns {boolean} - 如果插件可用则返回 true，否则返回 false。
  */
 function isAvailable(context) {
-    // OpenAI Rewriter 插件对任何选中的文本都可用
+    // AI Rewriter 插件对任何选中的文本都可用
     return context.selectedText && context.selectedText.trim().length > 0;
 }
 
@@ -90,7 +90,7 @@ function performAction(context) {
                 }
 
                 // --- Parse Response ---
-                // OpenAI compatible API response structure
+                // AI compatible API response structure
                 if (responseData.choices && responseData.choices.length > 0) {
                     const rewrittenText = responseData.choices[0].message.content.trim();
 

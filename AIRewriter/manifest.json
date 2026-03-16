@@ -1,8 +1,8 @@
 {
-  "identifier": "app.ikw.swiftbiu.openairewriter",
-  "name": "OpenAI Rewriter",
+  "identifier": "app.ikw.swiftbiu.airewriter",
+  "name": "AI Rewriter",
   "author": "kweizh",
-  "description": "Use preset prompt to rewrite the selected text by OpenAI Compatible API",
+  "description": "Use preset prompt to rewrite the selected text by AI Compatible API",
   "version": "1.0",
   "actions": [
     {
@@ -21,15 +21,15 @@
       "key": "apikey",
       "label": "API Key",
       "placeholder": "Enter your API key",
-      "description": "Your OpenAI compatible API key.",
+      "description": "Your AI compatible API key.",
       "type": "secure"
     },
     {
       "key": "apiurl",
       "label": "API URL",
       "type": "string",
-      "placeholder": "e.g., https://api.openai.com/v1",
-      "description": "OpenAI compatible API endpoint for chat completions.",
+      "placeholder": "e.g., https://api.example.com/v1",
+      "description": "AI compatible API endpoint for chat completions.",
       "isSecure": false
     },
     {

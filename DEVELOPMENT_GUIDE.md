@@ -13,7 +13,7 @@ Want AI to generate plugin code for you instantly?
 This template repository includes our official **AI Skill** document located at `AI_SKILL.md`. This file contains the complete SwiftBiuX plugin development specifications (including cross-platform UI responsiveness rules, permission mechanisms, and API degradation strategies).
 
 **How to use it:**
-Simply provide the `AI_SKILL.md` file as context to your favorite AI code assistant (like **Cursor**, **GitHub Copilot**, or **Gemini**) and describe your idea in natural language.
+Simply provide the `AI_SKILL.md` file as context to your favorite AI code assistant (like **Cursor**, **GitHub Copilot**, or **Smart AI**) and describe your idea in natural language.
 *Prompt Example:*
 > "Read the `AI_SKILL.md` file. Build a Rich Web App plugin named `TextCounter` that provides real-time character and word counting."
 
@@ -547,9 +547,9 @@ Your commit message must follow this structure:
 ```
 
 *   **Type**: Must be one of the following: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`, `build`.
-*   **Scope**: (Optional) The module affected by the change (e.g., `Gemini`, `UI`, `build`).
+*   **Scope**: (Optional) The module affected by the change (e.g., `Smart AI`, `UI`, `build`).
 *   **Subject**: A short, clear description of the change.
 
 **Example:**
 ```bash
-git commit -m "feat(Gemini): add support for streaming responses"
+git commit -m "feat(Smart AI): add support for streaming responses"
