@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-16T04:38:48.894Z",
+  "generatedAt": "2026-03-20T06:57:33.568Z",
   "categories": [
     {
       "id": "text-processing",
@@ -147,7 +147,7 @@
         "zh": "Real-time currency conversion with support for multiple currencies."
       },
       "icon": "banknote",
-      "version": "1.0",
+      "version": "1.1",
       "type": "Web App",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/CurrencyConverter.swiftbiux",
