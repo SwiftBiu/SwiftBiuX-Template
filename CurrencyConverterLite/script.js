@@ -27,12 +27,19 @@ function performAction(context) {
     const text = context.selectedText.trim();
 
     // 1. Parse Input
-    const { amount, currency } = parseInput(text);
+    const parsed = parseInput(text);
 
-    if (amount === null) {
+    if (!parsed || parsed.amount === null) {
         SwiftBiu.showNotification("Error", "Could not find a valid number in selection.");
         return;
     }
+
+    if (parsed.isUnsupported) {
+        SwiftBiu.showNotification("Error", `Unsupported currency: ${parsed.from}`);
+        return;
+    }
+
+    const { amount, from: currency } = parsed;
 
     // 2. Determine Source and Target Currencies
     const configTarget = SwiftBiu.getConfig("targetCurrency") || "CNY";
@@ -130,35 +137,79 @@ function performAction(context) {
 }
 
 function parseInput(text) {
-    // Try to find a number
-    // Remove commas
-    const cleanText = text.replace(/,/g, '');
-    const numberMatch = cleanText.match(/[\d]+\.?\d*/);
+    if (!text) return null;
 
+    // 1. Extract amount
+    // Match numbers (including decimals and commas)
+    const numberMatch = text.match(/[\d,]+\.?\d*/);
     let amount = null;
     if (numberMatch) {
-        amount = parseFloat(numberMatch[0]);
+        const cleanNum = numberMatch[0].replace(/,/g, '');
+        const val = parseFloat(cleanNum);
+        if (!isNaN(val)) {
+            amount = val;
+        }
     }
 
-    // Try to find currency codes
-    const commonCurrencies = ["AUD", "BGN", "BRL", "CAD", "CHF", "CNY", "CZK", "DKK", "EUR", "GBP", "HKD", "HUF", "IDR", "ILS", "INR", "ISK", "JPY", "KRW", "MXN", "MYR", "NOK", "NZD", "PHP", "PLN", "RON", "SEK", "SGD", "THB", "TRY", "USD", "ZAR"];
+    // 2. Extract currency
+    let detectedCurrency = null;
+    let isUnsupported = false;
     const upperText = text.toUpperCase();
-    let currency = null;
 
-    for (const code of commonCurrencies) {
-        if (upperText.includes(code)) {
-            currency = code;
+    // Symbols mapping
+    const symbols = {
+        '￥': 'CNY',
+        '¥': 'CNY',
+        '$': 'USD',
+        '€': 'EUR',
+        '£': 'GBP',
+        '₩': 'KRW',
+        '₽': 'RUB',
+        '₹': 'INR',
+        '฿': 'THB',
+        '₫': 'VND',
+        'R$': 'BRL',
+        '₪': 'ILS',
+        'Rp': 'IDR',
+        'RM': 'MYR'
+    };
+
+    for (const [symbol, code] of Object.entries(symbols)) {
+        if (text.includes(symbol)) {
+            detectedCurrency = code;
             break;
         }
     }
 
-    // Handle symbols if no code found
-    if (!currency) {
-        if (text.includes('$')) currency = 'USD';
-        else if (text.includes('¥') || text.includes('￥')) currency = 'CNY';
-        else if (text.includes('€')) currency = 'EUR';
-        else if (text.includes('£')) currency = 'GBP';
+    const supportedCurrencies = [
+        'AUD', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD',
+        'HUF', 'IDR', 'ILS', 'INR', 'ISK', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK',
+        'NZD', 'PHP', 'PLN', 'RON', 'SEK', 'SGD', 'THB', 'TRY', 'USD', 'ZAR'
+    ];
+
+    if (!detectedCurrency) {
+        // Try to find any 3-letter word that looks like a currency code
+        const potentialCodes = upperText.match(/[A-Z]{3}/g) || [];
+        for (const code of potentialCodes) {
+            if (supportedCurrencies.includes(code)) {
+                detectedCurrency = code;
+                isUnsupported = false;
+                break;
+            } else {
+                // Avoid common 3-letter words that aren't currencies
+                const ignoreWords = ['THE', 'AND', 'FOR', 'ANY', 'ALL', 'NOT', 'BUT', 'YOU', 'OUR', 'ARE'];
+                if (!ignoreWords.includes(code)) {
+                    detectedCurrency = code;
+                    isUnsupported = true;
+                    // Keep looking for a supported one in case there are multiple codes
+                }
+            }
+        }
     }
 
-    return { amount, currency };
+    return { 
+        amount, 
+        from: detectedCurrency,
+        isUnsupported: isUnsupported
+    };
 }

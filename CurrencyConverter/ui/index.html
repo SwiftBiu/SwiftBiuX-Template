@@ -507,6 +507,9 @@
 
         // Elements
         const amountInput = document.getElementById('amountInput');
+        let initialFromCode = '';
+        let initialToCode = 'CNY';
+
         const fromSelect = document.getElementById('fromCurrency');
         const toSelect = document.getElementById('toCurrency');
         const swapBtn = document.getElementById('swapBtn');
@@ -524,14 +527,30 @@
             console.log("Currency Converter Initialized", context);
 
             // 1. Parse Input
-            const text = context.selectedText || "";
-            parseInput(text);
+            const text = (context.selectedText || "").trim();
+            const parsed = parseInput(text);
+
+            if (parsed) {
+                amountInput.value = parsed.amount;
+                if (parsed.from) {
+                    if (parsed.isUnsupported) {
+                        showError(`Unsupported currency: ${parsed.from}`);
+                        // Default to USD for calculation even if unsupported was found
+                        initialFromCode = 'USD';
+                    } else {
+                        initialFromCode = parsed.from;
+                        // Smart defaults
+                        if (initialFromCode === 'CNY') initialToCode = 'USD';
+                        else if (initialFromCode === 'USD') initialToCode = 'CNY';
+                        else initialToCode = 'CNY';
+                    }
+                }
+            }
 
             // 2. Fetch Currencies & Rates
             await fetchCurrencies();
 
-            // 3. Initial Calculation
-            await updateRates();
+            // 3. Initial Calculation (Rates update will be triggered in populateSelects)
 
             // 4. Resize Window
             updateHeight();
@@ -582,30 +601,82 @@
 
         // Logic
         function parseInput(text) {
+            if (!text) return null;
+
+            // 1. Extract amount
             // Match numbers (including decimals and commas)
             const numberMatch = text.match(/[\d,]+\.?\d*/);
+            let amount = 1;
             if (numberMatch) {
                 const cleanNum = numberMatch[0].replace(/,/g, '');
                 const val = parseFloat(cleanNum);
                 if (!isNaN(val)) {
-                    amountInput.value = val;
+                    amount = val;
                 }
             }
 
-            // Common currency codes
-            const commonCurrencies = ['USD', 'CNY', 'EUR', 'JPY', 'GBP', 'HKD', 'AUD', 'CAD', 'KRW', 'SGD', 'CHF', 'NZD'];
+            // 2. Extract currency
+            let detectedCurrency = null;
+            let isUnsupported = false;
             const upperText = text.toUpperCase();
 
-            for (const code of commonCurrencies) {
-                if (upperText.includes(code)) {
-                    fromSelect.value = code;
-                    // Smart defaults
-                    if (code === 'CNY') toSelect.value = 'USD';
-                    else if (code === 'USD') toSelect.value = 'CNY';
-                    else toSelect.value = 'CNY';
+            // Symbols mapping
+            const symbols = {
+                '￥': 'CNY',
+                '¥': 'CNY',
+                '$': 'USD',
+                '€': 'EUR',
+                '£': 'GBP',
+                '₩': 'KRW',
+                '₽': 'RUB',
+                '₹': 'INR',
+                '฿': 'THB',
+                '₫': 'VND',
+                'R$': 'BRL',
+                '₪': 'ILS',
+                'Rp': 'IDR',
+                'RM': 'MYR'
+            };
+
+            for (const [symbol, code] of Object.entries(symbols)) {
+                if (text.includes(symbol)) {
+                    detectedCurrency = code;
                     break;
                 }
             }
+
+            const supportedCurrencies = [
+                'AUD', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD',
+                'HUF', 'IDR', 'ILS', 'INR', 'ISK', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK',
+                'NZD', 'PHP', 'PLN', 'RON', 'SEK', 'SGD', 'THB', 'TRY', 'USD', 'ZAR'
+            ];
+
+            if (!detectedCurrency) {
+                // Try to find any 3-letter word that looks like a currency code
+                const potentialCodes = upperText.match(/[A-Z]{3}/g) || [];
+                for (const code of potentialCodes) {
+                    if (supportedCurrencies.includes(code)) {
+                        detectedCurrency = code;
+                        isUnsupported = false;
+                        break;
+                    } else {
+                        // Avoid common 3-letter words that aren't currencies
+                        const ignoreWords = ['THE', 'AND', 'FOR', 'ANY', 'ALL', 'NOT', 'BUT', 'YOU', 'OUR', 'ARE'];
+                        if (!ignoreWords.includes(code)) {
+                            detectedCurrency = code;
+                            isUnsupported = true;
+                            // Keep looking for a supported one in case there are multiple codes
+                            // but if we don't find any supported ones, we'll use this as unsupported.
+                        }
+                    }
+                }
+            }
+
+            return {
+                amount: amount,
+                from: detectedCurrency,
+                isUnsupported: isUnsupported
+            };
         }
 
         async function fetchCurrencies() {
@@ -633,11 +704,25 @@
             fromSelect.innerHTML = optionsHTML;
             toSelect.innerHTML = optionsHTML;
 
-            if (currencies[currentFrom]) fromSelect.value = currentFrom;
-            else fromSelect.value = 'USD';
+            // Priority:
+            // 1. initialFromCode from parsed input
+            // 2. currentFrom state
+            // 3. Fallback to default
+            if (initialFromCode && currencies[initialFromCode]) {
+                fromSelect.value = initialFromCode;
+                toSelect.value = initialToCode;
+                // Clear initial once used
+                initialFromCode = '';
+            } else {
+                if (currencies[currentFrom]) fromSelect.value = currentFrom;
+                else fromSelect.value = 'USD';
 
-            if (currencies[currentTo]) toSelect.value = currentTo;
-            else toSelect.value = 'CNY';
+                if (currencies[currentTo]) toSelect.value = currentTo;
+                else toSelect.value = 'CNY';
+            }
+
+            // After population, trigger updateRates
+            updateRates();
         }
 
         async function updateRates() {
@@ -648,7 +733,10 @@
             }
 
             mainContainer.classList.add('loading');
-            errorMsg.style.display = 'none';
+            // Only hide error if it's not currently showing an "Unsupported currency" error
+            if (!errorMsg.innerText.includes("Unsupported")) {
+                errorMsg.style.display = 'none';
+            }
 
             try {
                 const response = await window.swiftBiu.fetch(`https://api.frankfurter.app/latest?from=${from}`);
@@ -704,7 +792,7 @@
         }
 
         function updateHeight() {
-            const height = mainContainer.offsetHeight + 40;
+            const height = mainContainer.offsetHeight;
             window.swiftBiu.ui.resizeWindow({ height: height });
         }
     </script>
