@@ -1,7 +1,7 @@
 {
   "identifier": "com.swiftbiu.plugin.doubaotext",
   "name": "豆包问答AI",
-  "version": "1.1.1",
+  "version": "1.2",
   "author": "SwiftBiu Team",
   "description": "使用豆包大语言模型生成文本，并将结果直接粘贴。",
   "icon": "text.bubble",
@@ -90,23 +90,6 @@
       ]
     },
     {
-      "key": "systemPrompt",
-      "label": "AI 角色预设 (System Roles)",
-      "type": "radioList",
-      "description": "选择或添加一个 AI 角色，AI 将根据该角色的设定进行回应。",
-      "group": "提示词设置",
-      "defaultItems": [
-        {
-          "enabled": true,
-          "value": "你是一个通用的人工智能助手。"
-        },
-        {
-          "enabled": false,
-          "value": "我是写代码，这个是我的甲方。他提需求很过分，帮我怼他"
-        }
-      ]
-    },
-    {
       "key": "pasteBehavior",
       "label": "默认应用方式",
       "description": "作为默认值使用。开启后默认追加到原文后；关闭则默认替换原文。在 AI 响应 UI 中也可以临时切换，并会同步回这里。",
@@ -127,8 +110,8 @@
       "label": "弹框默认系统提示词",
       "type": "string",
       "defaultValue": "",
-      "placeholder": "留空则沿用 AI 角色预设",
-      "description": "仅在启用原生 AI 响应弹框时使用。这里填写后会优先作为弹框中的默认系统提示词；留空时回退到上面的 AI 角色预设。你在弹框里修改后的内容也会同步写回这里。",
+      "placeholder": "留空则使用插件内置默认提示词",
+      "description": "仅在启用原生 AI 响应弹框时使用。这里填写后会优先作为弹框中的默认系统提示词。若需要多套固定提示词，建议复制扩展并分别保存不同版本。你在弹框里修改后的内容也会同步写回这里。",
       "group": "提示词设置"
     }
   ]

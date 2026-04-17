@@ -332,7 +332,8 @@ If your plugin needs user-provided settings (like an API key), define them in th
 ]
 ```
 
-Supported `type` values include: `string`, `secure` (for passwords), `boolean` (for switches), `option` (for dropdowns), and `radioList`.
+Supported `type` values include: `string`, `secure` (for passwords), `boolean` (for switches), and `option` (for dropdowns).
+Legacy `radioList` configurations are no longer supported. Migrate those cases to a normal `string` field or duplicate the extension for each fixed prompt variant.
 
 Common optional fields:
 *   `group` (String): Groups related settings into the same section in the native settings UI.
@@ -354,7 +355,6 @@ Settings are rendered in a **vertical stack**. This design ensures that long lab
 > | `string` / `secure` | The stored string | Use directly |
 > | `boolean` | `"true"` or `"false"` | `SwiftBiu.getConfig("key") === "true"` |
 > | `option` | The `value` of the selected option | Use directly |
-> | `radioList` | JSON string: `[{"enabled":true,"value":"..."}]` | `JSON.parse(SwiftBiu.getConfig("key"))` |
 
 ##### `option`
 *   **UI**: A dropdown selection menu.
@@ -381,17 +381,6 @@ Settings are rendered in a **vertical stack**. This design ensures that long lab
 ]
 ```
 
-##### `radioList`
-*   **UI**: A dynamic, editable list where each row contains a radio button, a multi-line text view, and a delete button. Users can add new rows.
-*   **Functionality**: Ideal for complex scenarios where users need to configure a set of rules and activate one at a time (e.g., multiple translation prompts).
-*   **Additional Keys**:
-    *   `defaultItems` (Array, No): Defines the initial default items for the list. Each object requires:
-        *   `enabled` (Boolean, Yes): Whether the radio button for this item is selected by default.
-        *   `value` (String, Yes): The default content of the text view.
-
-> [!WARNING]
-> **Visibility Requirement**: For a `radioList` to be visible in the settings UI, it **must** have at least one item defined in `defaultItems` or already stored in the preferences. If `defaultItems` is empty (`[]`) and there's no saved data, the setting will not appear.
-
 #### Configuration Keys: Generic vs Recognized Conventions
 Most configuration `key` values are entirely plugin-defined. SwiftBiu stores them and returns them through `getConfig(...)`, but their meaning is decided by your own script.
 
@@ -404,16 +393,15 @@ Examples of **plugin-level conventions** used by the current AI text templates:
 
 Examples of **currently recognized AI bubble convention keys**:
 *   `responseSystemPrompt`: When `showAIResponseBubble(...)` is called without an explicit `systemPrompt`, the native layer will first look for this config value as the default system prompt.
-*   `systemPrompt`: If `responseSystemPrompt` is empty, the native layer will look for an enabled item in this `radioList` and use that as the fallback system prompt.
 
 Current fallback order for the bubble's default system prompt:
 1. `responseSystemPrompt`
-2. The enabled item inside `systemPrompt`
-3. The manifest default for `responseSystemPrompt`
+2. The manifest default for `responseSystemPrompt`
 
 Recommendation:
 *   If a key is only used by your own script, you may rename it freely as long as the script stays in sync.
-*   If you rename `responseSystemPrompt` or `systemPrompt`, you must also update the script and any native fallback assumptions you rely on.
+*   If you rename `responseSystemPrompt`, you must also update the script and any native fallback assumptions you rely on.
+*   If you need multiple fixed prompt personas, prefer duplicating the extension and customizing each copy instead of adding an in-extension preset switcher.
 *   Treat these AI-related names as **documented conventions for the current native AI response workflow**, not as universal reserved keywords for every plugin.
 
 ### Core API Reference
@@ -452,7 +440,7 @@ In a Standard Action, all code executes globally in the background `script.js`. 
     *   `SwiftBiu.showImage(imageSource: String, position?: Object, context?: Object)`: Displays the native image toast card. `imageSource` accepts either a Base64 string or an `http/https` URL. *(Requires: `notifications`)*
     *   `SwiftBiu.showInteractiveImage(options, onRegenerate)`: Creates an interactive image session and returns a `sessionID`. Use it when you need regenerate/update behavior from the same image card. *(Requires: `notifications`)*
     *   `SwiftBiu.updateInteractiveImage(sessionID, options)` / `SwiftBiu.failInteractiveImage(sessionID, message)`: Updates or fails an existing interactive image session.
-    *   `SwiftBiu.showLoadingIndicator(position: Object)` / `SwiftBiu.hideLoadingIndicator()`: Displays a native loading spinner at the specified coordinates.
+    *   `SwiftBiu.showLoadingIndicator(position: Object)` / `SwiftBiu.hideLoadingIndicator()`: Displays a native loading spinner at the specified coordinates. Recommended only for lightweight non-UI quick actions. For `displayUI(...)`, AI bubble, or image card flows, manage loading state inside your own UI/session.
 *   **Advanced Operations:**
     *   `SwiftBiu.setConfig(key: String, value: String)`: (Synchronous) Persists a plugin configuration value back to native storage.
     *   `SwiftBiu.fetch(url, options, onSuccess, onError)`: (Callback Async) Initiates a low-level network request. *(Requires: `network`)*
@@ -488,7 +476,7 @@ Recommended background workflow:
 
 Best-practice defaults:
 
-*   Omit `systemPrompt` when you want the native layer to resolve it from plugin configuration. The current fallback order is `responseSystemPrompt` -> enabled item in `systemPrompt` -> manifest default.
+*   Omit `systemPrompt` when you want the native layer to resolve it from plugin configuration. The current fallback order is `responseSystemPrompt` -> manifest default.
 *   Omit `promptVisible` and `userPromptVisible` if you want both prompt editors hidden by default.
 *   Omit `submitLabel`, `replaceLabel`, and `appendLabel` unless you truly need a plugin-specific override. Native localization should own those labels.
 *   Only pass `state` or `status` when your plugin needs a custom state transition or custom wording.
@@ -705,9 +693,9 @@ Avoid using bleeding-edge ECMAScript syntax proposals (such as the array `.at()`
 > Background `script.js` currently has two native request styles: one-shot `fetch(...)` and incremental `fetchStream(...)`.
 
 Use `SwiftBiu.fetch(url, options, onSuccess, onError)` when the server returns a complete response in one shot:
-1. Before the request starts, call `SwiftBiu.showLoadingIndicator(context.screenPosition)` for visual feedback.
-2. Call `SwiftBiu.fetch(url, options, onSuccess, onError)` to initiate the request.
-3. Inside the success or error callback, immediately execute `SwiftBiu.hideLoadingIndicator()`.
+1. If your plugin already has its own visual container (`displayUI(...)`, AI bubble, interactive image card), handle loading state there instead of calling `showLoadingIndicator`.
+2. For non-UI quick actions, you may still wrap the request with `SwiftBiu.showLoadingIndicator(...)` and `SwiftBiu.hideLoadingIndicator()`.
+3. Call `SwiftBiu.fetch(url, options, onSuccess, onError)` to initiate the request.
 4. Call `SwiftBiu.showNotification(...)` or update your bubble/UI with the final result.
 
 Use `SwiftBiu.fetchStream(url, options, onEvent, onError)` when the provider supports SSE or chunked responses:

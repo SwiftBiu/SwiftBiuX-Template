@@ -84,22 +84,9 @@
     {
       "key": "prompt_template",
       "label": "Prompt Template",
-      "type": "radioList",
-      "description": "Choose a template for word analysis.",
-      "defaultItems": [
-        {
-          "enabled": true,
-          "value": "Analyze the content.\nIf it is a single word or a short compound word, respond in this JSON format:\n{\n  \"type\": \"word\",\n  \"word\": \"original word\",\n  \"ipa\": \"IPA pronunciation\",\n  \"etymology\": \"origin\",\n  \"rootAnalysis\": \"roots\",\n  \"collocations\": \"list of collocations formatted as a markdown list\",\n  \"memoryAids\": \"memory aid\",\n  \"commonConfusions\": \"confusing words formatted as a markdown list\"\n}\nIf it is a sentence or a phrase, respond in this JSON format:\n{\n  \"type\": \"sentence\",\n  \"original\": \"original text\",\n  \"translation\": \"translated text\",\n  \"grammarNotes\": \"brief grammar analysis or key points\",\n  \"alternatives\": [\"alternative translation 1\", \"alternative translation 2\"]\n}\nIMPORTANT: You MUST wrap your response in a markdown code block like this:\n```json\n{ ... }\n```"
-        },
-        {
-          "enabled": false,
-          "value": "As an etymology expert, analyze the content.\nIf it is a single word or a short compound word, respond in this JSON format:\n{\n  \"analysis\": [\n    { \"title\": \"Basic Info\", \"content\": { \"pronunciation\": \"...\", \"partOfSpeech\": \"...\", \"coreMeaning\": \"...\", \"frequency\": \"...\" } },\n    { \"title\": \"Word Formation\", \"content\": \"...\" },\n    { \"title\": \"Root Network\", \"content\": \"...\" },\n    { \"title\": \"Affix Value\", \"content\": \"...\" },\n    { \"title\": \"Collocations\", \"content\": \"...\" },\n    { \"title\": \"Memory Aids\", \"content\": \"...\" },\n    { \"title\": \"Common Confusions\", \"content\": \"...\" }\n  ]\n}\nIf it is a sentence or a phrase, respond in this JSON format:\n{\n  \"type\": \"sentence\",\n  \"original\": \"original text\",\n  \"translation\": \"translated text\",\n  \"grammarNotes\": \"brief grammar analysis or key points\",\n  \"alternatives\": [\"alternative translation 1\", \"alternative translation 2\"]\n}\nIMPORTANT: You MUST wrap your response in a markdown code block like this:\n```json\n{ ... }\n```"
-        },
-        {
-          "enabled": false,
-          "value": "Explain the content simply.\nIf it is a single word or a short compound word, respond in this JSON format:\n{\n  \"pronunciation\": \"...\",\n  \"meaning\": \"...\",\n  \"usage\": \"...\",\n  \"formationAnalogy\": \"...\",\n  \"relatedWords\": [\"...\", \"...\"],\n  \"exampleSentences\": [\"...\", \"...\"],\n  \"memoryAid\": \"...\",\n  \"commonMistakes\": \"...\"\n}\nIf it is a sentence or a phrase, respond in this JSON format:\n{\n  \"type\": \"sentence\",\n  \"original\": \"original text\",\n  \"translation\": \"translated text\",\n  \"grammarNotes\": \"brief grammar analysis or key points\",\n  \"alternatives\": [\"alternative translation 1\", \"alternative translation 2\"]\n}\nIMPORTANT: You MUST wrap your response in a markdown code block like this:\n```json\n{ ... }\n```"
-        }
-      ]
+      "type": "string",
+      "description": "Customize one analysis prompt for this extension. If you want multiple prompt variants, duplicate the extension and edit each copy separately.",
+      "defaultValue": "Analyze the content.\nIf it is a single word or a short compound word, respond in this JSON format:\n{\n  \"type\": \"word\",\n  \"word\": \"original word\",\n  \"ipa\": \"IPA pronunciation\",\n  \"etymology\": \"origin\",\n  \"rootAnalysis\": \"roots\",\n  \"collocations\": \"list of collocations formatted as a markdown list\",\n  \"memoryAids\": \"memory aid\",\n  \"commonConfusions\": \"confusing words formatted as a markdown list\"\n}\nIf it is a sentence or a phrase, respond in this JSON format:\n{\n  \"type\": \"sentence\",\n  \"original\": \"original text\",\n  \"translation\": \"translated text\",\n  \"grammarNotes\": \"brief grammar analysis or key points\",\n  \"alternatives\": [\"alternative translation 1\", \"alternative translation 2\"]\n}\nIMPORTANT: You MUST wrap your response in a markdown code block like this:\n```json\n{ ... }\n```"
     }
   ]
 }

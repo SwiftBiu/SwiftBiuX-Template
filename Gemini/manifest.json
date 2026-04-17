@@ -3,7 +3,7 @@
   "name": "Gemini",
   "author": "SwiftBiu",
   "description": "Send the selected text to Google Gemini and get the response.",
-  "version": "1.5",
+  "version": "1.6",
   "actions": [
     {
       "title": "Gemini",
@@ -109,24 +109,8 @@
       "label": "响应 UI 系统提示词",
       "type": "string",
       "defaultValue": "",
-      "placeholder": "留空则沿用 System Roles 预设",
-      "description": "AI 响应 UI 中显示和编辑的系统提示词。留空时会回退到启用中的 System Roles。"
-    },
-    {
-      "key": "systemRoles",
-      "label": "System Roles",
-      "type": "radioList",
-      "description": "Define custom roles for the AI assistant.",
-      "defaultItems": [
-        {
-          "enabled": true,
-          "value": "You are a helpful assistant."
-        },
-        {
-          "enabled": false,
-          "value": "You are a professional translator."
-        }
-      ]
+      "placeholder": "留空则使用脚本内置默认提示词",
+      "description": "AI 响应 UI 中显示和编辑的系统提示词。若需要多套固定提示词，建议复制扩展并分别保存不同版本。"
     }
   ]
 }

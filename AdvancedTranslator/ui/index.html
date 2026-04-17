@@ -223,15 +223,7 @@
                 settings.customModel = modelResponse.result;
 
                 if (templateResponse.result) {
-                    try {
-                        const templates = JSON.parse(templateResponse.result);
-                        const enabledTemplate = templates.find(t => t.enabled);
-                        if (enabledTemplate) {
-                            settings.promptTemplate = enabledTemplate.value;
-                        }
-                    } catch (e) {
-                        console.error("Failed to parse prompt templates:", e);
-                    }
+                    settings.promptTemplate = templateResponse.result;
                 }
             } catch (error) {
                 console.error("[UI] Failed to load settings:", error);

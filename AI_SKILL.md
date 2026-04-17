@@ -157,16 +157,18 @@ The `.swiftbiux` packages are universal, but you must keep iOS limitations in mi
 |----------------|----------|----------|-------|
 | `key`          | String   | ✅       | Unique identifier, used with `getConfig(key)` / `storage.get(key)` |
 | `label`        | TranslatableString | ✅       | Display label in settings UI |
-| `type`         | String   | ✅       | One of: `string`, `secure`, `boolean`, `option`, `radioList` |
+| `type`         | String   | ✅       | One of: `string`, `secure`, `boolean`, `option` |
 | `placeholder`  | String   | ❌       | Hint text for `string`/`secure` fields |
 | `description`  | TranslatableString | ❌       | **Sub-label / Help text**. Displays in a smaller font below the main label. |
 | `defaultValue` | Any      | ❌       | Default value (String/Bool/Int/Double) |
 | `group`        | String   | ❌       | Group name for visual grouping (default: "General") |
 | `options`      | Array    | ❌       | For `option` type only: `[{label (TranslatableString), value}]` |
-| `defaultItems` | Array    | ❌       | For `radioList` type only: `[{enabled, value}]` |
 
 > [!NOTE]
 > **Configuration UI Layout**: Settings are rendered in a **vertical stack**. Each item occupies the full width, with the label on top, followed by the description (if present), and the control at the bottom. This ensures long labels and descriptions are fully visible without being truncated.
+
+> [!CAUTION]
+> Legacy `radioList` configurations are no longer supported. If you need multiple fixed prompts, duplicate the extension and customize each copy instead.
 
 > [!CAUTION]
 > The JSON key is `"defaultValue"`, **NOT** `"default"`. Using `"default"` will be silently ignored.
@@ -214,22 +216,15 @@ The `.swiftbiux` packages are universal, but you must keep iOS limitations in mi
     "group": "Model"
   },
   {
-    "key": "system_roles",
-    "label": "System Roles",
-    "type": "radioList",
-    "description": "Define custom roles for the AI assistant.",
-    "defaultItems": [
-      { "enabled": true, "value": "You are a helpful assistant." },
-      { "enabled": false, "value": "You are a professional translator." }
-    ],
+    "key": "system_prompt",
+    "label": "System Prompt",
+    "type": "string",
+    "description": "One prompt per extension is recommended. Duplicate the extension if you want multiple personas.",
+    "defaultValue": "You are a helpful assistant.",
     "group": "Model"
   }
 ]
 ```
-
-> [!WARNING]
-> **Visibility of `radioList`**:
-> For a `radioList` configuration type to be visible in the plugin settings UI, it **must** have at least one item defined in its `defaultItems` (in the manifest) or already stored in the preferences. If `defaultItems` is empty (`[]`) and there's no saved data, the setting will not appear in the UI.
 
 ### `getConfig` Return Value Types
 
@@ -242,17 +237,14 @@ The `.swiftbiux` packages are universal, but you must keep iOS limitations in mi
 | `secure`    | The stored string (from Keychain) | `"sk-abc123"` |
 | `boolean`   | `"true"` or `"false"` (string!) | `"true"` |
 | `option`    | The `value` of the selected option | `"gpt-4o"` |
-| `radioList` | JSON string: `[{"enabled":Bool,"value":String}]` | `"[{\"enabled\":true,\"value\":\"You are helpful.\"}]"` |
 
 **Parsing examples in `script.js`:**
 ```javascript
 // boolean
 var autoPaste = SwiftBiu.getConfig("auto_paste") === "true";
 
-// radioList
-var roles = JSON.parse(SwiftBiu.getConfig("systemRoles") || "[]");
-var activeRole = roles.filter(function(r) { return r.enabled; })[0];
-if (activeRole) { console.log(activeRole.value); }
+// string
+var systemPrompt = SwiftBiu.getConfig("system_prompt") || "You are a helpful assistant.";
 ```
 
 > [!NOTE]
@@ -295,8 +287,8 @@ API object: **`SwiftBiu`** (also accessible as `swiftBiu`, both are injected)
 | `SwiftBiu.getClipboard()` | Sync → String | Requires `clipboardRead` |
 | `SwiftBiu.getConfig(key)` | Sync → String | Read configuration value. **NOT** `storage.get()` |
 | `SwiftBiu.showNotification(message)` | Sync | Requires `notifications`. Also: `showNotification(title, message)` |
-| `SwiftBiu.showLoadingIndicator(position)` | Sync | `position: {x, y}` or use `context.screenPosition` |
-| `SwiftBiu.hideLoadingIndicator()` | Sync | Hide the loading spinner |
+| `SwiftBiu.showLoadingIndicator(position)` | Sync | `position: {x, y}` or use `context.screenPosition`. Prefer only for lightweight non-UI actions |
+| `SwiftBiu.hideLoadingIndicator()` | Sync | Hide the loading spinner. For `displayUI` / AI bubble / image-card flows, handle loading in your own UI |
 | `SwiftBiu.fetch(url, options, onSuccess, onError)` | **Callback-based** | Requires `network`. See below |
 | `SwiftBiu.showImage(source, position, context)` | Sync | `source`: URL string or base64. Requires `notifications` |
 | `SwiftBiu.openFileInPreview(path)` | Sync | Opens file in Preview.app |
@@ -338,20 +330,17 @@ SwiftBiu.displayUI({
 > **`async/await` and `Promise` are FORBIDDEN in `script.js`!** JavaScriptCore does not support them.
 > Use callback-based `SwiftBiu.fetch(url, options, onSuccess, onError)` instead.
 
-**Fetch pattern in script.js (callback-based):**
+**Fetch pattern in script.js (callback-based, UI owns loading state):**
 ```javascript
 function performAction(context) {
-    SwiftBiu.showLoadingIndicator(context.screenPosition);
     SwiftBiu.fetch(
         'https://api.example.com/data',
         { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: context.selectedText}) },
         function(response) {  // onSuccess: { status: Int, data: String }
-            SwiftBiu.hideLoadingIndicator();
             var result = JSON.parse(response.data);
             SwiftBiu.pasteText(result.text);
         },
         function(error) {     // onError: { error: String }
-            SwiftBiu.hideLoadingIndicator();
             SwiftBiu.showNotification("Error", error.error);
         }
     );
@@ -426,7 +415,7 @@ The plugin UI supports native file and folder selection using standard HTML `<in
 6. **Window height auto-resize** — Set `<html>` bg to transparent, `<body>` with `min-height: 100vh`. Calculate height manually with `offsetHeight + 30~50px buffer`, then call `swiftBiu.ui.resizeWindow({height})`.
 7. **Icon specs** — SF Symbols preferred. If using PNG: 64×64 or 128×128, transparent background, named `icon.png`.
 8. **`boolean` config returns string** — `SwiftBiu.getConfig("myBool")` returns `"true"` / `"false"` (string), not native bool. Compare with `=== "true"`.
-9. **`radioList` config returns JSON** — Parse with `JSON.parse()`, filter by `.enabled`, access `.value`. Always wrap in try/catch.
+9. **Use one prompt per extension** — If you need multiple fixed prompt variants, duplicate the extension and customize each copy instead of building an in-extension preset switcher.
 10. **`secure` fields stored in Keychain** — `getConfig` automatically reads from Keychain for `secure` type fields. No extra handling needed in JS.
 
 ## CSS Best Practice for Plugin UI

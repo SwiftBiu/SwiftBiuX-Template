@@ -1,12 +1,12 @@
 {
-    "identifier": "com.swiftbiu.gemini-imageNative",
-    "name": "Nano Banana Native",
+    "identifier": "com.swiftbiu.gemini-imageToast",
+    "name": "Nano Banana",
     "author": "SwiftBiu",
     "description": "Generates images from selected text in a native SwiftBiu studio window.",
-    "version": "1.0",
+    "version": "1.1",
     "actions": [
         {
-            "title": "Nano Banana Native",
+            "title": "Nano Banana",
             "script": "script.js"
         }
     ],

@@ -49,29 +49,8 @@ function resolveSystemPrompt() {
     return overridePrompt;
   }
 
-  const systemRolesConfig = SwiftBiu.getConfig("systemPrompt");
-  if (!systemRolesConfig) {
-    debugLog("No systemPrompt config found, using built-in default");
-    return "你是一个通用的人工智能助手。";
-  }
-
-  try {
-    const roles = JSON.parse(systemRolesConfig);
-    const enabledRole = roles.find(role => role.enabled);
-    const resolvedPrompt = enabledRole ? enabledRole.value : "你是一个通用的人工智能助手。";
-    debugLog("Resolved system prompt from role preset", {
-      roleCount: Array.isArray(roles) ? roles.length : 0,
-      enabledRoleFound: Boolean(enabledRole),
-      length: resolvedPrompt.length
-    });
-    return resolvedPrompt;
-  } catch (error) {
-    console.log("无法解析 AI 角色配置:", error);
-    debugLog("Failed to parse systemPrompt config, falling back to built-in default", {
-      error: error.message
-    });
-    return "你是一个通用的人工智能助手。";
-  }
+  debugLog("No responseSystemPrompt configured, using built-in default");
+  return "你是一个通用的人工智能助手。";
 }
 
 function isAIResponseUIEnabled() {

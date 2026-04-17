@@ -1,93 +1,186 @@
 /**
  * @file script.js
- * @description 豆包图像生成插件 - 纯逻辑后台脚本
+ * @description 豆包图像生成插件 - 使用原生图片卡片展示结果
  */
 
+function getTrimmedSelectedText(context) {
+  if (!context || typeof context.selectedText !== "string") {
+    return "";
+  }
+  return context.selectedText.trim();
+}
 
-/**
- * (同步) 判断动作是否应在当前上下文显示。
- * @param {object} context - 上下文对象，包含选中的文本等信息。
- * @returns {{isAvailable: boolean, isContextMatch: boolean}}
- */
 function isAvailable(context) {
-  const isTextSelected = context.selectedText && context.selectedText.trim().length > 0;
+  const prompt = getTrimmedSelectedText(context);
   return {
-    isAvailable: isTextSelected,
-    isContextMatch: false // 默认 false 按序排序，true 优先排序 可以根据扩展需求用正则智能匹配
+    isAvailable: prompt.length > 0,
+    isContextMatch: false
   };
 }
 
-/**
- * 当用户点击动作时执行。
- * @param {object} context - 上下文对象。
- */
+function supportsInteractiveImage() {
+  return (
+    typeof SwiftBiu.showInteractiveImage === "function" &&
+    typeof SwiftBiu.updateInteractiveImage === "function" &&
+    typeof SwiftBiu.failInteractiveImage === "function"
+  );
+}
+
+function extractResponseJSON(response) {
+  const rawData = response && typeof response.data === "string" ? response.data : "";
+  if (!rawData) {
+    return {};
+  }
+  return JSON.parse(rawData);
+}
+
+function buildImageCardOptions(prompt, imageUrl, settings, context) {
+  return {
+    imageSource: imageUrl,
+    prompt: prompt,
+    selectionText: prompt,
+    position: context && context.screenPosition ? context.screenPosition : null,
+    modelName: settings.imageModel,
+    imageSize: settings.imageSize
+  };
+}
+
+function showRequestError(message, sessionID) {
+  if (sessionID && supportsInteractiveImage()) {
+    SwiftBiu.failInteractiveImage(sessionID, message);
+    return;
+  }
+  SwiftBiu.showNotification("处理失败", message);
+}
+
+function presentGeneratedImage(prompt, imageUrl, settings, context, sessionID) {
+  const imageOptions = buildImageCardOptions(prompt, imageUrl, settings, context);
+
+  if (sessionID && supportsInteractiveImage()) {
+    SwiftBiu.updateInteractiveImage(sessionID, imageOptions);
+    return sessionID;
+  }
+
+  if (supportsInteractiveImage()) {
+    return SwiftBiu.showInteractiveImage(imageOptions, function (event) {
+      handleRegenerate(event, settings, context);
+    });
+  }
+
+  SwiftBiu.showImage(
+    imageUrl,
+    null,
+    {
+      prompt: prompt,
+      selectionText: prompt,
+      modelName: settings.imageModel,
+      imageSize: settings.imageSize
+    }
+  );
+  return "";
+}
+
+function resolveDoubaoImageURL(result) {
+  return result && result.data && result.data[0] ? result.data[0].url : "";
+}
+
+function requestImageGeneration(prompt, settings, context, sessionID) {
+  SwiftBiu.fetch(
+    settings.apiUrl,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + settings.apiKey
+      },
+      body: JSON.stringify({
+        model: settings.imageModel,
+        prompt: prompt,
+        size: settings.imageSize,
+        response_format: "url"
+      })
+    },
+    function (response) {
+      try {
+        const result = extractResponseJSON(response);
+        if (!response || response.status < 200 || response.status >= 300) {
+          const errorMessage =
+            (result && result.error && result.error.message) ||
+            "HTTP Error " + (response ? response.status : "Unknown");
+          throw new Error(errorMessage);
+        }
+
+        const imageUrl = resolveDoubaoImageURL(result);
+        if (!imageUrl) {
+          throw new Error("API 未返回有效的图像 URL。");
+        }
+
+        console.log("Doubao image generated successfully:", JSON.stringify({
+          hasImageURL: true,
+          model: settings.imageModel,
+          size: settings.imageSize,
+          sessionID: sessionID || ""
+        }));
+
+        presentGeneratedImage(prompt, imageUrl, settings, context, sessionID);
+      } catch (error) {
+        const message = error && error.message ? error.message : "生成图片失败";
+        console.log("Doubao image response handling failed:", message);
+        showRequestError(message, sessionID);
+      }
+    },
+    function (error) {
+      const message =
+        (error && (error.error || error.message)) ||
+        "网络请求失败";
+      console.log("Doubao image request failed:", JSON.stringify(error || {}));
+      showRequestError(message, sessionID);
+    }
+  );
+}
+
+function handleRegenerate(event, settings, context) {
+  if (!event || typeof event !== "object") {
+    return;
+  }
+
+  const prompt = typeof event.prompt === "string" ? event.prompt.trim() : "";
+  const sessionID = typeof event.sessionID === "string" ? event.sessionID : "";
+
+  if (!prompt || !sessionID) {
+    showRequestError("缺少重生成所需的 prompt 或 sessionID。", sessionID);
+    return;
+  }
+
+  requestImageGeneration(prompt, settings, context, sessionID);
+}
+
 function performAction(context) {
-  // 1. 从配置中获取设置
-  const apiUrl = SwiftBiu.getConfig('apiUrl') || "https://ark.cn-beijing.volces.com/api/v3/images/generations";
-  const apiKey = SwiftBiu.getConfig('apiKey');
-  const imageModel = SwiftBiu.getConfig('imageModel');
-  const imageSize = SwiftBiu.getConfig('imageSize');
+  const apiUrl = SwiftBiu.getConfig("apiUrl") || "https://ark.cn-beijing.volces.com/api/v3/images/generations";
+  const apiKey = SwiftBiu.getConfig("apiKey");
+  const imageModel = SwiftBiu.getConfig("imageModel") || "doubao-seedream-5-0-260128";
+  const imageSize = SwiftBiu.getConfig("imageSize") || "1024x1024";
+  const prompt = getTrimmedSelectedText(context);
 
   if (!apiKey) {
     SwiftBiu.showNotification("配置错误", "请先在插件设置中配置 API Key。");
     return;
   }
 
-  // 2. 获取选中的文本作为 prompt
-  const prompt = context.selectedText;
-  if (!prompt || prompt.trim().length === 0) {
+  if (!prompt) {
     SwiftBiu.showNotification("输入错误", "请先选择用于生成图像的文本提示。");
     return;
   }
 
-  // 显示加载指示器
-  SwiftBiu.showLoadingIndicator(context.screenPosition);
-
-  // 3. 构造并异步发送 API 请求 (使用回调模式)
-  SwiftBiu.fetch(
-    apiUrl,
+  requestImageGeneration(
+    prompt,
     {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: imageModel || "doubao-seedream-5-0-260128", // Fallback
-        prompt: prompt,
-        size: imageSize || "1024x1024", // Fallback
-        response_format: "url"
-      })
+      apiUrl: apiUrl,
+      apiKey: apiKey,
+      imageModel: imageModel,
+      imageSize: imageSize
     },
-    (response) => { // onSuccess Callback
-      SwiftBiu.hideLoadingIndicator();
-      try {
-        const result = JSON.parse(response.data);
-        if (response.status !== 200) {
-          const errorMessage = result?.error?.message || `HTTP Error ${response.status}`;
-          throw new Error(errorMessage);
-        }
-
-        console.log("API Response:", JSON.stringify(result, null, 2));
-        // 使用兼容性更好的 [0] 替代 .at(0)
-        const imageUrl = result.data?.[0]?.url;
-
-        if (imageUrl) {
-          // 4. 使用原生控件直接显示生成的图片
-          SwiftBiu.showImage(imageUrl);
-        } else {
-          throw new Error("API 未返回有效的图像 URL。");
-        }
-      } catch (e) {
-        SwiftBiu.showNotification("处理失败", e.message);
-        console.log(`Parse error: ${e}, Original response: ${response.data}`);
-      }
-    },
-    (error) => { // onError Callback
-      SwiftBiu.hideLoadingIndicator();
-      const errorMessage = error.error || error.message || "网络请求失败";
-      SwiftBiu.showNotification("请求失败", errorMessage);
-      console.log(`API Error: ${JSON.stringify(error)}`);
-    }
+    context,
+    ""
   );
 }
