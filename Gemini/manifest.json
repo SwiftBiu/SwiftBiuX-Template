@@ -3,7 +3,7 @@
   "name": "Gemini",
   "author": "SwiftBiu",
   "description": "Send the selected text to Google Gemini and get the response.",
-  "version": "1.4",
+  "version": "1.5",
   "actions": [
     {
       "title": "Gemini",
@@ -15,7 +15,8 @@
   "permissions": [
     "network",
     "paste",
-    "notifications"
+    "notifications",
+    "ui"
   ],
   "configuration": [
     {
@@ -88,6 +89,28 @@
       "defaultValue": "0",
       "placeholder": "0-10",
       "description": "设置发送给 AI 的历史消息数量。0 表示不带上下文，最高可设置 10 条。"
+    },
+    {
+      "key": "pasteBehavior",
+      "label": "追加模式",
+      "type": "boolean",
+      "defaultValue": true,
+      "description": "开启后，结果会追加到原文后；关闭则直接替换原文。"
+    },
+    {
+      "key": "enableAIResponseUI",
+      "label": "启用 AI 响应 UI",
+      "type": "boolean",
+      "defaultValue": false,
+      "description": "开启后，Gemini 会使用 SwiftBiu 原生 AI 响应弹框展示结果，并支持在弹框中同步修改替换/追加和系统提示词。"
+    },
+    {
+      "key": "responseSystemPrompt",
+      "label": "响应 UI 系统提示词",
+      "type": "string",
+      "defaultValue": "",
+      "placeholder": "留空则沿用 System Roles 预设",
+      "description": "AI 响应 UI 中显示和编辑的系统提示词。留空时会回退到启用中的 System Roles。"
     },
     {
       "key": "systemRoles",

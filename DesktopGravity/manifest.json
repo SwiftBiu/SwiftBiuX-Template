@@ -1,0 +1,26 @@
+{
+  "identifier": "com.yourname.desktop-gravity",
+  "name": {
+    "en": "Desktop Gravity",
+    "zh": "桌面引力"
+  },
+  "author": "Your Name",
+  "version": "1.2",
+  "description": {
+    "en": "Automatically organize selected files into categorized folders.",
+    "zh": "一键将选中的文件按类型自动分类到文件夹中。"
+  },
+  "icon": "square.grid.3x3.topright.filled",
+  "iconType": "sfSymbol",
+  "actions": [
+    {
+      "title": {
+        "en": "Organize Files",
+        "zh": "整理文件"
+      },
+      "script": "script.js"
+    }
+  ],
+  "permissions": ["localFileRead", "localFileWrite", "notifications", "paste", "clipboardRead"],
+  "configuration": []
+}

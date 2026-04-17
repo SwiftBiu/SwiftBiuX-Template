@@ -186,6 +186,7 @@ SwiftBiu automatically injects the identical `context` (like the selected text) 
 window.swiftBiu_initialize = async function (context) {
     // The UI receives the context directly!
     const text = context.selectedText || "";
+    const selectedFiles = context.selectedFiles || [];
     console.log("User selected:", text);
     
     // You can now proceed to use window.swiftBiu.fetch for API calls 
@@ -206,15 +207,113 @@ This file is the "ID card" for your plugin. Here are the most important keys:
 | --------------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `identifier`    | String | Yes      | A unique ID for your plugin, e.g., `com.yourname.plugin`. **Must be globally unique, as a plugin with a duplicate identifier will overwrite any existing one.** |
 | `name`          | String | Yes      | The display name of your plugin.                                                                                                                                |
-| `author`        | String | Yes       | Author of the plugin.                                                                   |
-| `description`        | String | Yes       | Introduction to Plug-ins.                                                                  |
-
+| `author`        | String | Yes      | Author of the plugin.                                                                                                                                    |
+| `description`   | String | Yes      | Short introduction to the plugin.                                                                                                                          |
 | `version`       | String | Yes      | The plugin's version, e.g., `1.0`.                                                                                                                              |
-| `actions`       | Array  | Yes      | An array defining one actions the plugin provides.                                                                                                      |
-| `icon`          | String | No       | **(Root Level)** An SF Symbol name (e.g., `swift`) or a local PNG file name. This serves as the default icon for the entire plugin.                             |
-| `iconType`      | String | No       | **(Root Level)** Defines the type of the root `icon`. Can be `"sfSymbol"` or `"file"`.                                                                          |
+| `actions`       | Array  | Yes      | An array defining the actions the plugin provides.                                                                                                        |
+| `icon`          | String | No       | **(Root Level)** The default icon for the entire plugin. Supports SF Symbols, packaged image files, text icons, Iconify icons, or a `data:` URI payload.        |
+| `iconType`      | String | No       | **(Root Level)** Defines how `icon` should be interpreted. Supported values: `"sfSymbol"`, `"file"`, `"text"`, `"iconify"`, and `"data"`.                        |
 | `configuration` | Array  | No       | Defines a user-configurable settings UI for your plugin.                                                                                                        |
 | `permissions`   | Array  | No       | Declares system permissions required by the plugin.                                                                                                             |
+
+### Plugin Icon Formats
+
+SwiftBiu now supports multiple icon source types for the root-level plugin icon.
+
+#### 1. SF Symbol
+Use any valid SF Symbol name:
+
+```json
+{
+  "icon": "sparkles",
+  "iconType": "sfSymbol"
+}
+```
+
+If `iconType` is omitted and the value does not look like an image file, SwiftBiu treats it as an SF Symbol by default.
+
+#### 2. Packaged Image File
+Use an image file bundled inside your plugin package. Common formats such as `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`, `.bmp`, `.tif`, `.tiff`, `.heic`, `.icns`, `.pdf`, and `.svg` are supported.
+
+```json
+{
+  "icon": "icon.png",
+  "iconType": "file"
+}
+```
+
+If `iconType` is omitted and the file name ends in a supported image extension, SwiftBiu will also infer it as a file icon automatically.
+
+#### 3. Text Icon
+Use short text such as initials or a compact label:
+
+```json
+{
+  "icon": "AI",
+  "iconType": "text"
+}
+```
+
+You can also use the explicit prefix form:
+
+```json
+{
+  "icon": "text:AI"
+}
+```
+
+Notes:
+* Up to 2 visible characters are rendered.
+* Alphanumeric text is automatically uppercased.
+* Text icons are best for compact labels like `AI`, `EN`, or `123`.
+
+#### 4. Iconify Icon
+Use any Iconify icon name, for example `solar:flag-bold` or `mdi:robot-happy`:
+
+```json
+{
+  "icon": "solar:flag-bold",
+  "iconType": "iconify"
+}
+```
+
+You can also use the explicit prefix form:
+
+```json
+{
+  "icon": "iconify:solar:flag-bold"
+}
+```
+
+If you omit the `iconify:` prefix, make sure `iconType` is set to `"iconify"`.
+
+#### 5. Data URI Icon
+Use an inline `data:` URL when you want to embed the icon content directly in `manifest.json`:
+
+```json
+{
+  "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+  "iconType": "data"
+}
+```
+
+This is useful when your icon is generated dynamically or you want to avoid shipping a separate file.
+
+#### Parsing Rules and Recommendations
+* Explicit prefixes take priority over `iconType`. For example, `text:AI`, `iconify:solar:flag-bold`, and `data:image/png;base64,...` are recognized even if `iconType` is omitted or mismatched.
+* For `Iconify`, prefer storing the clean icon name plus `iconType: "iconify"` in released plugins. The prefixed form is also valid and convenient for quick testing.
+* For `file` icons, keep the asset inside the plugin package and reference it by file name.
+* For `text` icons, keep the text short so it stays visually balanced in toolbars and lists.
+
+#### Icon Design Best Practices
+
+To ensure your plugin feels native and premium within the macOS environment:
+
+*   **Prioritize Vectors**: Use SF Symbols or Iconify icons whenever possible. They scale perfectly and automatically adapt to system theme changes (Light/Dark mode) and user accent colors.
+*   **Transparency is Key**: For custom image files, always use PNG or WebP with alpha transparency. Avoid solid backgrounds, as they won't blend seamlessly with the toolbar's vibrant materials.
+*   **Optical Padding**: Leave approximately 10-15% empty padding around the main shape of your icon. This "breathing room" ensures the icon doesn't look cramped in the toolbar or menu bar rows.
+*   **Design for Small Sizes**: Toolbar icons are typically rendered between 18px and 24px. Avoid complex details, fine textures, or small text that might become illegible or blurry.
+*   **High Contrast**: Ensure your icon remains recognizable against both light and dark translucent backgrounds.
 
 ### Plugin Configuration (`configuration`)
 
@@ -234,6 +333,11 @@ If your plugin needs user-provided settings (like an API key), define them in th
 ```
 
 Supported `type` values include: `string`, `secure` (for passwords), `boolean` (for switches), `option` (for dropdowns), and `radioList`.
+
+Common optional fields:
+*   `group` (String): Groups related settings into the same section in the native settings UI.
+*   `placeholder` (String): Placeholder text for `string` / `secure` style inputs.
+*   `description` (String): Long-form explanatory copy shown under the label.
 
 #### Configuration UI Layout
 Settings are rendered in a **vertical stack**. This design ensures that long labels and detailed descriptions are fully visible.
@@ -288,6 +392,30 @@ Settings are rendered in a **vertical stack**. This design ensures that long lab
 > [!WARNING]
 > **Visibility Requirement**: For a `radioList` to be visible in the settings UI, it **must** have at least one item defined in `defaultItems` or already stored in the preferences. If `defaultItems` is empty (`[]`) and there's no saved data, the setting will not appear.
 
+#### Configuration Keys: Generic vs Recognized Conventions
+Most configuration `key` values are entirely plugin-defined. SwiftBiu stores them and returns them through `getConfig(...)`, but their meaning is decided by your own script.
+
+Examples of **plugin-level conventions** used by the current AI text templates:
+*   `pasteBehavior`: Read by the template script to decide the default apply mode (`append` vs `replace`).
+*   `enableAIResponseUI`: Read by the template script to decide whether to open the native AI response bubble or directly paste the final text.
+    *   By itself, this key does nothing at the native layer.
+    *   It becomes effective only when your `script.js` explicitly checks `SwiftBiu.getConfig("enableAIResponseUI")` and branches into `showAIResponseBubble(...)` instead of the legacy direct-paste flow.
+    *   In other words, this is a documented template convention, not a universal built-in manifest switch.
+
+Examples of **currently recognized AI bubble convention keys**:
+*   `responseSystemPrompt`: When `showAIResponseBubble(...)` is called without an explicit `systemPrompt`, the native layer will first look for this config value as the default system prompt.
+*   `systemPrompt`: If `responseSystemPrompt` is empty, the native layer will look for an enabled item in this `radioList` and use that as the fallback system prompt.
+
+Current fallback order for the bubble's default system prompt:
+1. `responseSystemPrompt`
+2. The enabled item inside `systemPrompt`
+3. The manifest default for `responseSystemPrompt`
+
+Recommendation:
+*   If a key is only used by your own script, you may rename it freely as long as the script stays in sync.
+*   If you rename `responseSystemPrompt` or `systemPrompt`, you must also update the script and any native fallback assumptions you rely on.
+*   Treat these AI-related names as **documented conventions for the current native AI response workflow**, not as universal reserved keywords for every plugin.
+
 ### Core API Reference
 
 The APIs available to your plugin depend entirely on which plugin architecture (Action Type) you chose in your `manifest.json`.
@@ -303,14 +431,67 @@ In a Standard Action, all code executes globally in the background `script.js`. 
     *   `SwiftBiu.writeToClipboard(text: String)`: Writes text to the system clipboard. *(Requires: `clipboardWrite`)*
     *   `SwiftBiu.pasteText(text: String)`: Writes text to the clipboard and immediately pastes it into the active window. *(Requires: `paste`)*
     *   `SwiftBiu.getClipboard()`: Retrieves plain text from the system clipboard. *(Requires: `clipboardRead`)*
+    *   `SwiftBiu.getFileMetadata(path: String)`: Returns metadata for the selected local file, including size, timestamps, and content type. *(Requires: `localFileRead`)*
+    *   `SwiftBiu.readLocalFile(path: String)`: Reads any currently selected local file and returns its contents as a Base64 string. *(Requires: `localFileRead`)*
+    *   `SwiftBiu.readLocalTextFile(path: String)`: Convenience API for decoding the current selected file as UTF-8 text. *(Requires: `localFileRead`)*
+    *   `SwiftBiu.listDirectory(path: String)`: Lists items in an accessible directory and returns metadata objects for each child. *(Requires: `localFileRead`)*
+    *   `SwiftBiu.fileExists(path: String)`: Returns whether an accessible path exists and is a file. *(Requires: `localFileRead` or `localFileWrite`)*
+    *   `SwiftBiu.directoryExists(path: String)`: Returns whether an accessible path exists and is a directory. *(Requires: `localFileRead` or `localFileWrite`)*
+    *   `SwiftBiu.pickLocalDirectory()`: Opens the macOS folder picker, stores the user's authorization, and returns the chosen folder path. *(Requires: `localFileWrite`)*
+    *   `SwiftBiu.createLocalDirectory(path: String)`: Creates a directory inside a selected or authorized location and returns the created path. *(Requires: `localFileWrite`)*
+    *   `SwiftBiu.createLocalFile(path: String, base64String: String)`: Creates a new file from Base64 data inside a selected or authorized location and returns the created path. *(Requires: `localFileWrite`)*
+    *   `SwiftBiu.writeLocalTextFile(path: String, text: String)`: Creates a new UTF-8 text file inside a selected or authorized location and returns the created path. *(Requires: `localFileWrite`)*
+    *   `SwiftBiu.overwriteLocalFile(path: String, base64String: String)`: Replaces the contents of an existing accessible file and returns the file path. *(Requires: `localFileWrite`)*
+    *   `SwiftBiu.renameLocalFile(path: String, newName: String)`: Renames a selected local file within its current directory. *(Requires: `localFileWrite`)*
+    *   `SwiftBiu.copyLocalFile(sourcePath: String, destinationPath: String)`: Copies a selected local file to an accessible destination path. *(Requires: `localFileWrite`)*
+    *   `SwiftBiu.moveLocalFile(sourcePath: String, destinationPath: String)`: Moves a selected local file to an accessible destination path. *(Requires: `localFileWrite`)*
+    *   `SwiftBiu.trashLocalItem(path: String)`: Moves a selected local file or an item inside an authorized directory to the macOS Trash. *(Requires: `localFileWrite`)*
     *   `SwiftBiu.openURL(urlString: String)`: Launches the default browser to open a link.
     *   `SwiftBiu.openFileInPreview(filePath: String)`: Opens a file using the macOS default app (e.g., Preview).
     *   `SwiftBiu.showNotification(title: String, body: String)`: Sends a system-level notification. *(Requires: `notifications`)*
+    *   `SwiftBiu.showImage(imageSource: String, position?: Object, context?: Object)`: Displays the native image toast card. `imageSource` accepts either a Base64 string or an `http/https` URL. *(Requires: `notifications`)*
+    *   `SwiftBiu.showInteractiveImage(options, onRegenerate)`: Creates an interactive image session and returns a `sessionID`. Use it when you need regenerate/update behavior from the same image card. *(Requires: `notifications`)*
+    *   `SwiftBiu.updateInteractiveImage(sessionID, options)` / `SwiftBiu.failInteractiveImage(sessionID, message)`: Updates or fails an existing interactive image session.
     *   `SwiftBiu.showLoadingIndicator(position: Object)` / `SwiftBiu.hideLoadingIndicator()`: Displays a native loading spinner at the specified coordinates.
 *   **Advanced Operations:**
+    *   `SwiftBiu.setConfig(key: String, value: String)`: (Synchronous) Persists a plugin configuration value back to native storage.
     *   `SwiftBiu.fetch(url, options, onSuccess, onError)`: (Callback Async) Initiates a low-level network request. *(Requires: `network`)*
+    *   `SwiftBiu.fetchStream(url, options, onEvent, onError)`: (Synchronous Create) Starts a streaming network request and returns a `streamID`. *(Requires: `network`)*
+    *   `SwiftBiu.cancelFetchStream(streamID: String)`: (Synchronous Cancel) Cancels an active streaming request created by `fetchStream(...)`.
     *   `SwiftBiu.runShellScript(script, context)`: (Synchronous) Executes a Bash/Zsh script and returns the output. *(Requires: `runShellScript`)*
 
+#### 1.5 Native AI Response Bubble (Background Script)
+For AI plugins such as Doubao, OpenAI, or Gemini, prefer SwiftBiu's native AI response bubble instead of building a second floating window from scratch.
+
+These APIs are available directly in background `script.js` and require the `ui` permission:
+
+*   `SwiftBiu.showAIResponseBubble(options, onEvent)`: (Synchronous Create) Displays the native AI response bubble and returns a `sessionID`.
+*   `SwiftBiu.updateAIResponseBubble(sessionID, options)`: (Synchronous Update) Updates state, status, generated text, and button availability.
+*   `SwiftBiu.failAIResponseBubble(sessionID, message)`: (Synchronous Update) Switches the bubble into a failed state with a message.
+*   `SwiftBiu.closeAIResponseBubble(sessionID)`: (Synchronous Close) Closes the current bubble session.
+
+Useful `onEvent(event)` values:
+
+*   `configChanged`: The user changed `mode`, `systemPrompt`, `userPrompt`, or section visibility.
+*   `submit`: The user confirmed applying the current text. The event includes `text`, `mode`, `systemPrompt`, and `userPrompt`.
+*   `regenerate`: The user requested a fresh generation using the current prompt values.
+*   `previewPoster` / `sharePoster`: Poster preview and share actions from the native bubble.
+
+Recommended background workflow:
+
+1. Call `showAIResponseBubble(...)` with the minimal fields your plugin truly needs, usually `title`, `mode`, and an `onEvent` handler.
+2. For one-shot APIs, use `SwiftBiu.fetch(...)` and update the bubble once on completion.
+3. For true streaming APIs, use `SwiftBiu.fetchStream(...)`, parse SSE or chunked output in your script, and repeatedly call `updateAIResponseBubble(...)` with the cumulative full text.
+4. When handling `configChanged`, persist settings such as `mode` or custom prompts through `SwiftBiu.setConfig(...)`.
+5. When handling `regenerate`, cancel any in-flight stream via `cancelFetchStream(...)` before starting a new request.
+6. When handling `submit`, let the background script decide whether to replace or append, then apply the text with `pasteText(...)`.
+
+Best-practice defaults:
+
+*   Omit `systemPrompt` when you want the native layer to resolve it from plugin configuration. The current fallback order is `responseSystemPrompt` -> enabled item in `systemPrompt` -> manifest default.
+*   Omit `promptVisible` and `userPromptVisible` if you want both prompt editors hidden by default.
+*   Omit `submitLabel`, `replaceLabel`, and `appendLabel` unless you truly need a plugin-specific override. Native localization should own those labels.
+*   Only pass `state` or `status` when your plugin needs a custom state transition or custom wording.
 
 #### 2. Web App Action API (Custom UI)
 Web App Actions employ a physically isolated dual-sandbox system. Under this architecture, APIs are strictly divided into the **"Background Launcher"** and the **"User Frontend Interface"**, isolating them from one another:
@@ -334,12 +515,23 @@ In a Web App's background script, complex business logic is omitted. Its primary
 Once the HTML UI is successfully displayed, the system assumes control and injects a bridging object into the page’s global scope to communicate natively. **It is highly recommended to prefix calls with `window.` to explicitly state the scope.**
 
 *   **Data Injection Hook (Core)**:
-    *   `window.swiftBiu_initialize = async function(context) { ... }` : You MUST define this global function in your HTML. After the page finishes loading, the system automatically calls it and injects the `context` parameter (such as highlighted text) from the background.
+    *   `window.swiftBiu_initialize = async function(context) { ... }` : You MUST define this global function in your HTML. After the page finishes loading, the system automatically calls it and injects the `context` parameter (such as highlighted text or selected local files) from the background.
+    *   `context.selectedText`: The original selected text.
+    *   `context.selectedFiles`: An array of inferred local file descriptors from the current selection. It can contain any local file type. Each item contains `{ path, fileURL, fileName, fileExtension }`.
+        *   Use this when the host has already recognized local files for the current context. If the user context only contains text-form paths (for example, newline-separated POSIX paths or `file://` URLs), your plugin should parse `context.selectedText` or the result of `SwiftBiu.getClipboard()` itself.
+        *   On macOS, some sources such as Finder file copies may provide both display text and native file URLs. SwiftBiu preserves those native file URLs when possible and maps them into `context.selectedFiles` even if `context.selectedText` only contains file names.
+        *   Plugin JavaScript can currently read **plain text** from the clipboard via `SwiftBiu.getClipboard()`. Reading native file-URL objects directly from the macOS pasteboard, like some built-in native actions do, is not guaranteed by the current plugin API.
 *   **Bridge Capabilities (Mind the Async Boundaries)**:
     *While the bridge code wraps all these APIs in a Promise (meaning you can technically `await` all of them), on the native Swift side they are strictly divided into **Data-Returning** (true async await) and **Trigger-Based** (Fire-and-Forget, no `await` needed).*
     *   **Methods that REQUIRE `await` for data:**
         *   `window.swiftBiu.fetch(url, options)`: Returns `{ status: Number, data: String }`. *(Requires: `network`)*
         *   `window.swiftBiu.storage.get(key)`: Returns `{ result: String }`.
+        *   `window.swiftBiu.getFileMetadata(path)`: Returns a metadata object for the selected local file. *(Requires: `localFileRead`)*
+        *   `window.swiftBiu.readLocalFile(path)`: Returns `{ base64: String }`. Reads any local file from the current `context.selectedFiles` only. *(Requires: `localFileRead`)*
+        *   `window.swiftBiu.readLocalTextFile(path)`: Returns `{ result: String }`. Convenience API for decoding the current selected file as UTF-8 text. *(Requires: `localFileRead`)*
+        *   `window.swiftBiu.listDirectory(path)`: Returns `{ items: Array<Object> }`. Lists direct children of an accessible directory. *(Requires: `localFileRead`)*
+        *   `window.swiftBiu.fileExists(path)`: Returns `{ exists: Boolean }`. Checks whether an accessible path exists as a file. *(Requires: `localFileRead` or `localFileWrite`)*
+        *   `window.swiftBiu.directoryExists(path)`: Returns `{ exists: Boolean }`. Checks whether an accessible path exists as a directory. *(Requires: `localFileRead` or `localFileWrite`)*
         *   `window.swiftBiu.runShellScript(script, context)`: Returns `{ result: String }`. *(Highly restricted by App Store sandbox).*
     *   **Trigger-Based Methods (No `await` needed):**
         *(Although they return a JS Promise, the native side resolves them immediately upon receiving the command without blocking to wait for side-effects like dialogs. Treat them as synchronous triggers.)*
@@ -347,7 +539,17 @@ Once the HTML UI is successfully displayed, the system assumes control and injec
         *   `window.swiftBiu.pasteText(text)`: Copies and actively pastes text into the focused window.
         *   `window.swiftBiu.openURL(url)`: Opens a Web URL via the default browser.
         *   `window.swiftBiu.speakText(text)`: Utilizes the macOS native TTS to speak the given text aloud.
-        *   `window.swiftBiu.exportFile(base64String, filename)`: Triggers the macOS native "Save As" dialogue.
+        *   `window.swiftBiu.pickLocalDirectory()`: Returns `{ path: String }`. Opens the native folder picker and persists the chosen writable location. *(Requires: `localFileWrite`)*
+        *   `window.swiftBiu.createLocalDirectory(path)`: Returns `{ path: String }`. Creates a directory inside a selected or authorized location. *(Requires: `localFileWrite`)*
+        *   `window.swiftBiu.createLocalFile(path, base64String)`: Returns `{ path: String }`. Creates a new file from Base64 data inside a selected or authorized location. *(Requires: `localFileWrite`)*
+        *   `window.swiftBiu.writeLocalTextFile(path, text)`: Returns `{ path: String }`. Creates a new UTF-8 text file inside a selected or authorized location. *(Requires: `localFileWrite`)*
+        *   `window.swiftBiu.overwriteLocalFile(path, base64String)`: Returns `{ path: String }`. Replaces the contents of an existing accessible file. *(Requires: `localFileWrite`)*
+        *   `window.swiftBiu.renameLocalFile(path, newName)`: Returns `{ path: String }`. Renames a selected local file in place. *(Requires: `localFileWrite`)*
+        *   `window.swiftBiu.copyLocalFile(sourcePath, destinationPath)`: Returns `{ path: String }`. Copies a selected local file to an accessible destination path. *(Requires: `localFileWrite`)*
+        *   `window.swiftBiu.moveLocalFile(sourcePath, destinationPath)`: Returns `{ path: String }`. Moves a selected local file to an accessible destination path. *(Requires: `localFileWrite`)*
+        *   `window.swiftBiu.trashLocalItem(path)`: Returns `{ success: Boolean }`. Moves a selected local file or an item in an authorized location to the macOS Trash. *(Requires: `localFileWrite`)*
+        *   `window.swiftBiu.saveLocalFile(base64String, filename)`: Triggers the macOS native "Save As" dialogue for arbitrary file data.
+        *   `window.swiftBiu.exportFile(base64String, filename)`: Backward-compatible alias for `saveLocalFile(...)`.
 *   **Window Lifecycles and Fluid Control (Trigger-Based):**
     *   `window.swiftBiu.ui.resizeWindow({ height: Number })`: Dynamically adjusts the height of the Web App window for responsive popups. (Recommend leaving a 30px buffer).
     *   `window.swiftBiu.closeWindow()`: (Trigger-Based) Closes its own Web UI window instantly. *(Note: The JS context immediately dies; code after this call may not execute).*
@@ -362,6 +564,12 @@ Plugins can trigger native macOS file and folder selection dialogs directly from
 *   **File Selection**: Use a standard `<input type="file">`.
 *   **Folder Selection**: Add the `webkitdirectory` attribute: `<input type="file" webkitdirectory>`.
 *(Best Practice: use the `FileReader` API to read the file content as an `ArrayBuffer` or `DataURL` as soon as the user selects the files, and cache that data. Avoid relying on the same `File` object for too long).*
+
+##### Best Practice for Sandboxed File Creation
+When a plugin needs to create files or folders inside the App Store sandbox, prefer this flow:
+1. Call `pickLocalDirectory()` so the user explicitly chooses a writable folder.
+2. Create subfolders with `createLocalDirectory(...)` and files with `createLocalFile(...)` underneath that returned path.
+3. Use `trashLocalItem(...)` instead of permanently deleting content.
 ## Cross-Platform (macOS & iOS) Compatibility
 
 With SwiftBiu expanding to iOS, your plugins can run seamlessly across both platforms with the exact same `.swiftbiux` package. However, you must adhere to the following responsive design and API graceful degradation practices:
@@ -384,8 +592,10 @@ To ensure your plugin functions correctly, especially in the sandboxed App Store
 *   `"network"`: Required for `swiftBiu.fetch`.
 *   `"clipboardRead"`: Required for `SwiftBiu.getClipboard()` — allows the plugin to read the current clipboard content.
 *   `"clipboardWrite"`: Required for `swiftBiu.copyText`.
+*   `"localFileRead"`: Required for `SwiftBiu.getFileMetadata(path)`, `SwiftBiu.readLocalFile(path)`, `SwiftBiu.readLocalTextFile(path)`, `SwiftBiu.listDirectory(path)`, `window.swiftBiu.getFileMetadata(path)`, `window.swiftBiu.readLocalFile(path)`, `window.swiftBiu.readLocalTextFile(path)`, and `window.swiftBiu.listDirectory(path)` — allows the plugin to inspect and read the currently selected local files or accessible directories.
+*   `"localFileWrite"`: Required for `pickLocalDirectory`, `createLocalDirectory`, `createLocalFile`, `writeLocalTextFile`, `overwriteLocalFile`, `renameLocalFile`, `copyLocalFile`, `moveLocalFile`, `trashLocalItem`, `saveLocalFile`, `fileExists`, and `directoryExists` when checking writable destinations — allows the plugin to create, update, move, rename, trash, or save files in selected or authorized locations.
 *   `"paste"`: Required for `swiftBiu.pasteText` — allows the plugin to paste text directly into the user's active application.
-*   `"notifications"`: Required for `swiftBiu.showNotification`.
+*   `"notifications"`: Required for `swiftBiu.showNotification`, `SwiftBiu.showImage`, and `SwiftBiu.showInteractiveImage`.
 *   `"runAppleScript"`: Required for `SwiftBiu.runAppleScript()` — allows the plugin to execute AppleScript code. ⚠️ **Not available in the App Store (sandboxed) version.**
 *   `"runShellScript"`: Required for `swiftBiu.runShellScript`. ⚠️ **Not available in the App Store (sandboxed) version.**
 
@@ -489,18 +699,25 @@ Through the development process, we've identified some common pitfalls and recom
 
 Avoid using bleeding-edge ECMAScript syntax proposals (such as the array `.at()` method or bleeding-edge RegEx features) in background scripts. This may cause runtime errors on older macOS systems. We recommend using standard ES6 syntax to ensure the broadest compatibility across different macOS versions.
 
-### 5. Native Callback Mechanism for Background Requests
+### 5. Native Request Modes for Background Scripts
 
 > [!NOTE]
-> The native `fetch` interface injected into background scripts by SwiftBiu uses a **Callback** pattern.
+> Background `script.js` currently has two native request styles: one-shot `fetch(...)` and incremental `fetchStream(...)`.
 
-If your Standard Action requires time-consuming network requests in `script.js`, please strictly follow this lifecycle pattern to avoid silent failures or UI blocking:
+Use `SwiftBiu.fetch(url, options, onSuccess, onError)` when the server returns a complete response in one shot:
 1. Before the request starts, call `SwiftBiu.showLoadingIndicator(context.screenPosition)` for visual feedback.
 2. Call `SwiftBiu.fetch(url, options, onSuccess, onError)` to initiate the request.
 3. Inside the success or error callback, immediately execute `SwiftBiu.hideLoadingIndicator()`.
-4. Call `SwiftBiu.showNotification(...)` to inform the user of the result.
+4. Call `SwiftBiu.showNotification(...)` or update your bubble/UI with the final result.
 
-*(Note: If you prefer modern JS, you can manually wrap this in a Promise in your script to use async/await. On the Web UI side, the global `window.swiftBiu.fetch` is already a pure Promise API.)*
+Use `SwiftBiu.fetchStream(url, options, onEvent, onError)` when the provider supports SSE or chunked responses:
+1. Start the request and store the returned `streamID` if you may need to cancel or replace it later.
+2. Handle `response` to inspect status and headers before data arrives.
+3. Handle each `data` event by parsing the provider-specific chunk format and appending it to your accumulated output.
+4. On `complete`, finalize UI state such as `ready`, enable submit buttons, or persist final metadata.
+5. If the user cancels or regenerates, call `SwiftBiu.cancelFetchStream(streamID)` before launching the next stream.
+
+*(If you prefer modern JS, you can manually wrap `fetch(...)` in a Promise for async/await style. On the Web UI side, the global `window.swiftBiu.fetch` is already a Promise API.)*
 
 ### 6. Background Debugging: Log Complex Objects Fully
 

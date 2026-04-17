@@ -181,6 +181,7 @@ SwiftBiu 会自动将相同的 `context` (如选中的文本) 直接注入到页
 window.swiftBiu_initialize = async function (context) {
     // UI 直接拿到了上下文！
     const text = context.selectedText || "";
+    const selectedFiles = context.selectedFiles || [];
     console.log("用户选中了:", text);
     
     // 接下来您可以使用 window.swiftBiu.fetch 继续调用 API 
@@ -204,48 +205,104 @@ window.swiftBiu_initialize = async function (context) {
 | `description`   | String | 是       | 插件的介绍。                                                                                                |
 | `version`       | String | 是       | 插件的版本号，例如 `1.0`。                                                                                  |
 | `actions`       | Array  | 是       | 定义插件提供的一个或多个动作的数组（目前只支持一个动作）。                                                  |
-| `icon`          | String | 否       | **(根级别)** SF Symbol 的名称 (如 `swift`) 或本地 PNG 文件名。这将作为整个插件的默认图标。                  |
-| `iconType`      | String | 否       | **(根级别)** 定义根级别 `icon` 的类型。可选值为 `"sfSymbol"` 或 `"file"`。                                  |
+| `icon`          | String | 否       | **(根级别)** 整个插件的默认图标。支持 SF Symbol、打包图片文件、文本图标、Iconify 图标和 `data:` URI 数据图标。 |
+| `iconType`      | String | 否       | **(根级别)** 定义 `icon` 的解析方式。支持 `"sfSymbol"`、`"file"`、`"text"`、`"iconify"` 和 `"data"`。        |
 | `configuration` | Array  | 否       | 为您的插件定义一个可由用户配置的设置界面。                                                                  |
 | `permissions`   | Array  | 否       | 声明插件运行所需的系统权限。                                                                                |
 
 ### 插件图标规范 (`icon`)
 
-为了确保您的插件在 SwiftBiu 的所有界面（包括插件商店、工具栏和设置）中都能清晰、美观地展示，请遵循以下图标设计规范：
+SwiftBiu 现在支持多种根级别插件图标来源，方便您根据场景选择最合适的表现形式。
 
-#### 图标类型
+#### 1. SF Symbol
+使用任意合法的 SF Symbol 名称：
 
-我们支持两种类型的图标：
-
-1.  **SF Symbol (推荐)**:
-    *   **优点**: 这是最推荐的方式。SF Symbols 是 Apple 官方的图标库，能自动适应系统的主题（浅色/深色模式），并保证在所有分辨率下都清晰锐利。
-    *   **使用**: 只需在 `icon` 字段中提供 SF Symbol 的官方名称即可。您可以使用 “SF Symbols” 应用来浏览和查找合适的图标。
-
-2.  **PNG 图片**:
-    *   **优点**: 允许您使用完全自定义的品牌图标。
-    *   **规范**:
-        *   **源文件尺寸**: 推荐使用 **64x64 像素** 或 **128x128 像素**。
-            *   **为何推荐更大的尺寸？** 这是为了完美适配高分辨率的 **Retina 屏幕**。一个在界面上显示为 **18x18 点**的图标，在 2x 的 Retina 屏幕上就需要 **36x36 像素**来渲染。提供一个比所需像素更大的源文件（如 64x64 或 128x128），可以让系统**缩小**图片来显示，从而获得比**放大**低分辨率图片（如 32x32）更清晰、更锐利的视觉效果。
-            *   **如何选择？** **64x64 像素** 是一个很好的平衡点，它在保证高质量的同时，文件体积也相对较小。**128x128 像素** 则提供了最高的图像质量，但文件体积会更大。两者都是可接受的优质选择。
-        *   **格式**: 必须是带透明通道的 PNG (`.png`) 文件。
-        *   **命名**: 将图标文件命名为 `icon.png` 并放置在您插件的根目录中。然后在 `manifest.json` 中将 `icon` 字段设置为 `"icon.png"`。
-    *   **显示尺寸**: 为了保持整个应用视觉风格的一致性，所有插件图标（无论是在主菜单、工具栏还是插件商店中）的最终显示尺寸都统一为 **18x18 点**。系统会自动将您的源文件按比例缩放以适应这个尺寸。
-
-**示例:**
-
-**使用 SF Symbol:**
 ```json
 {
-  "icon": "puzzlepiece.extension"
+  "icon": "sparkles",
+  "iconType": "sfSymbol"
 }
 ```
 
-**使用 PNG 图片:**
+如果省略 `iconType`，且 `icon` 的值看起来不像图片文件名，SwiftBiu 会默认按 SF Symbol 处理。
+
+#### 2. 打包图片文件
+使用随插件一起打包的图片文件。常见格式如 `.png`、`.jpg`、`.jpeg`、`.webp`、`.gif`、`.bmp`、`.tif`、`.tiff`、`.heic`、`.icns`、`.pdf`、`.svg` 都支持。
+
 ```json
 {
-  "icon": "icon.png"
+  "icon": "icon.png",
+  "iconType": "file"
 }
 ```
+
+如果省略 `iconType`，但文件名以受支持的图片扩展名结尾，SwiftBiu 也会自动推断为文件图标。
+
+建议：
+* 建议优先使用带透明背景的图片。
+* 推荐准备较高分辨率的源文件，例如 `64x64` 或 `128x128`，以便在 Retina 屏幕上缩放后仍然清晰。
+* 最终在主菜单、工具栏、插件商店等位置会统一缩放到接近一致的图标视觉尺寸。
+
+#### 3. 文本图标
+适合使用简短文本、缩写或编号作为图标：
+
+```json
+{
+  "icon": "AI",
+  "iconType": "text"
+}
+```
+
+也支持显式前缀写法：
+
+```json
+{
+  "icon": "text:AI"
+}
+```
+
+说明：
+* 最多渲染 2 个可见字符。
+* 字母和数字会自动转为大写。
+* 适合 `AI`、`EN`、`12` 这类短标签。
+
+#### 4. Iconify 图标
+可以直接使用任意合法的 Iconify 名称，例如 `solar:flag-bold` 或 `mdi:robot-happy`：
+
+```json
+{
+  "icon": "solar:flag-bold",
+  "iconType": "iconify"
+}
+```
+
+也支持显式前缀写法：
+
+```json
+{
+  "icon": "iconify:solar:flag-bold"
+}
+```
+
+如果不写 `iconify:` 前缀，请确保同时设置 `iconType` 为 `"iconify"`。
+
+#### 5. Data URI 图标
+如果您希望直接把图标内容内联到 `manifest.json` 中，可以使用 `data:` URL：
+
+```json
+{
+  "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+  "iconType": "data"
+}
+```
+
+这适合动态生成图标，或希望避免额外分发独立图片文件的场景。
+
+#### 解析规则与建议
+* 显式前缀的优先级高于 `iconType`。例如 `text:AI`、`iconify:solar:flag-bold`、`data:image/png;base64,...` 即使未设置或错误设置 `iconType`，也会优先按前缀解析。
+* 对于正式发布的插件，推荐将 Iconify 图标写成纯名称加 `iconType: "iconify"` 的形式；带前缀写法也完全有效，适合快速测试。
+* 对于 `file` 图标，请将资源文件放在插件包内，并通过文件名引用。
+* 对于 `text` 图标，请尽量保持简短，以获得更稳定的视觉效果。
 
 ### 插件配置 (`configuration`)
 
@@ -265,6 +322,11 @@ window.swiftBiu_initialize = async function (context) {
 ```
 
 支持的 `type` 值包括：`string` (文本)、`secure` (密码)、`boolean` (开关)、`option` (下拉菜单) 和 `radioList`。
+
+常见可选字段：
+*   `group` (String): 在原生设置界面中把相关配置项归到同一个分组里。
+*   `placeholder` (String): `string` / `secure` 输入框的占位提示。
+*   `description` (String): 显示在标题下方的长说明文案。
 
 #### 设置界面布局
 设置界面采用**纵向堆叠**布局。这种设计确保了长名称和详细说明都能完整显示。
@@ -319,6 +381,30 @@ window.swiftBiu_initialize = async function (context) {
 > [!WARNING]
 > **显示要求**: 为了让 `radioList` 在设置界面中可见，它**必须**在 `defaultItems` 中定义至少一个项目，或者在偏好设置中已经存储了数据。如果 `defaultItems` 为空 (`[]`) 且没有保存的数据，该设置项将不会显示。
 
+#### 配置 Key：自定义字段 vs 当前约定字段
+大多数配置项的 `key` 都是插件自己定义的。SwiftBiu 只负责存储，并通过 `getConfig(...)` 返回；它们真正的业务含义由您的脚本自己决定。
+
+当前 AI 文本模板里常见的**脚本层约定 key**：
+*   `pasteBehavior`: 由模板脚本读取，用来决定默认应用方式是 `append` 还是 `replace`。
+*   `enableAIResponseUI`: 由模板脚本读取，用来决定是打开原生 AI 响应弹框，还是在结果返回后直接粘贴文本。
+    *   这个 key 本身不会让原生层自动开启任何能力。
+    *   只有当您的 `script.js` 显式读取 `SwiftBiu.getConfig("enableAIResponseUI")`，并据此切换到 `showAIResponseBubble(...)` 分支时，它才会真正生效。
+    *   换句话说，它是当前模板文档化的脚本约定，不是所有插件都自动支持的 manifest 内建开关。
+
+当前 AI 响应弹框链路里会识别的**约定 key**：
+*   `responseSystemPrompt`: 当 `showAIResponseBubble(...)` 没有显式传 `systemPrompt` 时，原生层会优先读取这个配置项，作为默认系统提示词。
+*   `systemPrompt`: 如果 `responseSystemPrompt` 为空，原生层会继续尝试读取这个 `radioList` 中当前启用的项，作为系统提示词回退值。
+
+当前弹框默认系统提示词的回退顺序：
+1. `responseSystemPrompt`
+2. `systemPrompt` 中当前启用项
+3. manifest 里 `responseSystemPrompt` 的默认值
+
+建议：
+*   如果某个 key 只是给您自己的脚本使用，您可以自由改名，只要脚本同步调整即可。
+*   如果您重命名了 `responseSystemPrompt` 或 `systemPrompt`，就需要连同脚本逻辑和依赖这些 key 的原生回退约定一起调整。
+*   请把这些 AI 相关名称理解为**当前原生 AI 响应工作流的文档化约定**，而不是所有插件通用的硬编码保留关键字。
+
 ## 核心 API 参考
 
 根据您在 `manifest.json` 中选择的插件架构形态，可用的 API 环境会有本质区别。
@@ -334,14 +420,67 @@ window.swiftBiu_initialize = async function (context) {
     *   `SwiftBiu.writeToClipboard(text: String)`: 写入系统剪贴板。*(所需权限: `clipboardWrite`)*
     *   `SwiftBiu.pasteText(text: String)`: 写入剪贴板并立即粘贴到触发插件前的活跃窗口。*(所需权限: `paste`)*
     *   `SwiftBiu.getClipboard()`: 获取当前系统剪贴板文本。*(所需权限: `clipboardRead`)*
+    *   `SwiftBiu.getFileMetadata(path: String)`: 返回当前所选本地文件的元数据，包括大小、时间戳和内容类型。*(所需权限: `localFileRead`)*
+    *   `SwiftBiu.readLocalFile(path: String)`: 读取当前 `context.selectedFiles` 中的任意本地文件，并返回 Base64 字符串。*(所需权限: `localFileRead`)*
+    *   `SwiftBiu.readLocalTextFile(path: String)`: 读取当前文件并按 UTF-8 文本解码的便捷接口。*(所需权限: `localFileRead`)*
+    *   `SwiftBiu.listDirectory(path: String)`: 读取可访问目录下的直接子项，并返回每个子项的元数据对象。*(所需权限: `localFileRead`)*
+    *   `SwiftBiu.fileExists(path: String)`: 返回可访问路径是否存在且是文件。*(所需权限: `localFileRead` 或 `localFileWrite`)*
+    *   `SwiftBiu.directoryExists(path: String)`: 返回可访问路径是否存在且是目录。*(所需权限: `localFileRead` 或 `localFileWrite`)*
+    *   `SwiftBiu.pickLocalDirectory()`: 打开 macOS 原生文件夹选择器，保存用户授权，并返回所选目录路径。*(所需权限: `localFileWrite`)*
+    *   `SwiftBiu.createLocalDirectory(path: String)`: 在已选择或已授权的位置创建文件夹，并返回创建后的路径。*(所需权限: `localFileWrite`)*
+    *   `SwiftBiu.createLocalFile(path: String, base64String: String)`: 在已选择或已授权的位置根据 Base64 数据创建新文件，并返回创建后的路径。*(所需权限: `localFileWrite`)*
+    *   `SwiftBiu.writeLocalTextFile(path: String, text: String)`: 在已选择或已授权的位置创建新的 UTF-8 文本文件，并返回创建后的路径。*(所需权限: `localFileWrite`)*
+    *   `SwiftBiu.overwriteLocalFile(path: String, base64String: String)`: 覆盖一个已存在可访问文件的内容，并返回该文件路径。*(所需权限: `localFileWrite`)*
+    *   `SwiftBiu.renameLocalFile(path: String, newName: String)`: 在原目录中重命名当前所选本地文件。*(所需权限: `localFileWrite`)*
+    *   `SwiftBiu.copyLocalFile(sourcePath: String, destinationPath: String)`: 将当前所选本地文件复制到可访问的目标路径。*(所需权限: `localFileWrite`)*
+    *   `SwiftBiu.moveLocalFile(sourcePath: String, destinationPath: String)`: 将当前所选本地文件移动到可访问的目标路径。*(所需权限: `localFileWrite`)*
+    *   `SwiftBiu.trashLocalItem(path: String)`: 将当前所选本地文件，或已授权目录中的目标项移到 macOS 废纸篓。*(所需权限: `localFileWrite`)*
     *   `SwiftBiu.openURL(urlString: String)`: 唤起默认浏览器打开链接。
     *   `SwiftBiu.openFileInPreview(filePath: String)`: 唤起 macOS 默认应用(如预览)打开文件。
     *   `SwiftBiu.showNotification(title: String, body: String)`: 发送系统级通知窗。*(所需权限: `notifications`)*
+    *   `SwiftBiu.showImage(imageSource: String, position?: Object, context?: Object)`: 显示原生图片 Toast 卡片。`imageSource` 支持 Base64 字符串或 `http/https` 图片 URL。*(所需权限: `notifications`)*
+    *   `SwiftBiu.showInteractiveImage(options, onRegenerate)`: 创建可交互图片会话并返回 `sessionID`。适用于同一张图片卡片上的“重生成/更新”流程。*(所需权限: `notifications`)*
+    *   `SwiftBiu.updateInteractiveImage(sessionID, options)` / `SwiftBiu.failInteractiveImage(sessionID, message)`: 更新或失败结束已有的可交互图片会话。
     *   `SwiftBiu.showLoadingIndicator(position: Object)` / `SwiftBiu.hideLoadingIndicator()`: 在指定坐标处显示系统原生 Loading 动画。
 *   **进阶操作:**
+    *   `SwiftBiu.setConfig(key: String, value: String)`: (同步) 将插件配置值持久化写回原生存储。
     *   `SwiftBiu.fetch(url, options, onSuccess, onError)`: (Callback 异步) 发起底层网络请求。*(所需权限: `network`)*
+    *   `SwiftBiu.fetchStream(url, options, onEvent, onError)`: (同步创建) 发起一个流式网络请求，并返回 `streamID`。*(所需权限: `network`)*
+    *   `SwiftBiu.cancelFetchStream(streamID: String)`: (同步取消) 取消一个由 `fetchStream(...)` 创建的进行中流式请求。
     *   `SwiftBiu.runShellScript(script, context)`: (同步) 执行 Bash/Zsh 脚本并返回输出。*(所需权限: `runShellScript`)*
 
+#### 1.5 原生 AI 响应弹框（后台脚本）
+对于豆包、OpenAI、Gemini 这类“生成文本后再决定替换还是追加”的插件，推荐直接使用 SwiftBiu 的原生 AI 响应弹框，而不是再自己造一个悬浮窗。
+
+这些 API 可直接在后台 `script.js` 中调用，并需要声明 `ui` 权限：
+
+*   `SwiftBiu.showAIResponseBubble(options, onEvent)`: (同步创建) 显示原生 AI 响应弹框，并返回 `sessionID`。
+*   `SwiftBiu.updateAIResponseBubble(sessionID, options)`: (同步更新) 更新状态、状态文案、生成文本与按钮可用性。
+*   `SwiftBiu.failAIResponseBubble(sessionID, message)`: (同步更新) 让弹框快速切换到失败态并显示错误信息。
+*   `SwiftBiu.closeAIResponseBubble(sessionID)`: (同步关闭) 主动关闭当前弹框会话。
+
+常见的 `onEvent(event)` 事件包括：
+
+*   `configChanged`: 用户修改了 `mode`、`systemPrompt`、`userPrompt` 或提示词区域显隐状态。
+*   `submit`: 用户确认应用当前结果。事件里会带回 `text`、`mode`、`systemPrompt`、`userPrompt`。
+*   `regenerate`: 用户希望基于当前提示词重新生成。
+*   `previewPoster` / `sharePoster`: 用户进入海报预览或触发海报分享。
+
+推荐的后台工作流：
+
+1. 调用 `showAIResponseBubble(...)` 展示弹框，通常只需要传插件真正关心的最小字段，例如 `title`、`mode` 和 `onEvent`。
+2. 如果是一次性返回结果的接口，继续使用 `SwiftBiu.fetch(...)`，请求结束后一次性更新弹框。
+3. 如果是支持真流式的接口，使用 `SwiftBiu.fetchStream(...)`，在脚本里解析 SSE 或 chunk，并把“累计后的完整文本”持续回写给 `updateAIResponseBubble(...)`。
+4. 在处理 `configChanged` 时，使用 `SwiftBiu.setConfig(...)` 持久化 `mode` 或自定义提示词等设置。
+5. 在处理 `regenerate` 时，先通过 `cancelFetchStream(...)` 取消上一次未结束的流，再启动新的请求。
+6. 在处理 `submit` 时，由后台脚本决定是“替换”还是“追加”，随后通过 `pasteText(...)` 真正应用文本。
+
+默认建议：
+
+*   如果希望系统提示词由原生层自动从插件配置解析，请不要传 `systemPrompt`。当前回退顺序是 `responseSystemPrompt` -> `systemPrompt` 中当前启用项 -> manifest 默认值。
+*   如果希望系统提示词和用户提示词编辑区默认隐藏，请不要传 `promptVisible` 和 `userPromptVisible`。
+*   如果希望按钮文案跟随系统多语言，请不要传 `submitLabel`、`replaceLabel`、`appendLabel`，除非插件确实要强制覆盖。
+*   `state` 和 `status` 只在插件确实需要自定义阶段文案或状态流转时再传。
 
 #### 2. Web App 动作 API (自定义 UI 架构)
 Web App 动作采用了物理隔离的双沙盒系统。在这个架构下，API 被严格拆分为了**“后台启动器”**和**“用户前端界面”**两部分，它们互不干扰：
@@ -365,12 +504,23 @@ Web App 动作采用了物理隔离的双沙盒系统。在这个架构下，API
 当 HTML UI 成功显示后，系统会接管它，并在页面全局作用域中注入一个与原生层通信的桥接对象。**强烈建议加上 `window.` 前缀以明确该调用的所属范畴。**
 
 *   **数据交接入口 (核心)**:
-    *   `window.swiftBiu_initialize = async function(context) { ... }` : 您必须在 HTML 网页中定义该全局函数。当网页加载完毕，系统会自动注入来自后台脚本的 `context` 参数（如划词文本），供网页展示。
+    *   `window.swiftBiu_initialize = async function(context) { ... }` : 您必须在 HTML 网页中定义该全局函数。当网页加载完毕，系统会自动注入来自后台脚本的 `context` 参数（如划词文本或当前识别到的本地文件），供网页展示。
+    *   `context.selectedText`: 原始选中文本。
+    *   `context.selectedFiles`: 从当前选择内容中推断出的本地文件数组，可包含任意本地文件类型。每项包含 `{ path, fileURL, fileName, fileExtension }`。
+        *   该字段适合表示“宿主已经识别出的本地文件”。如果用户当前上下文只提供了文本形式的路径（例如多行 POSIX 路径或 `file://` URL），您需要自行解析 `context.selectedText` 或 `SwiftBiu.getClipboard()` 的返回值。
+        *   在 macOS 上，某些来源（例如 Finder 复制文件）可能会同时提供“文件名文本”和原生文件 URL。SwiftBiu 会尽量保留这些原生文件 URL，并将它们映射到 `context.selectedFiles`，即使 `context.selectedText` 只是文件名列表。
+        *   插件 JavaScript 当前只能通过 `SwiftBiu.getClipboard()` 读取**纯文本**剪贴板内容；像内置原生动作那样直接读取系统剪贴板中的文件 URL 对象，并不是当前插件 API 的保证能力。
 *   **底层交互 API (需注意异步边界)**:
     *底层桥接代码为所有 API 都包装了 Promise，所以形式上您都可以使用 `await` 调用。但在原生实现层面，它们分为**数据返回型**（真正的等待）和**触发型**（Fire-and-Forget，无需 `await`）。*
     *   **需要 `await` 获取数据的真实异步:**
         *   `window.swiftBiu.fetch(url, options)`: 返回 `{ status: Number, data: String }`。*(所需权限: `network`)*
         *   `window.swiftBiu.storage.get(key)`: 返回 `{ result: String }`。
+        *   `window.swiftBiu.getFileMetadata(path)`: 返回当前所选本地文件的元数据对象。*(所需权限: `localFileRead`)*
+        *   `window.swiftBiu.readLocalFile(path)`: 返回 `{ base64: String }`。仅允许读取当前 `context.selectedFiles` 中的本地文件。*(所需权限: `localFileRead`)*
+        *   `window.swiftBiu.readLocalTextFile(path)`: 返回 `{ result: String }`。按 UTF-8 文本解码当前文件的便捷接口。*(所需权限: `localFileRead`)*
+        *   `window.swiftBiu.listDirectory(path)`: 返回 `{ items: Array<Object> }`。读取可访问目录的直接子项。*(所需权限: `localFileRead`)*
+        *   `window.swiftBiu.fileExists(path)`: 返回 `{ exists: Boolean }`。判断可访问路径是否存在且是文件。*(所需权限: `localFileRead` 或 `localFileWrite`)*
+        *   `window.swiftBiu.directoryExists(path)`: 返回 `{ exists: Boolean }`。判断可访问路径是否存在且是目录。*(所需权限: `localFileRead` 或 `localFileWrite`)*
         *   `window.swiftBiu.runShellScript(script, context)`: 返回 `{ result: String }`。*(App Store 版极严限制)*
     *   **触发型方法 (无需刻意 `await`):**
         **(JS 侧返回 Promise，但原生一旦收到指令就会**立即** resolve，不会阻塞等待对话框等副作用结束。当作同步触发即可)*
@@ -378,7 +528,17 @@ Web App 动作采用了物理隔离的双沙盒系统。在这个架构下，API
         *   `window.swiftBiu.pasteText(text)`: 将文字复制并立刻打字粘贴到焦点窗口。
         *   `window.swiftBiu.openURL(url)`: 通过系统默认浏览器打开 Web 链接。
         *   `window.swiftBiu.speakText(text)`: 调用 macOS 系统 TTS 功能纯净朗读文本。
-        *   `window.swiftBiu.exportFile(base64String, filename)`: 唤起 macOS 原生的“另存为”文件对话框。
+        *   `window.swiftBiu.pickLocalDirectory()`: 返回 `{ path: String }`。打开原生文件夹选择器，并持久化该可写目录的授权。*(所需权限: `localFileWrite`)*
+        *   `window.swiftBiu.createLocalDirectory(path)`: 返回 `{ path: String }`。在已选择或已授权的位置创建文件夹。*(所需权限: `localFileWrite`)*
+        *   `window.swiftBiu.createLocalFile(path, base64String)`: 返回 `{ path: String }`。在已选择或已授权的位置根据 Base64 数据创建新文件。*(所需权限: `localFileWrite`)*
+        *   `window.swiftBiu.writeLocalTextFile(path, text)`: 返回 `{ path: String }`。在已选择或已授权的位置创建新的 UTF-8 文本文件。*(所需权限: `localFileWrite`)*
+        *   `window.swiftBiu.overwriteLocalFile(path, base64String)`: 返回 `{ path: String }`。覆盖一个已存在可访问文件的内容。*(所需权限: `localFileWrite`)*
+        *   `window.swiftBiu.renameLocalFile(path, newName)`: 返回 `{ path: String }`。原地重命名当前所选本地文件。*(所需权限: `localFileWrite`)*
+        *   `window.swiftBiu.copyLocalFile(sourcePath, destinationPath)`: 返回 `{ path: String }`。将当前所选本地文件复制到可访问的目标路径。*(所需权限: `localFileWrite`)*
+        *   `window.swiftBiu.moveLocalFile(sourcePath, destinationPath)`: 返回 `{ path: String }`。将当前所选本地文件移动到可访问的目标路径。*(所需权限: `localFileWrite`)*
+        *   `window.swiftBiu.trashLocalItem(path)`: 返回 `{ success: Boolean }`。将当前所选本地文件，或已授权目录中的目标项移到 macOS 废纸篓。*(所需权限: `localFileWrite`)*
+        *   `window.swiftBiu.saveLocalFile(base64String, filename)`: 为任意文件数据唤起 macOS 原生“另存为”对话框。
+        *   `window.swiftBiu.exportFile(base64String, filename)`: `saveLocalFile(...)` 的向后兼容别名。
 *   **弹窗生命周期与流体操纵 (触发型):**
     *   `window.swiftBiu.ui.resizeWindow({ height: Number })`: 动态调节现有 Web App 窗口的物理高度以实现自适应弹窗。（建议留足 30px 空隙防遮挡）
     *   `window.swiftBiu.closeWindow()`: (触发型) 直接关闭自身的当前 Web 窗口 UI，插件工作结束。*(注：JS 环境会随之立刻销毁，此方法后的代码可能不再运行)*
@@ -393,6 +553,12 @@ Web App 动作采用了物理隔离的双沙盒系统。在这个架构下，API
 *   **文件选择**: 使用标准的 `<input type="file">`。
 *   **文件夹选择**: 添加 `webkitdirectory` 属性：`<input type="file" webkitdirectory>`。
 *(建议在用户选择文件后，立即使用 `FileReader` API 将文件内容读取为 `ArrayBuffer` 或 `DataURL` 并进行缓存，以确保后续操作的稳定性。避免过长时间持有 File 句柄)*
+
+##### 沙盒内创建文件的最佳实践
+当插件需要在 App Store 沙盒环境里创建文件或文件夹时，推荐采用下面的流程：
+1. 先调用 `pickLocalDirectory()`，让用户显式选择一个可写目录。
+2. 在该返回路径下继续调用 `createLocalDirectory(...)` 与 `createLocalFile(...)` 创建子目录和文件。
+3. 删除内容时优先使用 `trashLocalItem(...)`，避免硬删除。
 ## 跨平台 (macOS & iOS) 兼容性
 
 随着 SwiftBiu 登录 iOS，您的插件使用同一份 `.swiftbiux` 安装包即可在双端无缝运行。但您必须遵循以下响应式设计与 API 优雅降级规范：
@@ -414,8 +580,10 @@ Web App 动作采用了物理隔离的双沙盒系统。在这个架构下，API
 *   `"network"`: `swiftBiu.fetch` 需要此权限。
 *   `"clipboardRead"`: `SwiftBiu.getClipboard()` 需要此权限 — 允许插件读取当前剪贴板内容。
 *   `"clipboardWrite"`: `swiftBiu.copyText` 需要此权限。
+*   `"localFileRead"`: `SwiftBiu.getFileMetadata(path)`、`SwiftBiu.readLocalFile(path)`、`SwiftBiu.readLocalTextFile(path)`、`SwiftBiu.listDirectory(path)`、`window.swiftBiu.getFileMetadata(path)`、`window.swiftBiu.readLocalFile(path)`、`window.swiftBiu.readLocalTextFile(path)` 与 `window.swiftBiu.listDirectory(path)` 需要此权限 — 允许插件检查并读取当前所选本地文件或可访问目录。
+*   `"localFileWrite"`: `pickLocalDirectory`、`createLocalDirectory`、`createLocalFile`、`writeLocalTextFile`、`overwriteLocalFile`、`renameLocalFile`、`copyLocalFile`、`moveLocalFile`、`trashLocalItem`、`saveLocalFile`，以及在检查可写目标时的 `fileExists`、`directoryExists` 需要此权限 — 允许插件在所选或已授权位置创建、更新、移动、重命名、移入废纸篓或保存文件。
 *   `"paste"`: `swiftBiu.pasteText` 需要此权限 — 允许插件将文本直接粘贴到用户的活跃应用程序中。
-*   `"notifications"`: `swiftBiu.showNotification` 需要此权限。
+*   `"notifications"`: `swiftBiu.showNotification`、`SwiftBiu.showImage` 与 `SwiftBiu.showInteractiveImage` 需要此权限。
 *   `"runAppleScript"`: `SwiftBiu.runAppleScript()` 需要此权限 — 允许插件执行 AppleScript 代码。⚠️ **在 App Store（沙盒）版本中不可用。**
 *   `"runShellScript"`: `swiftBiu.runShellScript` 需要此权限。⚠️ **在 App Store（沙盒）版本中不可用。**
 
@@ -519,18 +687,25 @@ SwiftBiu 提供了针对其双环境架构的两种互补的调试方式。
 
 避免在后台脚本中使用过于前沿的 ECMAScript 提案语法（例如数组的 `.at()` 方法或未定档的正则扩展特性），这可能会导致低版本系统的运行时报错。建议使用兼容性更好的标准 ES6 语法以确保更广泛的 macOS 兼容性。
 
-### 5. 后台网络请求的原生回调机制
+### 5. 后台脚本的两种原生请求模式
 
 > [!NOTE]
-> SwiftBiu 为后台脚本注入的原生 `fetch` 接口基于**回调函数 (Callback)** 模式。
+> 后台 `script.js` 当前有两种原生网络请求模式：一次性结果的 `fetch(...)`，以及增量回调的 `fetchStream(...)`。
 
-如果您的标准动作需要在 `script.js` 中执行耗时的网络请求，请严格按照以下生命周期编写，以避免请求静默失败或阻塞应用：
+当服务端是“一次性完整返回”时，使用 `SwiftBiu.fetch(url, options, onSuccess, onError)`：
 1. 请求开始前，调用 `SwiftBiu.showLoadingIndicator(context.screenPosition)` 给予视觉反馈。
 2. 调用 `SwiftBiu.fetch(url, options, onSuccess, onError)` 发起请求。
 3. 在成功或失败回调内部，立即执行 `SwiftBiu.hideLoadingIndicator()`。
-4. 调用 `SwiftBiu.showNotification(...)` 告知结果。
+4. 使用 `SwiftBiu.showNotification(...)` 或更新原生弹框 / 自定义 UI 告知最终结果。
 
-*(注意：如果您习惯现代 JS，您可以在脚本中自行将其封装为 Promise 进行 async/await 调用。而在 Web UI 侧，全局的 `window.swiftBiu.fetch` 已经是纯正的 Promise API。)*
+当服务端支持 SSE 或 chunked 真流式时，使用 `SwiftBiu.fetchStream(url, options, onEvent, onError)`：
+1. 启动请求后保存返回的 `streamID`，方便后续取消、重试或重新生成。
+2. 在 `response` 事件中先检查状态码和响应头。
+3. 在每次 `data` 事件里解析服务商自己的 chunk 格式，并把内容追加到脚本内部维护的累计文本里。
+4. 在 `complete` 事件里收尾，例如把 UI 切到 `ready`、开放提交按钮，或保存最终元数据。
+5. 如果用户取消或重新生成，请先调用 `SwiftBiu.cancelFetchStream(streamID)` 再启动新的流。
+
+*(注意：如果您习惯现代 JS，依然可以自行把 `fetch(...)` 包装成 Promise 以使用 async/await；而在 Web UI 侧，全局的 `window.swiftBiu.fetch` 本来就是 Promise API。)*
 
 ### 6. 后台调试：完整打印复杂对象
 

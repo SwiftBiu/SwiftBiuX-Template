@@ -53,7 +53,7 @@ function performAction(context) {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: imageModel || "doubao-seedream-4.5", // Fallback
+        model: imageModel || "doubao-seedream-5-0-260128", // Fallback
         prompt: prompt,
         size: imageSize || "1024x1024", // Fallback
         response_format: "url"

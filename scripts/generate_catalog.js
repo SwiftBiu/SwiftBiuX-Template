@@ -136,8 +136,20 @@ files.forEach(file => {
                 type: type,
                 author: manifest.author || 'Unknown',
                 downloadUrl: `${baseUrl}${file}.swiftbiux`,
-                categoryId: categoryId
+                categoryId: categoryId,
+                requiredHost: null // Initialize as null
             };
+
+            // Add requiredHost for specific AI plugins
+            const googleRequiredIds = [
+                'app.ikw.swiftbiu.airewriter',
+                'com.SwiftBiu.gemini',
+                'com.swiftbiu.gemini-imageToast'
+            ];
+            
+            if (googleRequiredIds.includes(plugin.id)) {
+                plugin.requiredHost = 'google.com';
+            }
 
             // Add author URL if known (hardcoded for now, can be in manifest later)
             if (manifest.author === 'zwpaper') {
@@ -177,7 +189,7 @@ const excludedIds = [
     'com.swiftbiu.gemini-imageToast'
 ];
 
-const filteredPlugins = plugins.filter(p => !excludedIds.includes(p.id));
+const filteredPlugins = plugins; // No longer filtered here, filtered at runtime in Swift
 
 const filteredCatalog = {
     ...catalog,
@@ -185,5 +197,5 @@ const filteredCatalog = {
 };
 
 fs.writeFileSync(path.join(catalogDir, 'plugins.json'), JSON.stringify(filteredCatalog, null, 2));
-console.log(`Successfully generated COMPLIANT catalog with ${filteredPlugins.length} plugins at catalog/plugins.json`);
+console.log(`Successfully generated catalog with ${filteredPlugins.length} plugins at catalog/plugins.json`);
 console.log(`(Excluded ${plugins.length - filteredPlugins.length} AI plugins: ${excludedIds.join(', ')})`);

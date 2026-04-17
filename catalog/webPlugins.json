@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-16T04:28:24.888Z",
+  "generatedAt": "2026-03-27T11:37:04.956Z",
   "categories": [
     {
       "id": "text-processing",
@@ -66,7 +66,8 @@
       "type": "Web App",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AIPolisher.swiftbiux",
-      "categoryId": "online-services"
+      "categoryId": "online-services",
+      "requiredHost": null
     },
     {
       "id": "app.ikw.swiftbiu.airewriter",
@@ -83,7 +84,8 @@
       "type": "Network",
       "author": "kweizh",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AIRewriter.swiftbiux",
-      "categoryId": "online-services"
+      "categoryId": "online-services",
+      "requiredHost": "google.com"
     },
     {
       "id": "com.swiftbiu.plugin.advancedtranslator",
@@ -100,7 +102,8 @@
       "type": "Web App",
       "author": "SwiftBiu Team",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AdvancedTranslator.swiftbiux",
-      "categoryId": "online-services"
+      "categoryId": "online-services",
+      "requiredHost": null
     },
     {
       "id": "com.SwiftBiu.base64converter",
@@ -117,7 +120,8 @@
       "type": "Local",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/Base64Converter.swiftbiux",
-      "categoryId": "text-processing"
+      "categoryId": "text-processing",
+      "requiredHost": null
     },
     {
       "id": "com.SwiftBiu.caseconverter",
@@ -134,7 +138,8 @@
       "type": "Local",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/CaseConverter.swiftbiux",
-      "categoryId": "text-processing"
+      "categoryId": "text-processing",
+      "requiredHost": null
     },
     {
       "id": "com.swiftbiu.plugin.currencyconverter",
@@ -147,11 +152,12 @@
         "zh": "Real-time currency conversion with support for multiple currencies."
       },
       "icon": "banknote",
-      "version": "1.0",
+      "version": "1.1",
       "type": "Web App",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/CurrencyConverter.swiftbiux",
-      "categoryId": "online-services"
+      "categoryId": "online-services",
+      "requiredHost": null
     },
     {
       "id": "com.swiftbiu.plugin.currencyconverterlite",
@@ -168,7 +174,8 @@
       "type": "Network",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/CurrencyConverterLite.swiftbiux",
-      "categoryId": "online-services"
+      "categoryId": "online-services",
+      "requiredHost": null
     },
     {
       "id": "com.swiftbiu.plugin.doubaoimage",
@@ -185,7 +192,8 @@
       "type": "Network",
       "author": "SwiftBiu Team",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DoubaoImage-Plugin.swiftbiux",
-      "categoryId": "online-services"
+      "categoryId": "online-services",
+      "requiredHost": null
     },
     {
       "id": "com.swiftbiu.plugin.doubaotext",
@@ -202,7 +210,8 @@
       "type": "Network",
       "author": "SwiftBiu Team",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DoubaoText-Plugin.swiftbiux",
-      "categoryId": "online-services"
+      "categoryId": "online-services",
+      "requiredHost": null
     },
     {
       "id": "com.SwiftBiu.gemini",
@@ -219,7 +228,8 @@
       "type": "Network",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/Gemini.swiftbiux",
-      "categoryId": "online-services"
+      "categoryId": "online-services",
+      "requiredHost": "google.com"
     },
     {
       "id": "com.swiftbiu.gemini-imageToast",
@@ -236,7 +246,26 @@
       "type": "Network",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/GeminiImage.swiftbiux",
-      "categoryId": "online-services"
+      "categoryId": "online-services",
+      "requiredHost": "google.com"
+    },
+    {
+      "id": "com.swiftbiu.gemini-imageNative",
+      "name": {
+        "en": "Nano Banana Native",
+        "zh": "Nano Banana Native"
+      },
+      "description": {
+        "en": "Generates images in a native SwiftBiu studio window with prompt editing, logs, and share-poster export.",
+        "zh": "Generates images in a native SwiftBiu studio window with prompt editing, logs, and share-poster export."
+      },
+      "icon": "nano-banana.png",
+      "version": "1.0",
+      "type": "Network",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/GeminiImageNative.swiftbiux",
+      "categoryId": "online-services",
+      "requiredHost": "google.com"
     },
     {
       "id": "com.SwiftBiu.hashcalculator",
@@ -253,7 +282,8 @@
       "type": "Local",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/HashCalculator.swiftbiux",
-      "categoryId": "text-processing"
+      "categoryId": "text-processing",
+      "requiredHost": null
     },
     {
       "id": "com.SwiftBiu.jsonformatter",
@@ -270,7 +300,8 @@
       "type": "Local",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/JSONFormatter.swiftbiux",
-      "categoryId": "text-processing"
+      "categoryId": "text-processing",
+      "requiredHost": null
     },
     {
       "id": "com.SwiftBiu.markdowntableformatter",
@@ -287,7 +318,8 @@
       "type": "Local",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/MarkdownTableFormatter.swiftbiux",
-      "categoryId": "text-processing"
+      "categoryId": "text-processing",
+      "requiredHost": null
     },
     {
       "id": "com.official.mermaidpreviewer",
@@ -304,7 +336,8 @@
       "type": "Web App",
       "author": "官方",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/MermaidPreviewer.swiftbiux",
-      "categoryId": "devtools"
+      "categoryId": "devtools",
+      "requiredHost": null
     },
     {
       "id": "com.swiftbiu.packager",
@@ -321,7 +354,8 @@
       "type": "Web App",
       "author": "Antigravity",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/PluginPackager.swiftbiux",
-      "categoryId": "devtools"
+      "categoryId": "devtools",
+      "requiredHost": null
     },
     {
       "id": "com.swiftbiu.qrcode",
@@ -338,7 +372,8 @@
       "type": "Web App",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/QRCodeGenerator.swiftbiux",
-      "categoryId": "data-creative"
+      "categoryId": "data-creative",
+      "requiredHost": null
     },
     {
       "id": "com.SwiftBiu.regexextractor",
@@ -355,7 +390,8 @@
       "type": "Local",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/RegexExtractor.swiftbiux",
-      "categoryId": "text-processing"
+      "categoryId": "text-processing",
+      "requiredHost": null
     },
     {
       "id": "com.SwiftBiu.sluggenerator",
@@ -372,7 +408,8 @@
       "type": "Local",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/SlugGenerator.swiftbiux",
-      "categoryId": "text-processing"
+      "categoryId": "text-processing",
+      "requiredHost": null
     },
     {
       "id": "com.SwiftBiu.textcleaner",
@@ -389,7 +426,8 @@
       "type": "Local",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/TextCleaner.swiftbiux",
-      "categoryId": "text-processing"
+      "categoryId": "text-processing",
+      "requiredHost": null
     },
     {
       "id": "com.SwiftBiu.timestampconverter",
@@ -406,7 +444,8 @@
       "type": "Local",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/TimestampConverter.swiftbiux",
-      "categoryId": "text-processing"
+      "categoryId": "text-processing",
+      "requiredHost": null
     },
     {
       "id": "com.SwiftBiu.wordcount",
@@ -423,7 +462,8 @@
       "type": "Local",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/WordCount.swiftbiux",
-      "categoryId": "text-processing"
+      "categoryId": "text-processing",
+      "requiredHost": null
     },
     {
       "id": "com.SwiftBiu.rmbconverter",
@@ -440,7 +480,8 @@
       "type": "Local",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/cny.swiftbiux",
-      "categoryId": "text-processing"
+      "categoryId": "text-processing",
+      "requiredHost": null
     }
   ]
 }

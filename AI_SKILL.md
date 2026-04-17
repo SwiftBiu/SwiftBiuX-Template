@@ -85,8 +85,8 @@ function performAction(context) {
   "author": "Your Name",                     // REQUIRED
   "description": "What this plugin does.",   // REQUIRED, supports TranslatableString
   "version": "1.0",                          // REQUIRED
-  "icon": "swift",                           // SF Symbol name or "icon.png"
-  "iconType": "sfSymbol",                    // "sfSymbol" or "file"
+  "icon": "swift",                           // Default plugin icon (see supported formats below)
+  "iconType": "sfSymbol",                    // "sfSymbol" | "file" | "text" | "iconify" | "data"
   "actions": [                               // REQUIRED, currently only one action
     {
       "title": "Action Title",               // Supports TranslatableString
@@ -111,6 +111,19 @@ function performAction(context) {
 }
 ```
 
+### Plugin Icon Formats (`icon` / `iconType`)
+
+SwiftBiu supports multiple icon formats for the root-level plugin icon:
+- `sfSymbol`: SF Symbol name, e.g. `"sparkles"`.
+- `file`: Image file bundled in the plugin package, e.g. `"icon.png"` (common formats like png/jpg/pdf/svg supported).
+- `text`: Short text label rendered as an icon, e.g. `"AI"`.
+- `iconify`: Iconify icon name, e.g. `"solar:flag-bold"` or `"mdi:robot-happy"`.
+- `data`: A `data:` URI payload, e.g. `"data:image/png;base64,..."`.
+
+Prefix rules:
+- Prefix forms are always recognized even if `iconType` is omitted: `text:AI`, `iconify:solar:flag-bold`, `data:image/png;base64,...`.
+- If you omit the `iconify:` prefix, set `"iconType": "iconify"` and use the plain name like `"solar:flag-bold"`.
+
 ### TranslatableString
 Many fields in `manifest.json` support the `TranslatableString` type, which allows providing different values for different languages.
 - **Simple Format**: `"name": "My Plugin"`
@@ -124,6 +137,8 @@ Many fields in `manifest.json` support the `TranslatableString` type, which allo
 | `network`        | `SwiftBiu.fetch` / `swiftBiu.fetch`    | Network requests               |
 | `clipboardWrite` | `SwiftBiu.writeToClipboard` / `swiftBiu.copyText` | Write to clipboard   |
 | `clipboardRead`  | `SwiftBiu.getClipboard`               | Read clipboard content         |
+| `localFileRead`  | `SwiftBiu.readLocalFile`, `SwiftBiu.readLocalTextFile`, `window.swiftBiu.readLocalFile`, `window.swiftBiu.readLocalTextFile` | Read currently selected local files (binary as Base64 or UTF-8 text) |
+| `localFileWrite` | `pickLocalDirectory`, `createLocalDirectory`, `createLocalFile`, `renameLocalFile`, `copyLocalFile`, `moveLocalFile`, `trashLocalItem`, `saveLocalFile` | Create, move, rename, trash, or save files in selected or authorized locations |
 | `paste`          | `SwiftBiu.pasteText` / `swiftBiu.pasteText` | Write + paste to active app. On iOS main app, degrades gracefully to a Toast Notification. Works properly on iOS Keyboard Extension |
 | `notifications`  | `SwiftBiu.showNotification` / `showImage` | Show toast/image notifications |
 | `runShellScript` | `SwiftBiu.runShellScript`              | Execute shell commands. ⚠️ macOS ONLY. Not available on iOS or App Store (sandbox) build |
@@ -261,6 +276,9 @@ API object: **`SwiftBiu`** (also accessible as `swiftBiu`, both are injected)
 {
   selectedText: "user selected text",
   sourceAppBundleID: "com.apple.TextEdit",
+  selectedFiles: [
+    { path: "/Users/name/Desktop/note.md", fileURL: "file:///Users/name/Desktop/note.md", fileName: "note.md", fileExtension: "md" }
+  ],
   screenPosition: { x: 100, y: 200 }  // may be absent
 }
 ```
@@ -283,6 +301,21 @@ API object: **`SwiftBiu`** (also accessible as `swiftBiu`, both are injected)
 | `SwiftBiu.showImage(source, position, context)` | Sync | `source`: URL string or base64. Requires `notifications` |
 | `SwiftBiu.openFileInPreview(path)` | Sync | Opens file in Preview.app |
 | `SwiftBiu.openImageInPreview(base64)` | Sync | Opens base64 image in Preview.app |
+| `SwiftBiu.getFileMetadata(path)` | Sync → Object | Requires `localFileRead`. Returns size, timestamps, content type, etc. |
+| `SwiftBiu.readLocalFile(path)` | Sync → Base64 String | Requires `localFileRead`. Path must come from `context.selectedFiles` |
+| `SwiftBiu.readLocalTextFile(path)` | Sync → String | Requires `localFileRead`. Convenience UTF-8 text decoder for `context.selectedFiles` |
+| `SwiftBiu.listDirectory(path)` | Sync → `Array<Object>` | Requires `localFileRead`. Lists direct children of an accessible directory |
+| `SwiftBiu.fileExists(path)` | Sync → Bool | Requires `localFileRead` or `localFileWrite`. Checks whether an accessible path is a file |
+| `SwiftBiu.directoryExists(path)` | Sync → Bool | Requires `localFileRead` or `localFileWrite`. Checks whether an accessible path is a directory |
+| `SwiftBiu.pickLocalDirectory()` | Sync → String | Requires `localFileWrite`. Opens the native folder picker and persists directory authorization |
+| `SwiftBiu.createLocalDirectory(path)` | Sync → String | Requires `localFileWrite`. Creates a directory in a selected or authorized location |
+| `SwiftBiu.createLocalFile(path, base64String)` | Sync → String | Requires `localFileWrite`. Creates a new file from Base64 data in a selected or authorized location |
+| `SwiftBiu.writeLocalTextFile(path, text)` | Sync → String | Requires `localFileWrite`. Creates a new UTF-8 text file |
+| `SwiftBiu.overwriteLocalFile(path, base64String)` | Sync → String | Requires `localFileWrite`. Replaces the contents of an existing accessible file |
+| `SwiftBiu.renameLocalFile(path, newName)` | Sync → String | Requires `localFileWrite`. Renames within the current directory |
+| `SwiftBiu.copyLocalFile(sourcePath, destinationPath)` | Sync → String | Requires `localFileWrite`. Destination must be accessible |
+| `SwiftBiu.moveLocalFile(sourcePath, destinationPath)` | Sync → String | Requires `localFileWrite`. Destination must be accessible |
+| `SwiftBiu.trashLocalItem(path)` | Sync → Bool | Requires `localFileWrite`. Moves a selected file or an item in an authorized directory to the macOS Trash |
 | `SwiftBiu.runShellScript(script, context)` | Sync → String | Requires `runShellScript`. Context vars: `{text}` → replaced in script |
 | `SwiftBiu.runAppleScript(script, context)` | Sync → String | Requires `runAppleScript` |
 | `SwiftBiu.displayUI(options, onMessage)` | Sync → windowID | Launch Rich Web App UI window |
@@ -332,7 +365,7 @@ API object: **`window.swiftBiu`** (injected via WebViewBridge.js)
 **Must implement:**
 ```javascript
 window.swiftBiu_initialize = function(context) {
-  // context -> { selectedText: "...", sourceAppBundleID: "..." }
+  // context -> { selectedText: "...", sourceAppBundleID: "...", selectedFiles: [...] }
 };
 ```
 
@@ -341,9 +374,25 @@ window.swiftBiu_initialize = function(context) {
 | API | Signature | Notes |
 |-----|-----------|-------|
 | `window.swiftBiu.fetch(url, options)` | Promise → `{status, data}` | Requires `network` |
+| `window.swiftBiu.getFileMetadata(path)` | Promise → `Object` | Requires `localFileRead` |
+| `window.swiftBiu.readLocalFile(path)` | Promise → `{base64: String}` | Requires `localFileRead`. Path must come from `context.selectedFiles` |
+| `window.swiftBiu.readLocalTextFile(path)` | Promise → `{result: String}` | Requires `localFileRead`. Convenience UTF-8 text decoder |
+| `window.swiftBiu.listDirectory(path)` | Promise → `{items: Array<Object>}` | Requires `localFileRead` |
+| `window.swiftBiu.fileExists(path)` | Promise → `{exists: Boolean}` | Requires `localFileRead` or `localFileWrite` |
+| `window.swiftBiu.directoryExists(path)` | Promise → `{exists: Boolean}` | Requires `localFileRead` or `localFileWrite` |
 | `window.swiftBiu.copyText(text)` | Promise | Requires `clipboardWrite` |
 | `window.swiftBiu.pasteText(text)` | Promise | Requires `paste` |
-| `window.swiftBiu.exportFile(base64, filename)` | Promise | Trigger Save Panel to export data as a file |
+| `window.swiftBiu.pickLocalDirectory()` | Promise → `{path: String}` | Requires `localFileWrite`. Lets the user choose a writable folder first |
+| `window.swiftBiu.createLocalDirectory(path)` | Promise → `{path: String}` | Requires `localFileWrite` |
+| `window.swiftBiu.createLocalFile(path, base64String)` | Promise → `{path: String}` | Requires `localFileWrite` |
+| `window.swiftBiu.writeLocalTextFile(path, text)` | Promise → `{path: String}` | Requires `localFileWrite` |
+| `window.swiftBiu.overwriteLocalFile(path, base64String)` | Promise → `{path: String}` | Requires `localFileWrite` |
+| `window.swiftBiu.renameLocalFile(path, newName)` | Promise → `{path: String}` | Requires `localFileWrite` |
+| `window.swiftBiu.copyLocalFile(sourcePath, destinationPath)` | Promise → `{path: String}` | Requires `localFileWrite` |
+| `window.swiftBiu.moveLocalFile(sourcePath, destinationPath)` | Promise → `{path: String}` | Requires `localFileWrite` |
+| `window.swiftBiu.trashLocalItem(path)` | Promise → `{success: Boolean}` | Requires `localFileWrite` |
+| `window.swiftBiu.saveLocalFile(base64, filename)` | Promise | Trigger Save Panel to save arbitrary file data |
+| `window.swiftBiu.exportFile(base64, filename)` | Promise | Backward-compatible alias of `saveLocalFile` |
 | `window.swiftBiu.speakText(text)` | Promise | Text-to-speech using system voice (NSSpeechSynthesizer) |
 | `window.swiftBiu.openURL(url)` | Promise | Opens in default browser |
 | `window.swiftBiu.closeWindow()` | Promise | Close the plugin window |
@@ -442,3 +491,9 @@ After creating a plugin, add an entry to the official plugin catalog:
   "categoryId": "text-processing|devtools|productivity|online-services|data-creative|system"
 }
 ```
+
+Catalog icon notes:
+- `catalog/plugins.json` currently stores `icon` only (no `iconType`). Use one of these forms:
+- SF Symbol name: `"sparkles"`.
+- File icon by extension: `"icon.png"` (or other supported image extensions).
+- Explicit prefixes: `"text:AI"`, `"iconify:solar:flag-bold"`, `"data:image/png;base64,..."`.

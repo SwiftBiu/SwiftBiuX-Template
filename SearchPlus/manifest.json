@@ -1,0 +1,113 @@
+{
+  "identifier": "com.SwiftBiu.searchplus",
+  "name": {
+    "en": "Search Plus",
+    "zh": "搜索助手"
+  },
+  "author": "SwiftBiu",
+  "description": {
+    "en": "Select text and search with a custom keyword (e.g., 'Apple' + 'Official').",
+    "zh": "选择文字并附带自定义关键字进行搜索（如：'苹果' + '官网'）。"
+  },
+  "version": "1.1",
+  "icon": "plus.magnifyingglass",
+  "iconType": "sfSymbol",
+  "actions": [
+    {
+      "title": {
+        "en": "Search with Keyword",
+        "zh": "带关键字搜索"
+      },
+      "script": "script.js"
+    }
+  ],
+  "permissions": [],
+  "configuration": [
+    {
+      "key": "search_engine",
+      "label": {
+        "en": "Search Engine",
+        "zh": "搜索引擎"
+      },
+      "type": "option",
+      "defaultValue": "https://www.bing.com/search?q={query}",
+      "options": [
+        {
+          "label": "Google",
+          "value": "https://www.google.com/search?q={query}"
+        },
+        {
+          "label": "Baidu",
+          "value": "https://www.baidu.com/s?wd={query}"
+        },
+        {
+          "label": "Bing",
+          "value": "https://www.bing.com/search?q={query}"
+        },
+        {
+          "label": "DuckDuckGo",
+          "value": "https://duckduckgo.com/?q={query}"
+        },
+        {
+          "label": {
+            "en": "Custom",
+            "zh": "自定义"
+          },
+          "value": "custom"
+        }
+      ],
+      "group": "General"
+    },
+    {
+      "key": "custom_engine_url",
+      "label": {
+        "en": "Custom Engine URL",
+        "zh": "自定义引擎 URL"
+      },
+      "type": "string",
+      "placeholder": "https://example.com/search?q={query}",
+      "description": {
+        "en": "Used only if 'Custom' is selected. Use {query} as placeholder.",
+        "zh": "仅在选择“自定义”时生效。使用 {query} 作为占位符。"
+      },
+      "group": "General"
+    },
+    {
+      "key": "keyword",
+      "label": {
+        "en": "Keyword",
+        "zh": "关键字"
+      },
+      "type": "string",
+      "defaultValue": "官网",
+      "placeholder": "e.g. 官网",
+      "group": "Search"
+    },
+    {
+      "key": "keyword_position",
+      "label": {
+        "en": "Keyword Position",
+        "zh": "关键字位置"
+      },
+      "type": "option",
+      "defaultValue": "suffix",
+      "options": [
+        {
+          "label": {
+            "en": "Suffix (Text + Keyword)",
+            "zh": "后缀 (文字 + 关键字)"
+          },
+          "value": "suffix"
+        },
+        {
+          "label": {
+            "en": "Prefix (Keyword + Text)",
+            "zh": "前缀 (关键字 + 文字)"
+          },
+          "value": "prefix"
+        }
+      ],
+      "group": "Search"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "identifier": "com.swiftbiu.plugin.doubaotext",
   "name": "豆包问答AI",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "author": "SwiftBiu Team",
   "description": "使用豆包大语言模型生成文本，并将结果直接粘贴。",
   "icon": "text.bubble",
@@ -9,11 +9,12 @@
   "permissions": [
     "network",
     "notifications",
-    "paste"
+    "paste",
+    "ui"
   ],
   "actions": [
     {
-      "title": "豆包文本生成",
+      "title": "豆包问答AI",
       "script": "script.js"
     }
   ],
@@ -23,53 +24,68 @@
       "label": "API URL",
       "description": "豆包文生文 API 的请求地址。",
       "type": "string",
-      "defaultValue": "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
+      "defaultValue": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+      "group": "API 配置"
     },
     {
       "key": "apiKey",
       "label": "API Key",
       "description": "请输入您从火山方舟获取的 Secret Access Key。",
       "type": "secure",
-      "placeholder": "在此输入您的 Secret Access Key"
+      "placeholder": "在此输入您的 Secret Access Key",
+      "group": "API 配置"
     },
     {
       "key": "textModel",
       "label": "文本模型",
       "description": "请选择用于生成文本的模型。",
       "type": "option",
-      "defaultValue": "doubao-seed-1-6-251015",
+      "defaultValue": "doubao-seed-2-0-pro-260215",
+      "group": "API 配置",
       "options": [
         {
-          "label": "Doubao Seed 1.6 (通用)",
-          "value": "doubao-seed-1-6-251015"
+          "label": "Doubao 2.0 Pro (旗舰/256K)",
+          "value": "doubao-seed-2-0-pro-260215"
         },
         {
-          "label": "Doubao Seed 1.6 Lite",
-          "value": "doubao-seed-1-6-lite-251015"
+          "label": "Doubao 2.0 Lite (平衡)",
+          "value": "doubao-seed-2-0-lite-260215"
         },
         {
-          "label": "Doubao Seed 1.6 Flash",
-          "value": "doubao-seed-1-6-flash-250828"
+          "label": "Doubao 2.0 Mini (极速)",
+          "value": "doubao-seed-2-0-mini-260215"
         },
         {
-          "label": "Deepseek V3.2 (通用)",
+          "label": "Doubao 2.0 Code (代码专家)",
+          "value": "doubao-seed-2-0-code-260215"
+        },
+        {
+          "label": "Doubao 1.8 Pro (Agent/256K)",
+          "value": "doubao-seed-1-8-251228"
+        },
+        {
+          "label": "Deepseek V3.2 (通用推理)",
           "value": "deepseek-v3-2-251201"
         },
         {
-          "label": "Deepseek V3.1 (通用)",
-          "value": "deepseek-v3-1-terminus"
-        },
-        {
-          "label": "Doubao Seed Code (代码)",
-          "value": "doubao-seed-code-preview-251028"
+          "label": "Kimi K2 (长文本/MoE)",
+          "value": "kimi-k2-thinking-251104"
         },
         {
           "label": "Doubao Seed Translation (翻译)",
           "value": "doubao-seed-translation-250915"
         },
         {
-          "label": "Kimi K2 (长文本)",
-          "value": "kimi-k2-thinking-251104"
+          "label": "(Legacy) Doubao Seed 1.6",
+          "value": "doubao-seed-1-6-251015"
+        },
+        {
+          "label": "(Legacy) Doubao Seed 1.6 Lite",
+          "value": "doubao-seed-1-6-lite-251015"
+        },
+        {
+          "label": "(Legacy) Deepseek V3.1",
+          "value": "deepseek-v3-1-terminus"
         }
       ]
     },
@@ -78,6 +94,7 @@
       "label": "AI 角色预设 (System Roles)",
       "type": "radioList",
       "description": "选择或添加一个 AI 角色，AI 将根据该角色的设定进行回应。",
+      "group": "提示词设置",
       "defaultItems": [
         {
           "enabled": true,
@@ -86,19 +103,33 @@
         {
           "enabled": false,
           "value": "我是写代码，这个是我的甲方。他提需求很过分，帮我怼他"
-        },
-        {
-          "enabled": false,
-          "value": "她是我的刁蛮女友，我要哄她开心"
         }
       ]
     },
     {
       "key": "pasteBehavior",
-      "label": "追加模式",
-      "description": "开启后，生成的内容会追加到原文后；关闭则直接替换原文。",
+      "label": "默认应用方式",
+      "description": "作为默认值使用。开启后默认追加到原文后；关闭则默认替换原文。在 AI 响应 UI 中也可以临时切换，并会同步回这里。",
       "type": "boolean",
-      "defaultValue": true
+      "defaultValue": true,
+      "group": "响应结果"
+    },
+    {
+      "key": "enableAIResponseUI",
+      "label": "启用原生 AI 响应弹框（推荐）",
+      "type": "boolean",
+      "defaultValue": true,
+      "description": "开启后，生成结果不会立刻粘贴，而是先显示 SwiftBiu 原生 AI 响应弹框。你可以在弹框中预览结果、修改系统提示词、切换替换/追加，再手动点击“应用”。关闭后则保持旧行为，接口返回后直接按默认应用方式写回文本。",
+      "group": "响应结果"
+    },
+    {
+      "key": "responseSystemPrompt",
+      "label": "弹框默认系统提示词",
+      "type": "string",
+      "defaultValue": "",
+      "placeholder": "留空则沿用 AI 角色预设",
+      "description": "仅在启用原生 AI 响应弹框时使用。这里填写后会优先作为弹框中的默认系统提示词；留空时回退到上面的 AI 角色预设。你在弹框里修改后的内容也会同步写回这里。",
+      "group": "提示词设置"
     }
   ]
 }

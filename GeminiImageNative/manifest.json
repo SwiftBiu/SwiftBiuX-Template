@@ -1,21 +1,17 @@
 {
-    "identifier": "com.swiftbiu.gemini-imageToast",
-    "name": "Nano Banana",
+    "identifier": "com.swiftbiu.gemini-imageNative",
+    "name": "Nano Banana Native",
     "author": "SwiftBiu",
-    "description": "Generates an image based on the selected text using the Gemini API.",
-    "version": "1.3",
+    "description": "Generates images from selected text in a native SwiftBiu studio window.",
+    "version": "1.0",
     "actions": [
         {
-            "title": "Nano Banana",
+            "title": "Nano Banana Native",
             "script": "script.js"
         }
     ],
-    "ui": {
-        "main": "ui/index.html"
-    },
     "permissions": [
-        "network",
-        "ui"
+        "network"
     ],
     "icon": "nano-banana.png",
     "iconType": "file",
