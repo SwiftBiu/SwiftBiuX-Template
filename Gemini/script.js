@@ -342,6 +342,7 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
             let accumulatedText = "";
             let sseRemainder = "";
             let pendingErrorMessage = "";
+            let hasShownThinking = false;
 
             SwiftBiu.updateAIResponseBubble(sessionID, {
                 systemPrompt: trimmedSystemPrompt,
@@ -353,7 +354,7 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
                 animateText: false
             });
 
-            const combinedUserPrompt = isRegenerate 
+            const combinedUserPrompt = isRegenerate
                 ? (trimmedSystemPrompt ? `${trimmedSystemPrompt}\n${trimmedUserPrompt}`.trim() : trimmedUserPrompt)
                 : (trimmedSystemPrompt ? `${trimmedSystemPrompt} 我选择的内容是“${trimmedUserPrompt}”`.trim() : `我选择的内容是“${trimmedUserPrompt}”`.trim());
 
@@ -382,6 +383,7 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
                 {
                     method: "POST",
                     headers: {
+                        "Accept": "text/event-stream",
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify(requestBody)
@@ -411,6 +413,7 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
                         const parsed = consumeServerSentEvents(sseRemainder);
                         sseRemainder = parsed.remainder;
 
+                        let chunkHasText = false;
                         for (const sseEvent of parsed.events) {
                             if (sseEvent.data === "[DONE]") {
                                 continue;
@@ -429,6 +432,7 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
                                     continue;
                                 }
 
+                                chunkHasText = true;
                                 accumulatedText += deltaText;
                                 SwiftBiu.updateAIResponseBubble(sessionID, {
                                     systemPrompt: trimmedSystemPrompt,
@@ -441,10 +445,22 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
                                 });
                             } catch (error) {
                                 debugLog("Failed to parse SSE payload", {
-                                    message: error.message,
-                                    payloadPreview: sseEvent.data.slice(0, 200)
+                                    message: error.message
                                 });
                             }
+                        }
+
+                        if (!chunkHasText && !accumulatedText && parsed.events.length > 0 && !hasShownThinking) {
+                            hasShownThinking = true;
+                            SwiftBiu.updateAIResponseBubble(sessionID, {
+                                systemPrompt: trimmedSystemPrompt,
+                                userPrompt: trimmedUserPrompt,
+                                state: "generating",
+                                status: "Thinking",
+                                text: "",
+                                allowSubmit: false,
+                                animateText: false
+                            });
                         }
                         return;
                     }
@@ -513,10 +529,10 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
             }
 
             if (event.sessionUserContent && event.text) {
-                 pendingSessionMessages = {
-                      user: event.sessionUserContent,
-                      model: event.text
-                 };
+                pendingSessionMessages = {
+                    user: event.sessionUserContent,
+                    model: event.text
+                };
             }
 
             if (event.type === "configChanged") {

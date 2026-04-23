@@ -433,6 +433,8 @@ In a Standard Action, all code executes globally in the background `script.js`. 
     *   `SwiftBiu.renameLocalFile(path: String, newName: String)`: Renames a selected local file within its current directory. *(Requires: `localFileWrite`)*
     *   `SwiftBiu.copyLocalFile(sourcePath: String, destinationPath: String)`: Copies a selected local file to an accessible destination path. *(Requires: `localFileWrite`)*
     *   `SwiftBiu.moveLocalFile(sourcePath: String, destinationPath: String)`: Moves a selected local file to an accessible destination path. *(Requires: `localFileWrite`)*
+    *   `SwiftBiu.requestDirectoryAuthorization(path: String)`: Opens the native folder authorization panel, stores the chosen directories, and returns the first authorized path. Use this instead of pretending success when sandbox access is missing. *(Requires: `localFileWrite`)*
+    *   `SwiftBiu.hasAuthorizedDirectoryAccess(path: String)`: Returns whether a path is already covered by a persisted writable folder authorization. *(Requires: `localFileWrite`)*
     *   `SwiftBiu.trashLocalItem(path: String)`: Moves a selected local file or an item inside an authorized directory to the macOS Trash. *(Requires: `localFileWrite`)*
     *   `SwiftBiu.openURL(urlString: String)`: Launches the default browser to open a link.
     *   `SwiftBiu.openFileInPreview(filePath: String)`: Opens a file using the macOS default app (e.g., Preview).
@@ -447,6 +449,34 @@ In a Standard Action, all code executes globally in the background `script.js`. 
     *   `SwiftBiu.fetchStream(url, options, onEvent, onError)`: (Synchronous Create) Starts a streaming network request and returns a `streamID`. *(Requires: `network`)*
     *   `SwiftBiu.cancelFetchStream(streamID: String)`: (Synchronous Cancel) Cancels an active streaming request created by `fetchStream(...)`.
     *   `SwiftBiu.runShellScript(script, context)`: (Synchronous) Executes a Bash/Zsh script and returns the output. *(Requires: `runShellScript`)*
+
+#### 1.4 Native File Task Progress Panel (Background Script)
+For file organizers, compressors, exporters, and other write-heavy actions, prefer the native file task panel instead of chaining multiple notifications.
+
+These APIs are available directly in background `script.js`:
+
+*   `SwiftBiu.beginFileTask(options)`: Creates a native file-processing session and returns a `sessionID`.
+*   `SwiftBiu.updateFileTask(sessionID, options)`: Pushes incremental progress, logs, and structured status updates.
+*   `SwiftBiu.finishFileTask(sessionID, options)`: Marks the task as completed.
+*   `SwiftBiu.failFileTask(sessionID, options)`: Marks the task as failed and keeps the panel honest.
+
+Recommended `options` fields:
+
+*   Core progress: `headlineText`, `detailText`, `totalCount`, `completedCount`, `skippedCount`, `progress`, `batchItems`
+*   Rich log stream: `activityEntries` with `{ message, category, isPinned }`
+*   Plan preview: `summaryChips` with `{ title, count, tone }`
+*   Grouped failures: `failureGroups` with `{ identifier, title, count, items, detailText }`
+*   Native panel labels: `sectionTitles` with `planTitle`, `logTitle`, `fileTitle`, `failureTitle`, `actionTitle`
+*   Completion actions: `actionButtons` with supported `kind` values `revealTargets` and `undoMoves`
+*   Action payloads: `targetDirectoryPaths` and `undoOperations`
+
+Recommended UX contract for file-processing plugins:
+
+1. Show the category plan before the first write happens.
+2. Ask for native folder authorization immediately when access is missing, then stop cleanly on cancel.
+3. Stream structural milestones such as folder creation, move start, conflict skip, and category completion.
+4. Group conflicts and permission failures separately instead of flattening everything into one “failed” bucket.
+5. Offer lightweight completion actions such as “open target folder” and “undo this run” only after you have the required payloads.
 
 #### 1.5 Native AI Response Bubble (Background Script)
 For AI plugins such as Doubao, OpenAI, or Gemini, prefer SwiftBiu's native AI response bubble instead of building a second floating window from scratch.
@@ -506,6 +536,8 @@ Once the HTML UI is successfully displayed, the system assumes control and injec
     *   `window.swiftBiu_initialize = async function(context) { ... }` : You MUST define this global function in your HTML. After the page finishes loading, the system automatically calls it and injects the `context` parameter (such as highlighted text or selected local files) from the background.
     *   `context.selectedText`: The original selected text.
     *   `context.selectedFiles`: An array of inferred local file descriptors from the current selection. It can contain any local file type. Each item contains `{ path, fileURL, fileName, fileExtension }`.
+    *   `context.locale`: The user's preferred locale identifier, such as `zh-Hans` or `en-US`.
+    *   `context.languageCode`: A simplified language code such as `zh` or `en`.
         *   Use this when the host has already recognized local files for the current context. If the user context only contains text-form paths (for example, newline-separated POSIX paths or `file://` URLs), your plugin should parse `context.selectedText` or the result of `SwiftBiu.getClipboard()` itself.
         *   On macOS, some sources such as Finder file copies may provide both display text and native file URLs. SwiftBiu preserves those native file URLs when possible and maps them into `context.selectedFiles` even if `context.selectedText` only contains file names.
         *   Plugin JavaScript can currently read **plain text** from the clipboard via `SwiftBiu.getClipboard()`. Reading native file-URL objects directly from the macOS pasteboard, like some built-in native actions do, is not guaranteed by the current plugin API.
@@ -630,6 +662,30 @@ The system selects the best string based on the user's system language:
 2. Falls back to English (`en`).
 3. Falls back to the first available translation in the dictionary.
 4. If a simple string is provided, it is used for all languages.
+
+### Recommended Resource Strategy For Rich UI
+For custom pages, native file-task copy, and any larger plugin-owned text surface, we recommend a stricter workflow than the manifest fallback alone:
+
+*   Keep one source file per locale, for example `Resources/i18n/en.json`, `Resources/i18n/zh-Hans.json`, `Resources/i18n/ja.json`.
+*   Translate and review each language independently. Do not copy English strings into another locale file as a placeholder just to “fill the matrix”.
+*   Treat untranslated locales as absent rather than shipping mixed-language UI.
+*   Use `context.locale` / `context.languageCode` in background scripts to choose the correct copy for progress panels, destructive confirmations, and structured file-task metadata.
+*   For Web UI, load the matching locale resource first, then fall back only inside your own explicitly chosen default locale policy.
+
+Recommended template shape:
+
+```text
+Resources/
+  i18n/
+    en.json
+    zh-Hans.json
+    zh-Hant.json
+ui/
+  locales.js
+script.js
+```
+
+For logic-only plugins, keep the same per-language separation even if you eventually bundle the strings into `script.js` during build time. The important part is the authoring model: one locale, one reviewed translation source.
 
 ## Debugging & Logging
 

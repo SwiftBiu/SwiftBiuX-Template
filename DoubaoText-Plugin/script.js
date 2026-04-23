@@ -421,6 +421,7 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
       let accumulatedText = "";
       let sseRemainder = "";
       let pendingErrorMessage = "";
+      let hasShownThinking = false;
 
       SwiftBiu.updateAIResponseBubble(sessionID, {
         systemPrompt: trimmedSystemPrompt,
@@ -434,10 +435,7 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
 
       debugLog("Starting streaming Doubao request", {
         sessionID,
-        requestToken,
-        model: resolveTextModel(textModel),
-        userPromptLength: trimmedUserPrompt.length,
-        systemPromptLength: trimmedSystemPrompt.length
+        requestToken
       });
 
       const streamID = SwiftBiu.fetchStream(
@@ -445,6 +443,7 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
         {
           method: "POST",
           headers: {
+            "Accept": "text/event-stream",
             "Content-Type": "application/json",
             "Authorization": `Bearer ${apiKey}`
           },
@@ -454,7 +453,10 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
               { role: "system", content: trimmedSystemPrompt },
               { role: "user", content: trimmedUserPrompt }
             ],
-            stream: true
+            stream: true,
+            thinking: {
+              type: "disabled"
+            }
           })
         },
         function onStreamEvent(event) {
@@ -464,10 +466,14 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
 
           if (event.type === "response") {
             responseStatus = typeof event.status === "number" ? event.status : 0;
-            debugLog("Streaming Doubao response started", {
+            return;
+          }
+
+          if (event.type === "error") {
+            debugLog("Streaming Doubao error", {
+              message: event.message,
               sessionID,
-              requestToken,
-              responseStatus
+              requestToken
             });
             return;
           }
@@ -491,6 +497,7 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
             const parsed = consumeServerSentEvents(sseRemainder);
             sseRemainder = parsed.remainder;
 
+            let chunkHasText = false;
             for (const sseEvent of parsed.events) {
               if (sseEvent.data === "[DONE]") {
                 continue;
@@ -509,22 +516,35 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
                   continue;
                 }
 
+                chunkHasText = true;
                 accumulatedText += deltaText;
                 SwiftBiu.updateAIResponseBubble(sessionID, {
                   systemPrompt: trimmedSystemPrompt,
                   userPrompt: trimmedUserPrompt,
                   state: "writing",
-                  status: "Drafting",
+                  status: "writing",
                   text: accumulatedText,
                   allowSubmit: false,
                   animateText: false
                 });
               } catch (error) {
                 debugLog("Failed to parse SSE payload", {
-                  message: error.message,
-                  payloadPreview: sseEvent.data.slice(0, 200)
+                  message: error.message
                 });
               }
+            }
+
+            if (!chunkHasText && !accumulatedText && parsed.events.length > 0 && !hasShownThinking) {
+              hasShownThinking = true;
+              SwiftBiu.updateAIResponseBubble(sessionID, {
+                systemPrompt: trimmedSystemPrompt,
+                userPrompt: trimmedUserPrompt,
+                state: "generating",
+                status: "Thinking",
+                text: "",
+                allowSubmit: false,
+                animateText: false
+              });
             }
             return;
           }

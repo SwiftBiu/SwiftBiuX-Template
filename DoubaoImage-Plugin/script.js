@@ -45,6 +45,32 @@ function buildImageCardOptions(prompt, imageUrl, settings, context) {
   };
 }
 
+function buildPendingImageCardOptions(prompt, settings, context) {
+  return {
+    prompt: prompt,
+    selectionText: prompt,
+    position: context && context.screenPosition ? context.screenPosition : null,
+    modelName: settings.imageModel,
+    imageSize: settings.imageSize,
+    showsPendingPlaceholder: true,
+    isGenerating: true,
+    statusMessage: "正在生成图片..."
+  };
+}
+
+function beginInteractiveImageRequest(prompt, settings, context) {
+  if (!supportsInteractiveImage()) {
+    return "";
+  }
+
+  return SwiftBiu.showInteractiveImage(
+    buildPendingImageCardOptions(prompt, settings, context),
+    function (event) {
+      handleRegenerate(event, settings, context);
+    }
+  );
+}
+
 function showRequestError(message, sessionID) {
   if (sessionID && supportsInteractiveImage()) {
     SwiftBiu.failInteractiveImage(sessionID, message);
@@ -181,6 +207,13 @@ function performAction(context) {
       imageSize: imageSize
     },
     context,
-    ""
+    beginInteractiveImageRequest(
+      prompt,
+      {
+        imageModel: imageModel,
+        imageSize: imageSize
+      },
+      context
+    )
   );
 }
