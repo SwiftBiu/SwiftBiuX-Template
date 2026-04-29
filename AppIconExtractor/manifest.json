@@ -1,0 +1,45 @@
+{
+  "identifier": "com.developer.appiconextractor",
+  "name": {
+    "en": "App Icon Extractor",
+    "zh": "应用图标提取器"
+  },
+  "author": "Developer",
+  "description": {
+    "en": "Extract the icon from the selected application and save it to an authorized folder.",
+    "zh": "从选中的应用程序中提取图标并保存到已授权目录。"
+  },
+  "version": "1.2",
+  "icon": "photo.artframe",
+  "iconType": "sfSymbol",
+  "actions": [
+    {
+      "title": {
+        "en": "Extract App Icon",
+        "zh": "提取应用图标"
+      },
+      "script": "script.js"
+    }
+  ],
+  "permissions": [
+    "notifications",
+    "localFileRead",
+    "localFileWrite",
+    "clipboardRead"
+  ],
+  "configuration": [
+    {
+      "key": "outputDirectory",
+      "label": {
+        "en": "Output Folder",
+        "zh": "保存目录"
+      },
+      "type": "string",
+      "description": {
+        "en": "The authorized folder used to save extracted app icons. Leave empty and choose one when the extension runs.",
+        "zh": "用于保存提取图标的已授权目录。留空时会在首次运行时选择。"
+      },
+      "defaultValue": ""
+    }
+  ]
+}

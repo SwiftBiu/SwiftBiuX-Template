@@ -154,19 +154,53 @@ Many fields in `manifest.json` support the `TranslatableString` type, which allo
 | `network`        | `SwiftBiu.fetch` / `swiftBiu.fetch`    | Network requests               |
 | `clipboardWrite` | `SwiftBiu.writeToClipboard` / `swiftBiu.copyText` | Write to clipboard   |
 | `clipboardRead`  | `SwiftBiu.getClipboard`               | Read clipboard content         |
-| `localFileRead`  | `SwiftBiu.getFileMetadata`, `SwiftBiu.readLocalFile`, `SwiftBiu.readLocalTextFile`, `SwiftBiu.listDirectory`, `SwiftBiu.openFileWithApp`, `window.swiftBiu.getFileMetadata`, `window.swiftBiu.readLocalFile`, `window.swiftBiu.readLocalTextFile`, `window.swiftBiu.listDirectory`, `window.swiftBiu.openFileWithApp` | Inspect, read, list, or open currently selected local files and accessible directories |
-| `localFileWrite` | `pickLocalDirectory`, `createLocalDirectory`, `createLocalFile`, `renameLocalFile`, `copyLocalFile`, `moveLocalFile`, `trashLocalItem`, `saveLocalFile` | Create, move, rename, trash, or save files in selected or authorized locations |
+| `localFileRead`  | `SwiftBiu.getFileMetadata`, `SwiftBiu.extractFileIcon`, `SwiftBiu.readLocalFile`, `SwiftBiu.readLocalTextFile`, `SwiftBiu.listDirectory`, `SwiftBiu.openFileWithApp`, `window.swiftBiu.getFileMetadata`, `window.swiftBiu.extractFileIcon`, `window.swiftBiu.readLocalFile`, `window.swiftBiu.readLocalTextFile`, `window.swiftBiu.listDirectory`, `window.swiftBiu.openFileWithApp` | Inspect, extract icons from, read, list, or open currently selected local files and accessible directories |
+| `localFileWrite` | `pickLocalDirectory`, `requestDirectoryAuthorization`, `hasAuthorizedDirectoryAccess`, `createLocalDirectory`, `createLocalFile`, `writeLocalTextFile`, `overwriteLocalFile`, `renameLocalFile`, `copyLocalFile`, `moveLocalFile`, `trashLocalItem`, `saveLocalFile`, `fileExists`, `directoryExists` | Create, update, move, rename, trash, save, or inspect writable destinations in selected or authorized locations |
 | `paste`          | `SwiftBiu.pasteText` / `swiftBiu.pasteText` | Write + paste to active app. On iOS main app, degrades gracefully to a Toast Notification. Works properly on iOS Keyboard Extension |
 | `notifications`  | `SwiftBiu.showNotification` / `showImage` | Show toast/image notifications |
-| `runShellScript` | `SwiftBiu.runShellScript`              | Execute shell commands. ⚠️ macOS ONLY. Not available on iOS or App Store (sandbox) build |
-| `runAppleScript` | `SwiftBiu.runAppleScript`              | Execute AppleScript. ⚠️ macOS ONLY. Not available on iOS or App Store (sandbox) build |
+| `runShellScript` | `SwiftBiu.runShellScript`              | Execute shell commands. ⚠️ macOS ONLY. Do not use for App Store-compatible plugins; sandboxed builds may block process execution and file access |
+| `runAppleScript` | `SwiftBiu.runAppleScript`              | Execute AppleScript. ⚠️ macOS ONLY. Do not use for App Store-compatible plugins; sandboxed builds may block automation |
 
 ### Cross-Platform (macOS & iOS) Compatibility
 The `.swiftbiux` packages are universal, but you must keep iOS limitations in mind:
-1. **Scripting Limit**: No embedded node or python on iOS. If using NPM packages, you must bundle them into vanilla `script.js` via Rollup/Webpack. For heavy OS tasks on iOS, leverage Apple Shortcuts. 
+1. **Scripting Limit**: No embedded node or python on iOS. App Store macOS builds are also sandboxed, so plugins that need OS resources should prefer SwiftBiu host APIs such as `extractFileIcon(...)`, `readLocalFile(...)`, and `createLocalFile(...)` instead of shell, AppleScript, or `osascript`. If using NPM packages, bundle them into vanilla `script.js` via Rollup/Webpack. For heavy OS tasks on iOS, leverage Apple Shortcuts.
 2. **Viewport Lock (Crucial)**: ALWAYS include `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">` in `ui/index.html` to prevent aggressive zoom-in when tapping an `<input>`.
 3. **Fluid UI**: Do NOT use fixed layouts. `width` and `height` from `displayUI` dictate window size ONLY on macOS floating windows. On iOS, the view is presented as a Sheet. You MUST use CSS media queries `@media (max-width: 600px)` to collapse sidebars and stack elements.
 4. **Touch Targets**: Any clickable buttons or list rows should be at least `44x44px` tall on mobile screens. Ensure inputs have a `font-size: 16px` minimum to avert iOS auto-zoom behavior.
+
+### App Store-Compatible Native Resource Workflows
+
+When a plugin needs data that only the host app can safely access in the App Store sandbox, call a SwiftBiu host API from JavaScript instead of launching a subprocess.
+
+Example: extracting a selected `.app` icon and saving it as PNG:
+
+```javascript
+function performAction(context) {
+    const app = (context.selectedFiles || []).find(file => {
+        const path = String(file.path || "").toLowerCase();
+        return path.endsWith(".app");
+    });
+    if (!app) {
+        SwiftBiu.showNotification("Extract App Icon", "Select a .app first.");
+        return;
+    }
+
+    const result = SwiftBiu.extractFileIcon(app.path, { size: 1024 });
+    if (!result || result.success !== true || !result.base64) {
+        SwiftBiu.showNotification("Extract App Icon", result && result.error ? result.error : "Icon extraction failed.");
+        return;
+    }
+
+    const folder = SwiftBiu.pickLocalDirectory();
+    if (!folder) return;
+
+    const outputPath = folder.replace(/\/+$/, "") + "/" + (result.fileName || "App_Icon.png");
+    const savedPath = SwiftBiu.createLocalFile(outputPath, result.base64);
+    if (savedPath) SwiftBiu.openFileInPreview(savedPath);
+}
+```
+
+Do not implement App icon extraction by reading `.app/Contents/Info.plist`, calling `sips`, `qlmanage`, shell scripts, AppleScript, or `osascript` when the plugin must work in the App Store build.
 
 ### Configuration Types
 
@@ -321,12 +355,15 @@ API object: **`SwiftBiu`** (also accessible as `swiftBiu`, both are injected)
 | `SwiftBiu.openFileWithApp(path, appBundleID)` | Sync → Bool | Requires `localFileRead`. Opens an accessible selected or authorized file with the specified macOS app bundle ID |
 | `SwiftBiu.openImageInPreview(base64)` | Sync | Opens base64 image in Preview.app |
 | `SwiftBiu.getFileMetadata(path)` | Sync → Object | Requires `localFileRead`. Returns size, timestamps, content type, etc. |
+| `SwiftBiu.extractFileIcon(path, options)` | Sync → Object | Requires `localFileRead`. Returns `{success, base64, fileName, width, height, format}` or `{success: false, error}`. Use this for App Store-compatible icon extraction instead of shell/osascript |
 | `SwiftBiu.readLocalFile(path)` | Sync → Base64 String | Requires `localFileRead`. Path must come from `context.selectedFiles` |
 | `SwiftBiu.readLocalTextFile(path)` | Sync → String | Requires `localFileRead`. Convenience UTF-8 text decoder for `context.selectedFiles` |
 | `SwiftBiu.listDirectory(path)` | Sync → `Array<Object>` | Requires `localFileRead`. Lists direct children of an accessible directory |
 | `SwiftBiu.fileExists(path)` | Sync → Bool | Requires `localFileRead` or `localFileWrite`. Checks whether an accessible path is a file |
 | `SwiftBiu.directoryExists(path)` | Sync → Bool | Requires `localFileRead` or `localFileWrite`. Checks whether an accessible path is a directory |
 | `SwiftBiu.pickLocalDirectory()` | Sync → String | Requires `localFileWrite`. Opens the native folder picker and persists directory authorization |
+| `SwiftBiu.requestDirectoryAuthorization(path)` | Sync → String | Requires `localFileWrite`. Prompts the user to authorize one or more folders and returns the first authorized path |
+| `SwiftBiu.hasAuthorizedDirectoryAccess(path)` | Sync → Bool | Requires `localFileWrite`. Checks whether a path is covered by a persisted writable folder authorization |
 | `SwiftBiu.createLocalDirectory(path)` | Sync → String | Requires `localFileWrite`. Creates a directory in a selected or authorized location |
 | `SwiftBiu.createLocalFile(path, base64String)` | Sync → String | Requires `localFileWrite`. Creates a new file from Base64 data in a selected or authorized location |
 | `SwiftBiu.writeLocalTextFile(path, text)` | Sync → String | Requires `localFileWrite`. Creates a new UTF-8 text file |
@@ -335,8 +372,8 @@ API object: **`SwiftBiu`** (also accessible as `swiftBiu`, both are injected)
 | `SwiftBiu.copyLocalFile(sourcePath, destinationPath)` | Sync → String | Requires `localFileWrite`. Destination must be accessible |
 | `SwiftBiu.moveLocalFile(sourcePath, destinationPath)` | Sync → String | Requires `localFileWrite`. Destination must be accessible |
 | `SwiftBiu.trashLocalItem(path)` | Sync → Bool | Requires `localFileWrite`. Moves a selected file or an item in an authorized directory to the macOS Trash |
-| `SwiftBiu.runShellScript(script, context)` | Sync → String | Requires `runShellScript`. Context vars: `{text}` → replaced in script |
-| `SwiftBiu.runAppleScript(script, context)` | Sync → String | Requires `runAppleScript` |
+| `SwiftBiu.runShellScript(script, context)` | Sync → String | Requires `runShellScript`. Context vars: `{text}` → replaced in script. Avoid for App Store-compatible plugins |
+| `SwiftBiu.runAppleScript(script, context)` | Sync → String | Requires `runAppleScript`. Avoid for App Store-compatible plugins |
 | `SwiftBiu.displayUI(options, onMessage)` | Sync → windowID | Launch Rich Web App UI window |
 | `SwiftBiu.postMessageToUI(windowID, message)` | Sync | Send data to UI (calls `window.__swiftBiu_receiveMessage`) |
 | `SwiftBiu.closeUI(windowID)` | Sync | Close a UI window |
@@ -391,6 +428,7 @@ window.swiftBiu_initialize = function(context) {
 |-----|-----------|-------|
 | `window.swiftBiu.fetch(url, options)` | Promise → `{status, data}` | Requires `network` |
 | `window.swiftBiu.getFileMetadata(path)` | Promise → `Object` | Requires `localFileRead` |
+| `window.swiftBiu.extractFileIcon(path, options)` | Promise → `Object` | Requires `localFileRead`. Returns PNG Base64 icon data from the host App; preferred for App Store sandbox compatibility |
 | `window.swiftBiu.readLocalFile(path)` | Promise → `{base64: String}` | Requires `localFileRead`. Path must come from `context.selectedFiles` |
 | `window.swiftBiu.readLocalTextFile(path)` | Promise → `{result: String}` | Requires `localFileRead`. Convenience UTF-8 text decoder |
 | `window.swiftBiu.listDirectory(path)` | Promise → `{items: Array<Object>}` | Requires `localFileRead` |

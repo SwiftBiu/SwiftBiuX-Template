@@ -440,6 +440,7 @@ In a Standard Action, all code executes globally in the background `script.js`. 
     *   `SwiftBiu.pasteText(text: String)`: Writes text to the clipboard and immediately pastes it into the active window. *(Requires: `paste`)*
     *   `SwiftBiu.getClipboard()`: Retrieves plain text from the system clipboard. *(Requires: `clipboardRead`)*
     *   `SwiftBiu.getFileMetadata(path: String)`: Returns metadata for the selected local file, including size, timestamps, and content type. *(Requires: `localFileRead`)*
+    *   `SwiftBiu.extractFileIcon(path: String, options?: Object)`: Extracts the selected file or application icon through SwiftBiu's native host process and returns `{ success, base64, fileName, width, height, format }` for PNG output, or `{ success: false, error }`. Use this for App Store-compatible icon extraction instead of shell, AppleScript, `sips`, `qlmanage`, or `osascript`. *(Requires: `localFileRead`)*
     *   `SwiftBiu.readLocalFile(path: String)`: Reads any currently selected local file and returns its contents as a Base64 string. *(Requires: `localFileRead`)*
     *   `SwiftBiu.readLocalTextFile(path: String)`: Convenience API for decoding the current selected file as UTF-8 text. *(Requires: `localFileRead`)*
     *   `SwiftBiu.listDirectory(path: String)`: Lists items in an accessible directory and returns metadata objects for each child. *(Requires: `localFileRead`)*
@@ -469,7 +470,7 @@ In a Standard Action, all code executes globally in the background `script.js`. 
     *   `SwiftBiu.fetch(url, options, onSuccess, onError)`: (Callback Async) Initiates a low-level network request. *(Requires: `network`)*
     *   `SwiftBiu.fetchStream(url, options, onEvent, onError)`: (Synchronous Create) Starts a streaming network request and returns a `streamID`. *(Requires: `network`)*
     *   `SwiftBiu.cancelFetchStream(streamID: String)`: (Synchronous Cancel) Cancels an active streaming request created by `fetchStream(...)`.
-    *   `SwiftBiu.runShellScript(script, context)`: (Synchronous) Executes a Bash/Zsh script and returns the output. *(Requires: `runShellScript`)*
+    *   `SwiftBiu.runShellScript(script, context)`: (Synchronous) Executes a Bash/Zsh script and returns the output. Avoid this for App Store-compatible plugins because sandboxed builds can block subprocess execution and file-system access. *(Requires: `runShellScript`)*
 
 #### 1.4 Native File Task Progress Panel (Background Script)
 For file organizers, compressors, exporters, and other write-heavy actions, prefer the native file task panel instead of chaining multiple notifications.
@@ -568,12 +569,13 @@ Once the HTML UI is successfully displayed, the system assumes control and injec
         *   `window.swiftBiu.fetch(url, options)`: Returns `{ status: Number, data: String }`. *(Requires: `network`)*
         *   `window.swiftBiu.storage.get(key)`: Returns `{ result: String }`.
         *   `window.swiftBiu.getFileMetadata(path)`: Returns a metadata object for the selected local file. *(Requires: `localFileRead`)*
+        *   `window.swiftBiu.extractFileIcon(path, options)`: Returns `{ success, base64, fileName, width, height, format }` or `{ success: false, error }`. Use this host-mediated PNG icon extraction API for App Store sandbox compatibility. *(Requires: `localFileRead`)*
         *   `window.swiftBiu.readLocalFile(path)`: Returns `{ base64: String }`. Reads any local file from the current `context.selectedFiles` only. *(Requires: `localFileRead`)*
         *   `window.swiftBiu.readLocalTextFile(path)`: Returns `{ result: String }`. Convenience API for decoding the current selected file as UTF-8 text. *(Requires: `localFileRead`)*
         *   `window.swiftBiu.listDirectory(path)`: Returns `{ items: Array<Object> }`. Lists direct children of an accessible directory. *(Requires: `localFileRead`)*
         *   `window.swiftBiu.fileExists(path)`: Returns `{ exists: Boolean }`. Checks whether an accessible path exists as a file. *(Requires: `localFileRead` or `localFileWrite`)*
         *   `window.swiftBiu.directoryExists(path)`: Returns `{ exists: Boolean }`. Checks whether an accessible path exists as a directory. *(Requires: `localFileRead` or `localFileWrite`)*
-        *   `window.swiftBiu.runShellScript(script, context)`: Returns `{ result: String }`. *(Highly restricted by App Store sandbox).*
+        *   `window.swiftBiu.runShellScript(script, context)`: Returns `{ result: String }`. Do not rely on this for App Store-compatible plugins. *(Highly restricted by App Store sandbox).*
     *   **Trigger-Based Methods (No `await` needed):**
         *(Although they return a JS Promise, the native side resolves them immediately upon receiving the command without blocking to wait for side-effects like dialogs. Treat them as synchronous triggers.)*
         *   `window.swiftBiu.copyText(text)`: Copies text to the system clipboard.
@@ -612,6 +614,38 @@ When a plugin needs to create files or folders inside the App Store sandbox, pre
 1. Call `pickLocalDirectory()` so the user explicitly chooses a writable folder.
 2. Create subfolders with `createLocalDirectory(...)` and files with `createLocalFile(...)` underneath that returned path.
 3. Use `trashLocalItem(...)` instead of permanently deleting content.
+
+##### Best Practice for App Icon and File Icon Extraction
+If a plugin needs to export a selected app's icon, do not inspect `.app/Contents/Info.plist` yourself or invoke external tools such as `sips`, `qlmanage`, shell scripts, AppleScript, or `osascript`. Those paths may work in the website/developer build and fail in the App Store sandbox.
+
+Use the host-mediated API instead:
+
+```javascript
+function performAction(context) {
+    const selectedApp = (context.selectedFiles || []).find(file => {
+        const path = String(file.path || "").toLowerCase();
+        return path.endsWith(".app");
+    });
+    if (!selectedApp) {
+        SwiftBiu.showNotification("Extract App Icon", "Select a .app first.");
+        return;
+    }
+
+    const icon = SwiftBiu.extractFileIcon(selectedApp.path, { size: 1024 });
+    if (!icon || icon.success !== true || !icon.base64) {
+        SwiftBiu.showNotification("Extract App Icon", icon && icon.error ? icon.error : "Icon extraction failed.");
+        return;
+    }
+
+    const folder = SwiftBiu.pickLocalDirectory();
+    if (!folder) return;
+
+    const outputPath = folder.replace(/\/+$/, "") + "/" + (icon.fileName || "App_Icon.png");
+    const savedPath = SwiftBiu.createLocalFile(outputPath, icon.base64);
+    if (savedPath) SwiftBiu.openFileInPreview(savedPath);
+}
+```
+
 ## Cross-Platform (macOS & iOS) Compatibility
 
 With SwiftBiu expanding to iOS, your plugins can run seamlessly across both platforms with the exact same `.swiftbiux` package. However, you must adhere to the following responsive design and API graceful degradation practices:
@@ -624,7 +658,7 @@ With SwiftBiu expanding to iOS, your plugins can run seamlessly across both plat
 
 ### 2. API Graceful Degradations
 - **Clipboard & Paste**: On macOS, `swiftBiu.pasteText()` writes to the clipboard and simulates `Cmd+V`. On the iOS Main App, this degrades gracefully to a "Copied to Clipboard" action with a Toast notification. However, if the user triggers the plugin inside the iOS Keyboard Extension, it will insert text directly at the cursor as expected.
-- **Unsupported APIs**: `runShellScript` and `runAppleScript` are strictly macOS-only due to iOS sandbox restrictions. If your plugin relies heavily on Node.js, consider using Webpack/Rollup to bundle JS dependencies directly into your `script.js`, or utilize Apple Shortcuts integration for complex iOS automation.
+- **Unsupported or restricted scripting APIs**: `runShellScript` and `runAppleScript` are unavailable on iOS and should not be used for App Store-compatible macOS plugins. The App Store sandbox can block subprocess execution, automation, and filesystem access even when the same script works in the website/developer build. Prefer SwiftBiu host APIs such as `extractFileIcon(...)`, `readLocalFile(...)`, `pickLocalDirectory(...)`, and `createLocalFile(...)`. If your plugin relies heavily on Node.js, consider using Webpack/Rollup to bundle JS dependencies directly into your `script.js`, or utilize Apple Shortcuts integration for complex iOS automation.
 
 ## Permissions (`permissions`)
 
@@ -634,12 +668,12 @@ To ensure your plugin functions correctly, especially in the sandboxed App Store
 *   `"network"`: Required for `swiftBiu.fetch`.
 *   `"clipboardRead"`: Required for `SwiftBiu.getClipboard()` — allows the plugin to read the current clipboard content.
 *   `"clipboardWrite"`: Required for `swiftBiu.copyText`.
-*   `"localFileRead"`: Required for `SwiftBiu.getFileMetadata(path)`, `SwiftBiu.readLocalFile(path)`, `SwiftBiu.readLocalTextFile(path)`, `SwiftBiu.listDirectory(path)`, `SwiftBiu.openFileWithApp(path, appBundleID)`, `window.swiftBiu.getFileMetadata(path)`, `window.swiftBiu.readLocalFile(path)`, `window.swiftBiu.readLocalTextFile(path)`, `window.swiftBiu.listDirectory(path)`, and `window.swiftBiu.openFileWithApp(path, appBundleID)` — allows the plugin to inspect, read, or open the currently selected local files or accessible directories.
-*   `"localFileWrite"`: Required for `pickLocalDirectory`, `createLocalDirectory`, `createLocalFile`, `writeLocalTextFile`, `overwriteLocalFile`, `renameLocalFile`, `copyLocalFile`, `moveLocalFile`, `trashLocalItem`, `saveLocalFile`, `fileExists`, and `directoryExists` when checking writable destinations — allows the plugin to create, update, move, rename, trash, or save files in selected or authorized locations.
+*   `"localFileRead"`: Required for `SwiftBiu.getFileMetadata(path)`, `SwiftBiu.extractFileIcon(path, options)`, `SwiftBiu.readLocalFile(path)`, `SwiftBiu.readLocalTextFile(path)`, `SwiftBiu.listDirectory(path)`, `SwiftBiu.openFileWithApp(path, appBundleID)`, `window.swiftBiu.getFileMetadata(path)`, `window.swiftBiu.extractFileIcon(path, options)`, `window.swiftBiu.readLocalFile(path)`, `window.swiftBiu.readLocalTextFile(path)`, `window.swiftBiu.listDirectory(path)`, and `window.swiftBiu.openFileWithApp(path, appBundleID)` — allows the plugin to inspect, extract icons from, read, or open the currently selected local files or accessible directories.
+*   `"localFileWrite"`: Required for `pickLocalDirectory`, `requestDirectoryAuthorization`, `hasAuthorizedDirectoryAccess`, `createLocalDirectory`, `createLocalFile`, `writeLocalTextFile`, `overwriteLocalFile`, `renameLocalFile`, `copyLocalFile`, `moveLocalFile`, `trashLocalItem`, `saveLocalFile`, `fileExists`, and `directoryExists` when checking writable destinations — allows the plugin to create, update, move, rename, trash, save, or inspect writable destinations in selected or authorized locations.
 *   `"paste"`: Required for `swiftBiu.pasteText` — allows the plugin to paste text directly into the user's active application.
 *   `"notifications"`: Required for `swiftBiu.showNotification`, `SwiftBiu.showImage`, and `SwiftBiu.showInteractiveImage`.
-*   `"runAppleScript"`: Required for `SwiftBiu.runAppleScript()` — allows the plugin to execute AppleScript code. ⚠️ **Not available in the App Store (sandboxed) version.**
-*   `"runShellScript"`: Required for `swiftBiu.runShellScript`. ⚠️ **Not available in the App Store (sandboxed) version.**
+*   `"runAppleScript"`: Required for `SwiftBiu.runAppleScript()` — allows the plugin to execute AppleScript code. ⚠️ **Do not use for App Store-compatible plugins.**
+*   `"runShellScript"`: Required for `swiftBiu.runShellScript`. ⚠️ **Do not use for App Store-compatible plugins.**
 
 ## Internationalization (i18n)
 
