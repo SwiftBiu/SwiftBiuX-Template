@@ -1,14 +1,9 @@
 function isAvailable(context) {
-  // Check if there is selected text and if it contains a number
-  const text = context.selectedText;
-  if (!text || text.trim().length === 0) {
-    return { isAvailable: false, isContextMatch: false };
-  }
-  
-  // Simple regex to check for numbers
+  const text = context && typeof context.selectedText === "string" ? context.selectedText : "";
+
   const hasNumber = /\d/.test(text);
-  
-  return { 
+
+  return {
     isAvailable: true, 
     isContextMatch: hasNumber 
   };

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-27T11:37:04.956Z",
+  "generatedAt": "2026-04-28T15:21:16.664Z",
   "categories": [
     {
       "id": "text-processing",
@@ -178,6 +178,24 @@
       "requiredHost": null
     },
     {
+      "id": "com.swiftbiu.plugin.desktop-gravity",
+      "name": {
+        "en": "Desktop Gravity",
+        "zh": "桌面引力"
+      },
+      "description": {
+        "en": "Automatically organize selected files into categorized folders.",
+        "zh": "一键将选中的文件按类型自动分类到文件夹中。"
+      },
+      "icon": "square.grid.3x3.topright.filled",
+      "version": "1.3",
+      "type": "Local",
+      "author": "SwiftBiu Team",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DesktopGravity.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null
+    },
+    {
       "id": "com.swiftbiu.plugin.doubaoimage",
       "name": {
         "en": "豆包图像生成",
@@ -188,7 +206,7 @@
         "zh": "使用豆包文生图模型生成图像，并直接预览。"
       },
       "icon": "photo.on.rectangle.angled",
-      "version": "1.0.0",
+      "version": "1.2",
       "type": "Network",
       "author": "SwiftBiu Team",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DoubaoImage-Plugin.swiftbiux",
@@ -206,7 +224,7 @@
         "zh": "使用豆包大语言模型生成文本，并将结果直接粘贴。"
       },
       "icon": "text.bubble",
-      "version": "1.0.0",
+      "version": "1.4",
       "type": "Network",
       "author": "SwiftBiu Team",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DoubaoText-Plugin.swiftbiux",
@@ -224,7 +242,7 @@
         "zh": "Send the selected text to Google Gemini and get the response."
       },
       "icon": "gemini.png",
-      "version": "1.4",
+      "version": "1.6",
       "type": "Network",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/Gemini.swiftbiux",
@@ -238,29 +256,11 @@
         "zh": "Nano Banana"
       },
       "description": {
-        "en": "Generates an image based on the selected text using the Gemini API.",
-        "zh": "Generates an image based on the selected text using the Gemini API."
+        "en": "Generates images from selected text in a native SwiftBiu studio window.",
+        "zh": "Generates images from selected text in a native SwiftBiu studio window."
       },
       "icon": "nano-banana.png",
-      "version": "1.2",
-      "type": "Network",
-      "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/GeminiImage.swiftbiux",
-      "categoryId": "online-services",
-      "requiredHost": "google.com"
-    },
-    {
-      "id": "com.swiftbiu.gemini-imageNative",
-      "name": {
-        "en": "Nano Banana Native",
-        "zh": "Nano Banana Native"
-      },
-      "description": {
-        "en": "Generates images in a native SwiftBiu studio window with prompt editing, logs, and share-poster export.",
-        "zh": "Generates images in a native SwiftBiu studio window with prompt editing, logs, and share-poster export."
-      },
-      "icon": "nano-banana.png",
-      "version": "1.0",
+      "version": "1.1",
       "type": "Network",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/GeminiImageNative.swiftbiux",
@@ -340,6 +340,24 @@
       "requiredHost": null
     },
     {
+      "id": "com.swiftbiu.openfilewithapp",
+      "name": {
+        "en": "Open File With App",
+        "zh": "指定 App 打开文件"
+      },
+      "description": {
+        "en": "Open selected files with a configured macOS app, optionally filtered by file suffix.",
+        "zh": "使用配置的 macOS App 打开选中文件，可按文件后缀过滤。"
+      },
+      "icon": "arrow.up.forward.square",
+      "version": "1.0",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/OpenFileWithApp.swiftbiux",
+      "categoryId": "system",
+      "requiredHost": null
+    },
+    {
       "id": "com.swiftbiu.packager",
       "name": {
         "en": "Packager",
@@ -391,6 +409,24 @@
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/RegexExtractor.swiftbiux",
       "categoryId": "text-processing",
+      "requiredHost": null
+    },
+    {
+      "id": "com.SwiftBiu.searchplus",
+      "name": {
+        "en": "Search Plus",
+        "zh": "搜索助手"
+      },
+      "description": {
+        "en": "Select text and search with a custom keyword (e.g., 'Apple' + 'Official').",
+        "zh": "选择文字并附带自定义关键字进行搜索（如：'苹果' + '官网'）。"
+      },
+      "icon": "plus.magnifyingglass",
+      "version": "1.1",
+      "type": "Local",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/SearchPlus.swiftbiux",
+      "categoryId": "utilities",
       "requiredHost": null
     },
     {

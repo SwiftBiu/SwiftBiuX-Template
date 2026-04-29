@@ -19,9 +19,30 @@ function debugLog(message, details) {
 function isAvailable(context) {
   const isTextSelected = context.selectedText && context.selectedText.trim().length > 0;
   return {
-    isAvailable: isTextSelected,
+    isAvailable: isTextSelected || isAIResponseUIEnabled(),
     isContextMatch: false
   };
+}
+
+const conversationMessages = [];
+const maxContextMessageCount = 10;
+const maxStoredConversationMessages = 40;
+
+function resetConversation() {
+  conversationMessages.length = 0;
+  SwiftBiu.showNotification("豆包问答AI", "当前上下文历史已清空。");
+}
+
+function shouldResetConversation(text) {
+  const normalized = (text || "").trim().toLowerCase();
+  return [
+    "reset chat",
+    "reset conversation",
+    "清空聊天",
+    "重置聊天",
+    "清空上下文",
+    "重置上下文"
+  ].includes(normalized);
 }
 
 function getBooleanConfig(key, fallbackValue) {
@@ -60,6 +81,19 @@ function isAIResponseUIEnabled() {
   return enabled;
 }
 
+function resolveContextMessageCount() {
+  const rawValue = SwiftBiu.getConfig("contextMessageCount");
+  const parsedValue = parseInt(rawValue || "0", 10);
+  const count = Number.isFinite(parsedValue) ? parsedValue : 0;
+  const clampedCount = Math.max(0, Math.min(maxContextMessageCount, count));
+  debugLog("Resolved context message count", {
+    rawValue,
+    clampedCount,
+    storedMessages: conversationMessages.length
+  });
+  return clampedCount;
+}
+
 function persistResponseUISettings(event) {
   if (!event || typeof event !== "object" || !SwiftBiu.setConfig) {
     debugLog("Skip persisting response UI settings", {
@@ -84,13 +118,63 @@ function persistResponseUISettings(event) {
 }
 
 function buildPasteContent(sourceText, responseText, mode) {
-  return mode === "replace"
+  const trimmedSourceText = typeof sourceText === "string" ? sourceText.trim() : "";
+  return mode === "replace" || !trimmedSourceText
     ? responseText
-    : sourceText + "\n\n" + responseText;
+    : trimmedSourceText + "\n\n" + responseText;
 }
 
 function resolveTextModel(textModel) {
   return textModel || "doubao-seed-2-0-pro-260215";
+}
+
+function buildDoubaoMessages(systemPrompt, userPrompt, contextMessageCount) {
+  const trimmedSystemPrompt = typeof systemPrompt === "string" ? systemPrompt.trim() : "";
+  const trimmedUserPrompt = typeof userPrompt === "string" ? userPrompt.trim() : "";
+  const parsedContextCount = typeof contextMessageCount === "number"
+    ? contextMessageCount
+    : parseInt(contextMessageCount || "0", 10);
+  const resolvedContextCount = Math.max(
+    0,
+    Math.min(maxContextMessageCount, Number.isFinite(parsedContextCount) ? parsedContextCount : 0)
+  );
+  const requestMessages = [];
+
+  if (trimmedSystemPrompt) {
+    requestMessages.push({ role: "system", content: trimmedSystemPrompt });
+  }
+
+  if (resolvedContextCount > 0 && conversationMessages.length > 0) {
+    const sliceCount = Math.min(resolvedContextCount, conversationMessages.length);
+    const recentMessages = conversationMessages.slice(-sliceCount);
+    while (recentMessages.length > 0 && recentMessages[0].role !== "user") {
+      recentMessages.shift();
+    }
+    requestMessages.push(...recentMessages);
+  }
+
+  requestMessages.push({ role: "user", content: trimmedUserPrompt });
+  return requestMessages;
+}
+
+function rememberConversationTurn(userContent, assistantContent) {
+  const trimmedUserContent = typeof userContent === "string" ? userContent.trim() : "";
+  const trimmedAssistantContent = typeof assistantContent === "string" ? assistantContent.trim() : "";
+
+  if (!trimmedUserContent || !trimmedAssistantContent) {
+    return;
+  }
+
+  conversationMessages.push({ role: "user", content: trimmedUserContent });
+  conversationMessages.push({ role: "assistant", content: trimmedAssistantContent });
+
+  if (conversationMessages.length > maxStoredConversationMessages) {
+    conversationMessages.splice(0, conversationMessages.length - maxStoredConversationMessages);
+  }
+
+  debugLog("Remembered conversation turn", {
+    storedMessages: conversationMessages.length
+  });
 }
 
 function extractTextContent(value) {
@@ -206,6 +290,7 @@ function requestDoubaoCompletion(options) {
     textModel,
     systemPrompt,
     userPrompt,
+    contextMessageCount,
     bubbleSessionID,
     mode,
     context
@@ -225,11 +310,16 @@ function requestDoubaoCompletion(options) {
     return;
   }
 
+  const requestMessages = buildDoubaoMessages(systemPrompt, trimmedUserPrompt, contextMessageCount);
+
   debugLog("Sending Doubao request", {
     apiUrl,
     model: resolveTextModel(textModel),
     bubbleSessionID,
     mode,
+    contextMessageCount,
+    storedMessages: conversationMessages.length,
+    requestMessageCount: requestMessages.length,
     systemPromptLength: typeof systemPrompt === "string" ? systemPrompt.length : 0,
     userPromptLength: trimmedUserPrompt.length
   });
@@ -244,10 +334,7 @@ function requestDoubaoCompletion(options) {
       },
       body: JSON.stringify({
         model: resolveTextModel(textModel),
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: trimmedUserPrompt }
-        ],
+        messages: requestMessages,
         stream: false
       })
     },
@@ -293,6 +380,7 @@ function requestDoubaoCompletion(options) {
           return;
         }
 
+        rememberConversationTurn(trimmedUserPrompt, content);
         debugLog("Using legacy direct paste flow", {
           mode,
           contentLength: content.length
@@ -335,7 +423,8 @@ function requestDoubaoCompletion(options) {
 
 function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
   debugLog("Attempting to present AI response bubble", {
-    initialMode
+    initialMode,
+    hasInitialRequest: Boolean(initialRequestOptions)
   });
 
   if (!isAIResponseUIEnabled()) {
@@ -356,6 +445,8 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
     });
     return null;
   }
+
+  let pendingSessionMessages = null;
 
   function createStreamingRunner(sessionID) {
     let activeStreamID = "";
@@ -402,7 +493,8 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
         apiKey,
         textModel,
         systemPrompt,
-        userPrompt
+        userPrompt,
+        contextMessageCount
       } = requestOptions;
 
       const trimmedUserPrompt = typeof userPrompt === "string" ? userPrompt.trim() : "";
@@ -422,6 +514,23 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
       let sseRemainder = "";
       let pendingErrorMessage = "";
       let hasShownThinking = false;
+      const requestMessages = buildDoubaoMessages(trimmedSystemPrompt, trimmedUserPrompt, contextMessageCount);
+
+      function publishStreamingBubbleUpdate() {
+        if (requestToken !== activeRequestToken || !accumulatedText) {
+          return;
+        }
+
+        SwiftBiu.updateAIResponseBubble(sessionID, {
+          systemPrompt: trimmedSystemPrompt,
+          userPrompt: trimmedUserPrompt,
+          state: "writing",
+          status: "writing",
+          text: accumulatedText,
+          allowSubmit: false,
+          animateText: false
+        });
+      }
 
       SwiftBiu.updateAIResponseBubble(sessionID, {
         systemPrompt: trimmedSystemPrompt,
@@ -435,7 +544,10 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
 
       debugLog("Starting streaming Doubao request", {
         sessionID,
-        requestToken
+        requestToken,
+        contextMessageCount,
+        storedMessages: conversationMessages.length,
+        requestMessageCount: requestMessages.length
       });
 
       const streamID = SwiftBiu.fetchStream(
@@ -449,10 +561,7 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
           },
           body: JSON.stringify({
             model: resolveTextModel(textModel),
-            messages: [
-              { role: "system", content: trimmedSystemPrompt },
-              { role: "user", content: trimmedUserPrompt }
-            ],
+            messages: requestMessages,
             stream: true,
             thinking: {
               type: "disabled"
@@ -518,15 +627,6 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
 
                 chunkHasText = true;
                 accumulatedText += deltaText;
-                SwiftBiu.updateAIResponseBubble(sessionID, {
-                  systemPrompt: trimmedSystemPrompt,
-                  userPrompt: trimmedUserPrompt,
-                  state: "writing",
-                  status: "writing",
-                  text: accumulatedText,
-                  allowSubmit: false,
-                  animateText: false
-                });
               } catch (error) {
                 debugLog("Failed to parse SSE payload", {
                   message: error.message
@@ -545,6 +645,8 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
                 allowSubmit: false,
                 animateText: false
               });
+            } else if (chunkHasText) {
+              publishStreamingBubbleUpdate();
             }
             return;
           }
@@ -553,6 +655,10 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
             clearActiveStream(streamID);
 
             if (accumulatedText) {
+              pendingSessionMessages = {
+                user: trimmedUserPrompt,
+                model: accumulatedText
+              };
               SwiftBiu.updateAIResponseBubble(sessionID, {
                 systemPrompt: trimmedSystemPrompt,
                 userPrompt: trimmedUserPrompt,
@@ -571,6 +677,10 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
                 const payload = JSON.parse(trailingText);
                 const responseText = extractDoubaoResponseText(payload);
                 if (responseText) {
+                  pendingSessionMessages = {
+                    user: trimmedUserPrompt,
+                    model: responseText
+                  };
                   SwiftBiu.updateAIResponseBubble(sessionID, {
                     systemPrompt: trimmedSystemPrompt,
                     userPrompt: trimmedUserPrompt,
@@ -628,7 +738,17 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
   sessionID = SwiftBiu.showAIResponseBubble(
     {
       title: "豆包问答AI",
-      mode: initialMode
+      mode: initialMode,
+      allowFollowUp: true,
+      systemPrompt: initialRequestOptions?.systemPrompt || resolveSystemPrompt(),
+      userPrompt: initialRequestOptions?.userPrompt || "",
+      userPromptPlaceholder: "输入问题或需要处理的文本",
+      userPromptVisible: true,
+      promptVisible: !initialRequestOptions,
+      state: initialRequestOptions ? "generating" : "ready",
+      status: initialRequestOptions ? "Generating" : "Ready",
+      text: initialRequestOptions ? "" : "请输入问题或文本后点击发送。",
+      allowSubmit: false
     },
     function onBubbleEvent(event) {
       debugLog("Received AI response bubble event", {
@@ -646,12 +766,41 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
         return;
       }
 
+      if (event.type === "followup") {
+        persistResponseUISettings(event);
+
+        const previousText = typeof event.text === "string" ? event.text.trim() : "";
+        if (pendingSessionMessages) {
+          rememberConversationTurn(
+            pendingSessionMessages.user,
+            previousText || pendingSessionMessages.model
+          );
+          pendingSessionMessages = null;
+        }
+
+        streamRunner?.run({
+          apiUrl: SwiftBiu.getConfig("apiUrl") || "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+          apiKey: SwiftBiu.getConfig("apiKey"),
+          textModel: SwiftBiu.getConfig("textModel"),
+          contextMessageCount: resolveContextMessageCount(),
+          systemPrompt: typeof event.systemPrompt === "string" && event.systemPrompt.trim()
+            ? event.systemPrompt.trim()
+            : resolveSystemPrompt(),
+          userPrompt: typeof event.userPrompt === "string" ? event.userPrompt : "",
+          bubbleSessionID: sessionID,
+          mode: event.mode === "replace" ? "replace" : "append",
+          context
+        });
+        return;
+      }
+
       if (event.type === "regenerate") {
         persistResponseUISettings(event);
         streamRunner?.run({
           apiUrl: SwiftBiu.getConfig("apiUrl") || "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
           apiKey: SwiftBiu.getConfig("apiKey"),
           textModel: SwiftBiu.getConfig("textModel"),
+          contextMessageCount: resolveContextMessageCount(),
           systemPrompt: typeof event.systemPrompt === "string" && event.systemPrompt.trim()
             ? event.systemPrompt.trim()
             : resolveSystemPrompt(),
@@ -673,6 +822,13 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
       if (!nextText) {
         SwiftBiu.showNotification("文本生成失败", "响应内容为空，无法应用。");
         return;
+      }
+
+      if (pendingSessionMessages) {
+        rememberConversationTurn(pendingSessionMessages.user, nextText);
+        pendingSessionMessages = null;
+      } else if (typeof event.userPrompt === "string" && event.userPrompt.trim()) {
+        rememberConversationTurn(event.userPrompt, nextText);
       }
 
       const mode = event.mode === "replace" ? "replace" : "append";
@@ -711,6 +867,7 @@ function performAction(context) {
   const textModel = SwiftBiu.getConfig("textModel");
   const initialMode = resolveInsertMode();
   const systemPrompt = resolveSystemPrompt();
+  const contextMessageCount = resolveContextMessageCount();
 
   debugLog("Starting Doubao action", {
     hasApiKey: Boolean(apiKey),
@@ -718,7 +875,9 @@ function performAction(context) {
     textModel: textModel || "doubao-seed-2-0-pro-260215",
     selectedTextLength: context.selectedText ? context.selectedText.length : 0,
     initialMode,
-    systemPromptLength: systemPrompt.length
+    systemPromptLength: systemPrompt.length,
+    contextMessageCount,
+    storedMessages: conversationMessages.length
   });
 
   if (!apiKey) {
@@ -727,10 +886,19 @@ function performAction(context) {
     return;
   }
 
-  const selectedText = context.selectedText;
+  const selectedText = typeof context.selectedText === "string" ? context.selectedText.trim() : "";
   if (!selectedText || selectedText.trim().length === 0) {
-    debugLog("Abort action because selectedText is empty");
-    SwiftBiu.showNotification("输入错误", "请先选择需要处理的文本。");
+    debugLog("No selected text, trying to open AI response bubble for manual prompt input");
+    const bubbleSessionID = presentAIResponseBubble(context, initialMode, null);
+    if (!bubbleSessionID) {
+      debugLog("Abort action because selectedText is empty and native bubble is unavailable");
+      SwiftBiu.showNotification("输入错误", "请先选择需要处理的文本。");
+    }
+    return;
+  }
+
+  if (shouldResetConversation(selectedText)) {
+    resetConversation();
     return;
   }
 
@@ -739,7 +907,8 @@ function performAction(context) {
     apiKey,
     textModel,
     systemPrompt,
-    userPrompt: selectedText
+    userPrompt: selectedText,
+    contextMessageCount
   });
   debugLog("Resolved response presentation mode", {
     bubbleSessionID,
@@ -757,6 +926,7 @@ function performAction(context) {
     textModel,
     systemPrompt,
     userPrompt: selectedText,
+    contextMessageCount,
     bubbleSessionID,
     mode: initialMode,
     context

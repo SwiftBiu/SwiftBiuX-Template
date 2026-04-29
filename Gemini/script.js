@@ -18,7 +18,11 @@ function debugLog(message, details) {
 }
 
 function isAvailable(context) {
-    return context.selectedText.trim().length > 0;
+    const selectedText = context && typeof context.selectedText === "string" ? context.selectedText.trim() : "";
+    return {
+        isAvailable: selectedText.length > 0 || isAIResponseUIEnabled(),
+        isContextMatch: selectedText.length > 0
+    };
 }
 
 const messages = [];
@@ -74,9 +78,10 @@ function persistResponseUISettings(event) {
 }
 
 function buildPasteContent(sourceText, assistantText, mode) {
-    return mode === "replace"
+    const trimmedSourceText = typeof sourceText === "string" ? sourceText.trim() : "";
+    return mode === "replace" || !trimmedSourceText
         ? assistantText
-        : sourceText + "\n\n" + assistantText;
+        : trimmedSourceText + "\n\n" + assistantText;
 }
 
 function resolveModelConfig() {
@@ -261,8 +266,9 @@ function requestGeminiCompletion(options) {
     );
 }
 
-function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
-    if (!isAIResponseUIEnabled()) {
+function presentAIResponseBubble(context, initialMode, initialRequestOptions, launchOptions) {
+    const forceOpen = launchOptions && launchOptions.forceOpen === true;
+    if (!forceOpen && !isAIResponseUIEnabled()) {
         debugLog("AI Response UI is disabled, falling back to legacy.");
         return null;
     }
@@ -518,7 +524,17 @@ function presentAIResponseBubble(context, initialMode, initialRequestOptions) {
         {
             title: "Gemini",
             mode: initialMode,
+            allowFollowUp: true,
+            systemPrompt: initialRequestOptions?.systemPrompt || resolveSystemPrompt(),
             systemPromptPlaceholder: "系统提示词（建议复制扩展保存不同版本）",
+            userPrompt: initialRequestOptions?.userPrompt || "",
+            userPromptPlaceholder: "输入问题或需要处理的文本",
+            userPromptVisible: true,
+            promptVisible: !initialRequestOptions,
+            state: initialRequestOptions ? "generating" : "ready",
+            status: initialRequestOptions ? "Generating" : "Ready",
+            text: initialRequestOptions ? "" : "请输入问题或文本后点击发送。",
+            allowSubmit: false,
             submitLabel: "应用",
             replaceLabel: "替换",
             appendLabel: "追加"
@@ -607,13 +623,22 @@ function performAction(context) {
     const initialMode = resolveInsertMode();
     const systemPrompt = resolveSystemPrompt();
     const model = resolveModelConfig();
+    const selectedText = context && typeof context.selectedText === "string" ? context.selectedText.trim() : "";
 
     if (!apiKey) {
         SwiftBiu.showNotification("Configuration Error", "Please set your Gemini API Key in the plugin settings.");
         return;
     }
 
-    if (context.selectedText.trim().toLowerCase() === "reset chat") {
+    if (!selectedText) {
+        const bubbleSessionID = presentAIResponseBubble(context, initialMode, null, { forceOpen: true });
+        if (!bubbleSessionID) {
+            SwiftBiu.showNotification("Input Error", "Please select text or enter a prompt in the Gemini bubble.");
+        }
+        return;
+    }
+
+    if (selectedText.toLowerCase() === "reset chat") {
         resetConversation();
         return;
     }
@@ -623,7 +648,7 @@ function performAction(context) {
         apiKey,
         model,
         systemPrompt,
-        userPrompt: context.selectedText,
+        userPrompt: selectedText,
         contextMessageCount
     });
 
@@ -637,7 +662,7 @@ function performAction(context) {
         apiKey,
         model,
         systemPrompt,
-        userPrompt: context.selectedText,
+        userPrompt: selectedText,
         contextMessageCount,
         bubbleSessionID: null,
         mode: initialMode,

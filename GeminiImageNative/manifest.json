@@ -3,7 +3,7 @@
     "name": "Nano Banana",
     "author": "SwiftBiu",
     "description": "Generates images from selected text in a native SwiftBiu studio window.",
-    "version": "1.1",
+    "version": "1.2",
     "actions": [
         {
             "title": "Nano Banana",

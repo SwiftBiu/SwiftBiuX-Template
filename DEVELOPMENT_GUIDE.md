@@ -332,7 +332,7 @@ If your plugin needs user-provided settings (like an API key), define them in th
 ]
 ```
 
-Supported `type` values include: `string`, `secure` (for passwords), `boolean` (for switches), and `option` (for dropdowns).
+Supported `type` values include: `string`, `secure` (for passwords), `boolean` (for switches), `option` (for dropdowns), and `fileExtensionAppRules` (for suffix-to-app rule editors).
 Legacy `radioList` configurations are no longer supported. Migrate those cases to a normal `string` field or duplicate the extension for each fixed prompt variant.
 
 Common optional fields:
@@ -355,6 +355,7 @@ Settings are rendered in a **vertical stack**. This design ensures that long lab
 > | `string` / `secure` | The stored string | Use directly |
 > | `boolean` | `"true"` or `"false"` | `SwiftBiu.getConfig("key") === "true"` |
 > | `option` | The `value` of the selected option | Use directly |
+> | `fileExtensionAppRules` | JSON string like `{"rules":[{"fileExtension":"pdf","appBundleID":"com.apple.Preview"}]}` | Parse with `JSON.parse(...)` and pass `appBundleID` to `SwiftBiu.openFileWithApp(...)` |
 
 ##### `option`
 *   **UI**: A dropdown selection menu.
@@ -377,6 +378,25 @@ Settings are rendered in a **vertical stack**. This design ensures that long lab
       { "label": "Python (Requests)", "value": "Python (Requests)" },
       { "label": "JavaScript (Fetch)", "value": "JavaScript (Fetch)" }
     ]
+  }
+]
+```
+
+##### `fileExtensionAppRules`
+*   **UI**: A native suffix-rule editor. Users add one or more file suffixes on the left and choose one macOS app per suffix on the right.
+*   **Functionality**: Best for file actions that need to open selected files with specific apps without asking users to type bundle identifiers.
+*   **Stored value**: A JSON string with a `rules` array. Each rule uses `fileExtension` and `appBundleID`.
+*   **Default value**: Optional stringified JSON in the same format.
+
+**Example of suffix-to-app rules:**
+```json
+"configuration": [
+  {
+    "key": "rules",
+    "label": "File Suffix Rules",
+    "type": "fileExtensionAppRules",
+    "description": "Add suffixes and choose the app used to open each one.",
+    "defaultValue": "{\"rules\":[{\"fileExtension\":\"pdf\",\"appBundleID\":\"com.apple.Preview\"}]}"
   }
 ]
 ```
@@ -438,6 +458,7 @@ In a Standard Action, all code executes globally in the background `script.js`. 
     *   `SwiftBiu.trashLocalItem(path: String)`: Moves a selected local file or an item inside an authorized directory to the macOS Trash. *(Requires: `localFileWrite`)*
     *   `SwiftBiu.openURL(urlString: String)`: Launches the default browser to open a link.
     *   `SwiftBiu.openFileInPreview(filePath: String)`: Opens a file using the macOS default app (e.g., Preview).
+    *   `SwiftBiu.openFileWithApp(filePath: String, appBundleID: String)`: Opens an accessible selected or authorized file with the specified macOS app bundle ID. Returns `Boolean`. *(Requires: `localFileRead`)*
     *   `SwiftBiu.showNotification(title: String, body: String)`: Sends a system-level notification. *(Requires: `notifications`)*
     *   `SwiftBiu.showImage(imageSource: String, position?: Object, context?: Object)`: Displays the native image toast card. `imageSource` accepts either a Base64 string or an `http/https` URL. *(Requires: `notifications`)*
     *   `SwiftBiu.showInteractiveImage(options, onRegenerate)`: Creates an interactive image session and returns a `sessionID`. Use it when you need regenerate/update behavior from the same image card. *(Requires: `notifications`)*
@@ -558,6 +579,7 @@ Once the HTML UI is successfully displayed, the system assumes control and injec
         *   `window.swiftBiu.copyText(text)`: Copies text to the system clipboard.
         *   `window.swiftBiu.pasteText(text)`: Copies and actively pastes text into the focused window.
         *   `window.swiftBiu.openURL(url)`: Opens a Web URL via the default browser.
+        *   `window.swiftBiu.openFileWithApp(path, appBundleID)`: Returns `{ success: Boolean }`. Opens an accessible selected or authorized file with the specified macOS app bundle ID. *(Requires: `localFileRead`)*
         *   `window.swiftBiu.speakText(text)`: Utilizes the macOS native TTS to speak the given text aloud.
         *   `window.swiftBiu.pickLocalDirectory()`: Returns `{ path: String }`. Opens the native folder picker and persists the chosen writable location. *(Requires: `localFileWrite`)*
         *   `window.swiftBiu.createLocalDirectory(path)`: Returns `{ path: String }`. Creates a directory inside a selected or authorized location. *(Requires: `localFileWrite`)*
@@ -612,7 +634,7 @@ To ensure your plugin functions correctly, especially in the sandboxed App Store
 *   `"network"`: Required for `swiftBiu.fetch`.
 *   `"clipboardRead"`: Required for `SwiftBiu.getClipboard()` — allows the plugin to read the current clipboard content.
 *   `"clipboardWrite"`: Required for `swiftBiu.copyText`.
-*   `"localFileRead"`: Required for `SwiftBiu.getFileMetadata(path)`, `SwiftBiu.readLocalFile(path)`, `SwiftBiu.readLocalTextFile(path)`, `SwiftBiu.listDirectory(path)`, `window.swiftBiu.getFileMetadata(path)`, `window.swiftBiu.readLocalFile(path)`, `window.swiftBiu.readLocalTextFile(path)`, and `window.swiftBiu.listDirectory(path)` — allows the plugin to inspect and read the currently selected local files or accessible directories.
+*   `"localFileRead"`: Required for `SwiftBiu.getFileMetadata(path)`, `SwiftBiu.readLocalFile(path)`, `SwiftBiu.readLocalTextFile(path)`, `SwiftBiu.listDirectory(path)`, `SwiftBiu.openFileWithApp(path, appBundleID)`, `window.swiftBiu.getFileMetadata(path)`, `window.swiftBiu.readLocalFile(path)`, `window.swiftBiu.readLocalTextFile(path)`, `window.swiftBiu.listDirectory(path)`, and `window.swiftBiu.openFileWithApp(path, appBundleID)` — allows the plugin to inspect, read, or open the currently selected local files or accessible directories.
 *   `"localFileWrite"`: Required for `pickLocalDirectory`, `createLocalDirectory`, `createLocalFile`, `writeLocalTextFile`, `overwriteLocalFile`, `renameLocalFile`, `copyLocalFile`, `moveLocalFile`, `trashLocalItem`, `saveLocalFile`, `fileExists`, and `directoryExists` when checking writable destinations — allows the plugin to create, update, move, rename, trash, or save files in selected or authorized locations.
 *   `"paste"`: Required for `swiftBiu.pasteText` — allows the plugin to paste text directly into the user's active application.
 *   `"notifications"`: Required for `swiftBiu.showNotification`, `SwiftBiu.showImage`, and `SwiftBiu.showInteractiveImage`.
@@ -720,7 +742,31 @@ Through the development process, we've identified some common pitfalls and recom
 *   **`isAvailable` (Visibility)**: Controls whether the plugin should appear in this context at all. For example, a code formatting plugin returns `false` when selected text contains no code features, keeping the toolbar clean.
 *   **`isContextMatch` (Priority)**: Controls sorting in the toolbar. For example, a translate plugin detects selected text and returns `isContextMatch: true`, ensuring its icon jumps to the very front of the toolbar for immediate access.
 
-### 2. Isolate Environment APIs and Read Configuration
+### 2. Support Direct Open for UI Extensions
+
+SwiftBiu shows an explicit Open button for extensions that expose an interactive surface, including `manifest.ui`, `SwiftBiu.displayUI(...)`, `SwiftBiu.showAIResponseBubble(...)`, `SwiftBiu.showInteractiveImage(...)`, and `SwiftBiu.openNativeGeminiImageStudio(...)`.
+
+These plugins may be launched without a text selection. Treat `context.selectedText` as optional:
+
+*   Web UI plugins should return `{ isAvailable: true, isContextMatch: hasSelection }` and always call `displayUI(...)`. The UI can initialize empty with `context.selectedText || ""`.
+*   AI bubble plugins should open the bubble in a ready/manual-input state when no selected text exists. Start a request only after the user submits a prompt.
+*   Image UI plugins should open an editable prompt card/studio when no selected text exists. Start image generation only after the user enters a prompt.
+*   Append-mode actions should paste/apply only the generated result when the source text is empty; do not prepend blank lines.
+*   Logic-only quick actions may still require selected text and return `isAvailable: false` when no meaningful input exists.
+
+Recommended `isAvailable` shape for UI extensions:
+
+```javascript
+function isAvailable(context) {
+    const hasSelection = Boolean(context && context.selectedText && context.selectedText.trim());
+    return {
+        isAvailable: true,
+        isContextMatch: hasSelection
+    };
+}
+```
+
+### 3. Isolate Environment APIs and Read Configuration
 
 > [!WARNING]
 > Do not mix up the APIs for the background script (`script.js`) and the frontend interface (`ui/index.html`).
@@ -728,7 +774,7 @@ Through the development process, we've identified some common pitfalls and recom
 *   To read user configuration in the background script, you **must** use the synchronous `SwiftBiu.getConfig('your_key')`.
 *   `window.swiftBiu.storage.get(key)` is an asynchronous API specifically designed for the stateless Web UI environment to safely read persisted data from the native layer.
 
-### 3. Declare Permissions Precisely
+### 4. Declare Permissions Precisely
 
 > [!IMPORTANT]
 > Plugin functionality is strictly limited by the requirements declared in `manifest.json`. Undeclared permissions will cause API calls to be blocked.
@@ -736,14 +782,14 @@ Through the development process, we've identified some common pitfalls and recom
 *   To **paste** text directly at the cursor: use `SwiftBiu.pasteText(text)` -> requires `"paste"` permission.
 *   To write text only to the system **clipboard**: use `SwiftBiu.writeToClipboard(text)` -> requires `"clipboardWrite"` permission.
 
-### 4. JavaScript Environment Compatibility
+### 5. JavaScript Environment Compatibility
 
 > [!CAUTION]
 > The background script (`script.js`) runs in the native `JavaScriptCore` engine.
 
 Avoid using bleeding-edge ECMAScript syntax proposals (such as the array `.at()` method or bleeding-edge RegEx features) in background scripts. This may cause runtime errors on older macOS systems. We recommend using standard ES6 syntax to ensure the broadest compatibility across different macOS versions.
 
-### 5. Native Request Modes for Background Scripts
+### 6. Native Request Modes for Background Scripts
 
 > [!NOTE]
 > Background `script.js` currently has two native request styles: one-shot `fetch(...)` and incremental `fetchStream(...)`.
@@ -763,7 +809,7 @@ Use `SwiftBiu.fetchStream(url, options, onEvent, onError)` when the provider sup
 
 *(If you prefer modern JS, you can manually wrap `fetch(...)` in a Promise for async/await style. On the Web UI side, the global `window.swiftBiu.fetch` is already a Promise API.)*
 
-### 6. Background Debugging: Log Complex Objects Fully
+### 7. Background Debugging: Log Complex Objects Fully
 
 > [!TIP]
 > Printing complex objects with native logs might result in truncation or simply `[object Object]`.

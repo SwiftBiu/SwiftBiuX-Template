@@ -3,7 +3,7 @@
   "name": "Currency Converter",
   "author": "SwiftBiu",
   "description": "Real-time currency conversion with support for multiple currencies.",
-  "version": "1.1",
+  "version": "1.2",
   "icon": "banknote",
   "iconType": "sfSymbol",
   "actions": [

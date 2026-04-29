@@ -13,8 +13,8 @@ function getTrimmedSelectedText(context) {
 function isAvailable(context) {
   const prompt = getTrimmedSelectedText(context);
   return {
-    isAvailable: prompt.length > 0,
-    isContextMatch: false
+    isAvailable: true,
+    isContextMatch: prompt.length > 0
   };
 }
 
@@ -65,6 +65,28 @@ function beginInteractiveImageRequest(prompt, settings, context) {
 
   return SwiftBiu.showInteractiveImage(
     buildPendingImageCardOptions(prompt, settings, context),
+    function (event) {
+      handleRegenerate(event, settings, context);
+    }
+  );
+}
+
+function openPromptEditor(settings, context) {
+  if (!supportsInteractiveImage()) {
+    return "";
+  }
+
+  return SwiftBiu.showInteractiveImage(
+    {
+      prompt: "",
+      selectionText: "",
+      position: context && context.screenPosition ? context.screenPosition : null,
+      modelName: settings.imageModel,
+      imageSize: settings.imageSize,
+      showsPendingPlaceholder: true,
+      isGenerating: false,
+      statusMessage: "请输入提示词后点击生成。"
+    },
     function (event) {
       handleRegenerate(event, settings, context);
     }
@@ -194,7 +216,17 @@ function performAction(context) {
   }
 
   if (!prompt) {
-    SwiftBiu.showNotification("输入错误", "请先选择用于生成图像的文本提示。");
+    const sessionID = openPromptEditor(
+      {
+        imageModel: imageModel,
+        imageSize: imageSize
+      },
+      context
+    );
+
+    if (!sessionID) {
+      SwiftBiu.showNotification("输入错误", "请先选择用于生成图像的文本提示。");
+    }
     return;
   }
 

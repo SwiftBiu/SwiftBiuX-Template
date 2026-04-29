@@ -1,7 +1,11 @@
 // AIPolisher Plugin Script
 
 function isAvailable(context) {
-    return context.selectedText && context.selectedText.trim().length > 0;
+    const hasSelectedText = Boolean(context && context.selectedText && context.selectedText.trim().length > 0);
+    return {
+        isAvailable: true,
+        isContextMatch: hasSelectedText
+    };
 }
 
 function performAction(context) {

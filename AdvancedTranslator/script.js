@@ -3,9 +3,11 @@
 
 // The isAvailable function is still needed for the action to appear.
 function isAvailable(context) {
-    // This can be as simple or complex as needed.
-    // For the translator, we can make it available if there's any selected text.
-    return context.selectedText && context.selectedText.length > 0;
+    const hasSelectedText = Boolean(context && context.selectedText && context.selectedText.trim().length > 0);
+    return {
+        isAvailable: true,
+        isContextMatch: hasSelectedText
+    };
 }
 
 // The performAction function is now only responsible for telling SwiftBiu to display the UI.

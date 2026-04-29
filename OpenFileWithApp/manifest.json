@@ -1,0 +1,48 @@
+{
+  "identifier": "com.swiftbiu.openfilewithapp",
+  "name": {
+    "en": "Open File With App",
+    "zh": "指定 App 打开文件"
+  },
+  "author": "SwiftBiu",
+  "description": {
+    "en": "Open selected files with a configured macOS app, optionally filtered by file suffix.",
+    "zh": "使用配置的 macOS App 打开选中文件，可按文件后缀过滤。"
+  },
+  "version": "1.0",
+  "actions": [
+    {
+      "title": {
+        "en": "Open File With App",
+        "zh": "指定 App 打开文件"
+      },
+      "icon": "arrow.up.forward.square",
+      "description": {
+        "en": "Open matching selected files with the configured app.",
+        "zh": "使用配置的 App 打开匹配的选中文件。"
+      },
+      "script": "script.js"
+    }
+  ],
+  "icon": "arrow.up.forward.square",
+  "iconType": "sfSymbol",
+  "permissions": [
+    "localFileRead",
+    "notifications"
+  ],
+  "configuration": [
+    {
+      "key": "rules",
+      "label": {
+        "en": "File Suffix Rules",
+        "zh": "文件后缀规则"
+      },
+      "type": "fileExtensionAppRules",
+      "description": {
+        "en": "Add suffixes on the left and choose one app for each suffix on the right. Duplicate this extension when you need an alternate app for the same suffix.",
+        "zh": "左侧添加文件后缀，右侧为每个后缀选择一个 App。若同一后缀需要备用 App，可复制此扩展后单独配置。"
+      },
+      "defaultValue": "{\"rules\":[{\"fileExtension\":\"pdf\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"png\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"jpg\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"jpeg\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"heic\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"webp\",\"appBundleID\":\"com.apple.Preview\"}]}"
+    }
+  ]
+}
