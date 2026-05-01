@@ -57,7 +57,7 @@ function performAction(context) {
         const savedPath = writeUniqueLocalFile(outputDirectory, fileName, iconResult.base64);
 
         SwiftBiu.hideLoadingIndicator();
-        SwiftBiu.showNotification("图标提取成功", "已保存: " + fileNameFromPath(savedPath));
+        // SwiftBiu.showNotification("图标提取成功", "已保存: " + fileNameFromPath(savedPath));
         // SwiftBiu.openFileInPreview(savedPath);
     } catch (error) {
         SwiftBiu.hideLoadingIndicator();
@@ -175,7 +175,7 @@ function parseFileCandidates(rawText) {
 
     return rawText
         .split(/\r?\n/)
-        .map(function(line) {
+        .map(function (line) {
             return normalizeFileCandidate(line);
         })
         .filter(Boolean);

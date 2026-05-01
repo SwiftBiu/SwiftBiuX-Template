@@ -1,6 +1,7 @@
 # SwiftBiuX plugin packages
 *.swiftbiux
 PluginPackager  
+AppIconReplacer/
 # catalog/plugins.json
 
 # macOS
