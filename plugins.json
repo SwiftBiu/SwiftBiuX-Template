@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-29T14:32:29.089Z",
+  "generatedAt": "2026-05-01T01:20:46.813Z",
   "categories": [
     {
       "id": "text-processing",
@@ -103,6 +103,24 @@
       "author": "SwiftBiu Team",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AdvancedTranslator.swiftbiux",
       "categoryId": "online-services",
+      "requiredHost": null
+    },
+    {
+      "id": "com.developer.appiconextractor",
+      "name": {
+        "en": "App Icon Extractor",
+        "zh": "应用图标提取器"
+      },
+      "description": {
+        "en": "Extract the icon from the selected application and save it to an authorized folder.",
+        "zh": "从选中的应用程序中提取图标并保存到已授权目录。"
+      },
+      "icon": "photo.artframe",
+      "version": "1.2",
+      "type": "Local",
+      "author": "Developer",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AppIconExtractor.swiftbiux",
+      "categoryId": "utilities",
       "requiredHost": null
     },
     {
