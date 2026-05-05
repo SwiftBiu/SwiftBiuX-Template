@@ -25,6 +25,20 @@ npx create-swiftbiux-plugin <PluginName>
 
 When generating a plugin from scratch, use the following boilerplates based on the type:
 
+### Extension Kind Contract (Required)
+
+SwiftBiu now routes extension actions by selection type:
+- Text selection triggers `textAction` extensions.
+- File selection triggers `fileAction` extensions.
+
+Every plugin manifest must explicitly declare:
+- Root-level `extensionKind`
+- Per-action `actions[].extensionKind`
+
+Use one of:
+- `textAction` for text-first extensions
+- `fileAction` for file-first extensions
+
 ### 1. Logic-Only (No UI)
 For text processing, API calls that return a notification or paste result.
 **`script.js` template:**
@@ -102,12 +116,14 @@ Those extensions must treat `context.selectedText` as optional because a user ca
   "author": "Your Name",                     // REQUIRED
   "description": "What this plugin does.",   // REQUIRED, supports TranslatableString
   "version": "1.0",                          // REQUIRED
+  "extensionKind": "textAction",             // REQUIRED: "textAction" | "fileAction"
   "icon": "swift",                           // Default plugin icon (see supported formats below)
   "iconType": "sfSymbol",                    // "sfSymbol" | "file" | "text" | "iconify" | "data"
   "actions": [                               // REQUIRED, currently only one action
     {
       "title": "Action Title",               // Supports TranslatableString
       "script": "script.js",                 // REQUIRED for JS plugins
+      "extensionKind": "textAction",         // REQUIRED: keep consistent with action intent
       "rules": {                             // Optional: contextual availability
         "regex": "^https?://"                // Show action only when text matches regex
       }
@@ -127,6 +143,14 @@ Those extensions must treat `context.selectedText` as optional because a user ca
   }
 }
 ```
+
+### Stable and Beta Catalog Channels
+
+To avoid impacting the current App Store plugin catalog, keep two channels:
+- Stable catalog: `catalog/plugins.json` + `catalog/webPlugins.json`
+- Beta catalog: `catalog/plugins.beta.json` + `catalog/webPlugins.beta.json`
+
+Beta builds should publish `.swiftbiux` assets to beta prereleases and generate beta catalogs with a beta-only download base URL.
 
 ### Plugin Icon Formats (`icon` / `iconType`)
 
@@ -357,8 +381,8 @@ API object: **`SwiftBiu`** (also accessible as `swiftBiu`, both are injected)
 | `SwiftBiu.getFileMetadata(path)` | Sync → Object | Requires `localFileRead`. Returns size, timestamps, content type, etc. |
 | `SwiftBiu.extractFileIcon(path, options)` | Sync → Object | Requires `localFileRead`. Returns `{success, base64, fileName, width, height, format}` or `{success: false, error}`. Use this for App Store-compatible icon extraction instead of shell/osascript |
 | `SwiftBiu.setFileIcon(targetPath, iconPath, options)` | Sync → Object | Requires `localFileRead` + `localFileWrite`. Uses the host App to apply an image as the custom Finder icon for an accessible file/folder/app. Prefer this over shell tools for App Store compatibility |
-| `SwiftBiu.readLocalFile(path)` | Sync → Base64 String | Requires `localFileRead`. Path must come from `context.selectedFiles` |
-| `SwiftBiu.readLocalTextFile(path)` | Sync → String | Requires `localFileRead`. Convenience UTF-8 text decoder for `context.selectedFiles` |
+| `SwiftBiu.readLocalFile(path)` | Sync → Base64 String | Requires `localFileRead`. Path must come from `context.selectedFiles` or a user-authorized location |
+| `SwiftBiu.readLocalTextFile(path)` | Sync → String | Requires `localFileRead`. Convenience UTF-8 text decoder for selected or authorized files |
 | `SwiftBiu.listDirectory(path)` | Sync → `Array<Object>` | Requires `localFileRead`. Lists direct children of an accessible directory |
 | `SwiftBiu.fileExists(path)` | Sync → Bool | Requires `localFileRead` or `localFileWrite`. Checks whether an accessible path is a file |
 | `SwiftBiu.directoryExists(path)` | Sync → Bool | Requires `localFileRead` or `localFileWrite`. Checks whether an accessible path is a directory |
@@ -432,8 +456,8 @@ window.swiftBiu_initialize = function(context) {
 | `window.swiftBiu.getFileMetadata(path)` | Promise → `Object` | Requires `localFileRead` |
 | `window.swiftBiu.extractFileIcon(path, options)` | Promise → `Object` | Requires `localFileRead`. Returns PNG Base64 icon data from the host App; preferred for App Store sandbox compatibility |
 | `window.swiftBiu.setFileIcon(targetPath, iconPath, options)` | Promise → `Object` | Requires `localFileRead` + `localFileWrite`. Applies an image as the custom Finder icon for an accessible file/folder/app |
-| `window.swiftBiu.readLocalFile(path)` | Promise → `{base64: String}` | Requires `localFileRead`. Path must come from `context.selectedFiles` |
-| `window.swiftBiu.readLocalTextFile(path)` | Promise → `{result: String}` | Requires `localFileRead`. Convenience UTF-8 text decoder |
+| `window.swiftBiu.readLocalFile(path)` | Promise → `{base64: String}` | Requires `localFileRead`. Path must come from `context.selectedFiles` or a user-authorized location |
+| `window.swiftBiu.readLocalTextFile(path)` | Promise → `{result: String}` | Requires `localFileRead`. Convenience UTF-8 text decoder for selected or authorized files |
 | `window.swiftBiu.listDirectory(path)` | Promise → `{items: Array<Object>}` | Requires `localFileRead` |
 | `window.swiftBiu.fileExists(path)` | Promise → `{exists: Boolean}` | Requires `localFileRead` or `localFileWrite` |
 | `window.swiftBiu.directoryExists(path)` | Promise → `{exists: Boolean}` | Requires `localFileRead` or `localFileWrite` |

@@ -15,7 +15,8 @@
   "actions": [
     {
       "title": "豆包问答AI",
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "textAction"
     }
   ],
   "configuration": [
@@ -123,5 +124,6 @@
       "description": "仅在启用原生 AI 响应弹框时使用。这里填写后会优先作为弹框中的默认系统提示词。若需要多套固定提示词，建议复制扩展并分别保存不同版本。你在弹框里修改后的内容也会同步写回这里。",
       "group": "提示词设置"
     }
-  ]
+  ],
+  "extensionKind": "textAction"
 }

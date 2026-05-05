@@ -18,7 +18,8 @@
         "en": "Organize Files",
         "zh": "整理文件"
       },
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "fileAction"
     }
   ],
   "permissions": [
@@ -28,5 +29,6 @@
     "paste",
     "clipboardRead"
   ],
-  "configuration": []
+  "configuration": [],
+  "extensionKind": "fileAction"
 }

@@ -7,7 +7,8 @@
   "actions": [
     {
       "title": "清洗文本",
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "textAction"
     }
   ],
   "icon": "wand.and.stars",
@@ -53,5 +54,6 @@
       "type": "boolean",
       "defaultValue": true
     }
-  ]
+  ],
+  "extensionKind": "textAction"
 }

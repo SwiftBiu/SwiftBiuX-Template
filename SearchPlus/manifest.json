@@ -18,7 +18,8 @@
         "en": "Search with Keyword",
         "zh": "带关键字搜索"
       },
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "textAction"
     }
   ],
   "permissions": [],
@@ -109,5 +110,6 @@
       ],
       "group": "Search"
     }
-  ]
+  ],
+  "extensionKind": "textAction"
 }

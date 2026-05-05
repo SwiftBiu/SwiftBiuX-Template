@@ -1,0 +1,87 @@
+{
+  "identifier": "com.swiftbiu.local-background-remover",
+  "name": {
+    "en": "Local Background Remover",
+    "zh": "本地抠图"
+  },
+  "author": "SwiftBiu",
+  "description": {
+    "en": "Remove image backgrounds locally in the plugin window.",
+    "zh": "在插件窗口中本地移除图片背景。"
+  },
+  "version": "0.1.0",
+  "icon": "person.crop.square",
+  "iconType": "sfSymbol",
+  "actions": [
+    {
+      "title": {
+        "en": "Remove Background",
+        "zh": "本地抠图"
+      },
+      "description": {
+        "en": "Open the local background remover.",
+        "zh": "打开本地抠图工具。"
+      },
+      "script": "script.js",
+      "extensionKind": "fileAction"
+    }
+  ],
+  "permissions": [
+    "ui",
+    "network",
+    "localFileRead",
+    "localFileWrite"
+  ],
+  "configuration": [
+    {
+      "key": "assetPath",
+      "label": {
+        "en": "IMG.LY Asset Path",
+        "zh": "IMG.LY 资源路径"
+      },
+      "type": "string",
+      "placeholder": "../assets/imgly/",
+      "description": {
+        "en": "Optional. Leave blank to use the default remote model assets. Set this when bundling WASM/ONNX assets locally.",
+        "zh": "可选。留空使用默认远程模型资源；打包本地 WASM/ONNX 资源时填写。"
+      },
+      "defaultValue": ""
+    },
+    {
+      "key": "defaultModel",
+      "label": {
+        "en": "Default Model",
+        "zh": "默认模型"
+      },
+      "type": "option",
+      "defaultValue": "isnet_fp16",
+      "options": [
+        {
+          "label": {
+            "en": "Balanced",
+            "zh": "均衡"
+          },
+          "value": "isnet_fp16"
+        },
+        {
+          "label": {
+            "en": "Quality",
+            "zh": "高质量"
+          },
+          "value": "isnet"
+        },
+        {
+          "label": {
+            "en": "Fast",
+            "zh": "快速"
+          },
+          "value": "isnet_quint8"
+        }
+      ]
+    }
+  ],
+  "ui": {
+    "main": "ui/index.html"
+  },
+  "extensionKind": "fileAction"
+}

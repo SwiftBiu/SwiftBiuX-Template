@@ -109,7 +109,8 @@ function performAction(context) {
 "actions": [
   {
     "title": "Lite: 转换选中货币",
-    "script": "script.js" 
+    "script": "script.js",
+    "extensionKind": "textAction"
   }
 ]
 ```
@@ -146,7 +147,8 @@ function performAction(context) {
 "actions": [
   {
     "title": "Pro: 汇率计算大屏",
-    "script": "script.js" // 用于接收点击事件并拉起 UI
+    "script": "script.js", // 用于接收点击事件并拉起 UI
+    "extensionKind": "textAction"
   }
 ],
 "ui": {
@@ -204,6 +206,7 @@ window.swiftBiu_initialize = async function (context) {
 | `author`        | String | 是       | 插件的作者。                                                                                                |
 | `description`   | String | 是       | 插件的介绍。                                                                                                |
 | `version`       | String | 是       | 插件的版本号，例如 `1.0`。                                                                                  |
+| `extensionKind` | String | 是       | 扩展类别。使用 `textAction` 或 `fileAction`。                                                                |
 | `actions`       | Array  | 是       | 定义插件提供的一个或多个动作的数组（目前只支持一个动作）。                                                  |
 | `icon`          | String | 否       | **(根级别)** 整个插件的默认图标。支持 SF Symbol、打包图片文件、文本图标、Iconify 图标和 `data:` URI 数据图标。 |
 | `iconType`      | String | 否       | **(根级别)** 定义 `icon` 的解析方式。支持 `"sfSymbol"`、`"file"`、`"text"`、`"iconify"` 和 `"data"`。        |
@@ -854,3 +857,37 @@ console.log("API 响应数据:", result);
 请查看并克隆官方的 [SwiftBiu 插件开发模板仓库 (SwiftBiuX-Template)](https://github.com/SwiftBiu/SwiftBiuX-Template) 以获取完整的示例插件源代码。阅读这些真实运行的代码是了解底层概念和最佳实践的最快方式。
 
 祝您编码愉快！
+
+---
+
+## 扩展类型路由约束（必填）
+
+SwiftBiu 会按用户选择类型进行动作路由：
+* 选中文本时，仅触发 `textAction` 扩展。
+* 选择文件时，仅触发 `fileAction` 扩展。
+
+因此每个插件都需要显式声明：
+* 根级别 `extensionKind`
+* 动作级别 `actions[].extensionKind`
+
+并且建议二者保持一致，避免触发路由歧义。
+
+---
+
+## 稳定版与 Beta 发布通道
+
+为了不影响现有商店用户，建议维护双通道目录：
+* 稳定通道：`catalog/plugins.json` 与 `catalog/webPlugins.json`
+* Beta 通道：`catalog/plugins.beta.json` 与 `catalog/webPlugins.beta.json`
+
+推荐流程：
+1. 在 `beta` 分支开发和验证打包改动。
+2. 通过 beta workflow 发布 prerelease 资产，并仅刷新 beta catalog。
+3. 稳定 catalog 保持不动，确保商店侧体验稳定。
+4. 等 App 版本与扩展兼容性验证完成后，再从 `beta` 合并到 `main`。
+
+在推送前请执行：
+```bash
+node scripts/test_extension_channels.js
+```
+该脚本会校验 `manifest.extensionKind`、`actions[].extensionKind` 以及 stable/beta catalog 的生成结果。

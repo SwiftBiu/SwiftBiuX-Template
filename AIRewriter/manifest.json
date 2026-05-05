@@ -7,7 +7,8 @@
   "actions": [
     {
       "title": "OAIRewrite",
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "textAction"
     }
   ],
   "iconType": "file",
@@ -46,5 +47,6 @@
       "placeholder": "e.g., Rewrite the following text to make it more professional",
       "description": "The prompt template for rewriting"
     }
-  ]
+  ],
+  "extensionKind": "textAction"
 }

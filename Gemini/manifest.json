@@ -7,7 +7,8 @@
   "actions": [
     {
       "title": "Gemini",
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "textAction"
     }
   ],
   "icon": "gemini.png",
@@ -112,5 +113,6 @@
       "placeholder": "留空则使用脚本内置默认提示词",
       "description": "AI 响应 UI 中显示和编辑的系统提示词。若需要多套固定提示词，建议复制扩展并分别保存不同版本。"
     }
-  ]
+  ],
+  "extensionKind": "textAction"
 }

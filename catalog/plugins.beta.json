@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-05T07:57:17.979Z",
+  "generatedAt": "2026-05-05T07:57:18.290Z",
   "categories": [
     {
       "id": "text-processing",
@@ -66,7 +66,7 @@
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AIPolisher.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/AIPolisher.swiftbiux",
       "categoryId": "online-services",
       "requiredHost": null
     },
@@ -85,7 +85,7 @@
       "type": "Network",
       "extensionKind": "textAction",
       "author": "kweizh",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AIRewriter.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/AIRewriter.swiftbiux",
       "categoryId": "online-services",
       "requiredHost": "google.com"
     },
@@ -104,7 +104,7 @@
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "SwiftBiu Team",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AdvancedTranslator.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/AdvancedTranslator.swiftbiux",
       "categoryId": "online-services",
       "requiredHost": null
     },
@@ -123,7 +123,7 @@
       "type": "Local",
       "extensionKind": "fileAction",
       "author": "Developer",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AppIconExtractor.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/AppIconExtractor.swiftbiux",
       "categoryId": "utilities",
       "requiredHost": null
     },
@@ -142,7 +142,7 @@
       "type": "Local",
       "extensionKind": "fileAction",
       "author": "Developer",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/AppIconReplacer.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/AppIconReplacer.swiftbiux",
       "categoryId": "utilities",
       "requiredHost": null
     },
@@ -161,7 +161,7 @@
       "type": "Web App",
       "extensionKind": "fileAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/BackgroundRemover.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/BackgroundRemover.swiftbiux",
       "categoryId": "utilities",
       "requiredHost": null
     },
@@ -180,7 +180,7 @@
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/Base64Converter.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/Base64Converter.swiftbiux",
       "categoryId": "text-processing",
       "requiredHost": null
     },
@@ -199,7 +199,7 @@
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/CaseConverter.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/CaseConverter.swiftbiux",
       "categoryId": "text-processing",
       "requiredHost": null
     },
@@ -218,7 +218,7 @@
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/CurrencyConverter.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/CurrencyConverter.swiftbiux",
       "categoryId": "online-services",
       "requiredHost": null
     },
@@ -237,7 +237,7 @@
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/CurrencyConverterLite.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/CurrencyConverterLite.swiftbiux",
       "categoryId": "online-services",
       "requiredHost": null
     },
@@ -256,7 +256,7 @@
       "type": "Local",
       "extensionKind": "fileAction",
       "author": "SwiftBiu Team",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DesktopGravity.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/DesktopGravity.swiftbiux",
       "categoryId": "utilities",
       "requiredHost": null
     },
@@ -275,7 +275,7 @@
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu Team",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DoubaoImage-Plugin.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/DoubaoImage-Plugin.swiftbiux",
       "categoryId": "online-services",
       "requiredHost": null
     },
@@ -294,7 +294,7 @@
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu Team",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/DoubaoText-Plugin.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/DoubaoText-Plugin.swiftbiux",
       "categoryId": "online-services",
       "requiredHost": null
     },
@@ -313,7 +313,7 @@
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/Gemini.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/Gemini.swiftbiux",
       "categoryId": "online-services",
       "requiredHost": "google.com"
     },
@@ -332,7 +332,7 @@
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/GeminiImageNative.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/GeminiImageNative.swiftbiux",
       "categoryId": "online-services",
       "requiredHost": "google.com"
     },
@@ -351,7 +351,7 @@
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/HashCalculator.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/HashCalculator.swiftbiux",
       "categoryId": "text-processing",
       "requiredHost": null
     },
@@ -370,7 +370,7 @@
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/JSONFormatter.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/JSONFormatter.swiftbiux",
       "categoryId": "text-processing",
       "requiredHost": null
     },
@@ -389,7 +389,7 @@
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/MarkdownTableFormatter.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/MarkdownTableFormatter.swiftbiux",
       "categoryId": "text-processing",
       "requiredHost": null
     },
@@ -408,7 +408,7 @@
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "官方",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/MermaidPreviewer.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/MermaidPreviewer.swiftbiux",
       "categoryId": "devtools",
       "requiredHost": null
     },
@@ -427,7 +427,7 @@
       "type": "Local",
       "extensionKind": "fileAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/OpenFileWithApp.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/OpenFileWithApp.swiftbiux",
       "categoryId": "system",
       "requiredHost": null
     },
@@ -446,7 +446,7 @@
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "Antigravity",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/PluginPackager.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/PluginPackager.swiftbiux",
       "categoryId": "devtools",
       "requiredHost": null
     },
@@ -465,7 +465,7 @@
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/QRCodeGenerator.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/QRCodeGenerator.swiftbiux",
       "categoryId": "data-creative",
       "requiredHost": null
     },
@@ -484,7 +484,7 @@
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/RegexExtractor.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/RegexExtractor.swiftbiux",
       "categoryId": "text-processing",
       "requiredHost": null
     },
@@ -503,7 +503,7 @@
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/SearchPlus.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/SearchPlus.swiftbiux",
       "categoryId": "utilities",
       "requiredHost": null
     },
@@ -522,7 +522,7 @@
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/SlugGenerator.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/SlugGenerator.swiftbiux",
       "categoryId": "text-processing",
       "requiredHost": null
     },
@@ -541,7 +541,7 @@
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/TextCleaner.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/TextCleaner.swiftbiux",
       "categoryId": "text-processing",
       "requiredHost": null
     },
@@ -560,7 +560,7 @@
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/TimestampConverter.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/TimestampConverter.swiftbiux",
       "categoryId": "text-processing",
       "requiredHost": null
     },
@@ -579,7 +579,7 @@
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/WordCount.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/WordCount.swiftbiux",
       "categoryId": "text-processing",
       "requiredHost": null
     },
@@ -598,7 +598,7 @@
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/cny.swiftbiux",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/cny.swiftbiux",
       "categoryId": "text-processing",
       "requiredHost": null
     }

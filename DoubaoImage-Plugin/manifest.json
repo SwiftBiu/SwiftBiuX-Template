@@ -14,7 +14,8 @@
   "actions": [
     {
       "title": "豆包图像生成",
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "textAction"
     }
   ],
   "configuration": [
@@ -130,5 +131,6 @@
         }
       ]
     }
-  ]
+  ],
+  "extensionKind": "textAction"
 }

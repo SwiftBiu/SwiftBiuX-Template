@@ -18,7 +18,8 @@
         "en": "Extract App Icon",
         "zh": "提取应用图标"
       },
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "fileAction"
     }
   ],
   "permissions": [
@@ -41,5 +42,6 @@
       },
       "defaultValue": ""
     }
-  ]
+  ],
+  "extensionKind": "fileAction"
 }

@@ -28,33 +28,28 @@ jobs:
         run: mkdir -p dist
 
       - name: Build all plugins
-        run: |
-          # Find all directories containing a manifest.json to identify them as plugins.
-          for dir in */; do
-            plugin_name="${dir%/}"
-            if [ -f "${plugin_name}/manifest.json" ]; then
-              echo "Building plugin: ${plugin_name}"
-              ./scripts/build_plugin.sh "${plugin_name}"
-              if [ $? -eq 0 ]; then
-                # Move the successfully built plugin to the dist directory
-                mv "${plugin_name}.swiftbiux" dist/
-              else
-                echo "::error::Failed to build plugin ${plugin_name}"
-                exit 1
-              fi
-            fi
-          done
+        run: ./scripts/build_plugin.sh --all --output-dir dist
 
       - name: Generate plugins.json catalog
         run: node scripts/generate_catalog.js
+
+      - name: Validate extension kind and catalog channels
+        run: node scripts/test_extension_channels.js
+
+      - name: Prepare gh-pages stable payload
+        run: |
+          mkdir -p catalog-stable
+          cp catalog/plugins.json catalog-stable/plugins.json
+          cp catalog/webPlugins.json catalog-stable/webPlugins.json
 
       - name: Deploy Catalog to gh-pages
         if: success()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./catalog
+          publish_dir: ./catalog-stable
           publish_branch: gh-pages
+          keep_files: true
           force_orphan: false # Keep history on gh-pages if desired, or true to keep it small
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
@@ -63,7 +58,7 @@ jobs:
       - name: List packaged assets
         run: |
           echo "Contents of dist directory:"
-          ls -l dist
+          find dist -maxdepth 1 -name '*.swiftbiux' -print | sort
 
       - name: Determine Release Tag and Type
         id: determine_tag
@@ -95,6 +90,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload plugin assets to release
-        run: gh release upload ${{ steps.determine_tag.outputs.TAG }} dist/*
+        run: gh release upload ${{ steps.determine_tag.outputs.TAG }} dist/*.swiftbiux
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

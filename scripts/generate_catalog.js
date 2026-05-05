@@ -3,8 +3,15 @@ const path = require('path');
 
 const rootDir = path.resolve(__dirname, '..');
 const catalogDir = path.join(rootDir, 'catalog');
-// Base URL for downloading plugins from the latest release
-const baseUrl = 'https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/';
+const channel = String(process.env.CATALOG_CHANNEL || 'stable').toLowerCase();
+if (!['stable', 'beta'].includes(channel)) {
+    throw new Error(`Unsupported CATALOG_CHANNEL '${channel}'. Expected 'stable' or 'beta'.`);
+}
+
+// Base URL for downloading packaged plugins. Stable keeps latest release semantics.
+const baseUrl = String(
+    process.env.CATALOG_BASE_URL || 'https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/'
+);
 
 // Map category IDs to Material Symbols icons for the frontend
 const categoryIcons = {
@@ -87,6 +94,60 @@ console.log(`Found ${categories.length} categories and mapped ${Object.keys(cate
 
 const plugins = [];
 
+function normalizeKind(value) {
+    return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function canonicalExtensionKind(value) {
+    switch (normalizeKind(value)) {
+        case 'file':
+        case 'fileaction':
+        case 'fileactions':
+        case 'fileextension':
+        case 'fileextensions':
+        case 'filedocument':
+        case 'filedocuments':
+            return 'fileAction';
+        case 'text':
+        case 'textaction':
+        case 'textactions':
+        case 'textdocument':
+        case 'textdocuments':
+        case 'document':
+        case 'documents':
+            return 'textAction';
+        default:
+            return null;
+    }
+}
+
+function inferExtensionKind(manifest) {
+    const explicitKind = canonicalExtensionKind(manifest.extensionKind);
+    if (manifest.extensionKind && !explicitKind) {
+        throw new Error(`Unsupported extensionKind '${manifest.extensionKind}'`);
+    }
+    if (explicitKind) {
+        return explicitKind;
+    }
+
+    const actionKinds = (manifest.actions || [])
+        .map(action => action && action.extensionKind)
+        .filter(Boolean)
+        .map(canonicalExtensionKind);
+    if (actionKinds.some(kind => !kind)) {
+        throw new Error('Unsupported action extensionKind');
+    }
+    if (actionKinds.includes('fileAction')) {
+        return 'fileAction';
+    }
+
+    const permissions = Array.isArray(manifest.permissions) ? manifest.permissions : [];
+    const configuration = Array.isArray(manifest.configuration) ? manifest.configuration : [];
+    const hasFilePermission = permissions.includes('localFileRead') || permissions.includes('localFileWrite');
+    const hasFileRules = configuration.some(item => item && item.type === 'fileExtensionAppRules');
+    return hasFilePermission || hasFileRules ? 'fileAction' : 'textAction';
+}
+
 // 2. Scan directories for plugins
 const files = fs.readdirSync(rootDir);
 console.log('Scanning directories for plugins...');
@@ -107,6 +168,7 @@ files.forEach(file => {
             } else if (manifest.permissions && manifest.permissions.includes('network')) {
                 type = 'Network';
             }
+            const extensionKind = inferExtensionKind(manifest);
 
             // Determine Category from the map generated from README
             // Fallback to 'utilities' if not found in README
@@ -134,6 +196,7 @@ files.forEach(file => {
                 icon: manifest.icon || 'extension',
                 version: manifest.version,
                 type: type,
+                extensionKind: extensionKind,
                 author: manifest.author || 'Unknown',
                 downloadUrl: `${baseUrl}${file}.swiftbiux`,
                 categoryId: categoryId,
@@ -177,9 +240,12 @@ if (!fs.existsSync(catalogDir)) {
 
 // 3. Generate two versions of the catalog
 
-// Version A: webPlugins.json - FULL (Includes all plugins)
-fs.writeFileSync(path.join(catalogDir, 'webPlugins.json'), JSON.stringify(catalog, null, 2));
-console.log(`Successfully generated FULL catalog with ${plugins.length} plugins at catalog/webPlugins.json`);
+const webCatalogName = channel === 'beta' ? 'webPlugins.beta.json' : 'webPlugins.json';
+const appCatalogName = channel === 'beta' ? 'plugins.beta.json' : 'plugins.json';
+
+// Version A: web catalog - FULL (Includes all plugins)
+fs.writeFileSync(path.join(catalogDir, webCatalogName), JSON.stringify(catalog, null, 2));
+console.log(`Successfully generated FULL catalog with ${plugins.length} plugins at catalog/${webCatalogName}`);
 
 // Version B: plugins.json - APP STORE COMPLIANT (Filters out non-compliant AI plugins)
 // IDs to exclude: AIRewriter, Gemini, GeminiImage
@@ -196,6 +262,7 @@ const filteredCatalog = {
     plugins: filteredPlugins
 };
 
-fs.writeFileSync(path.join(catalogDir, 'plugins.json'), JSON.stringify(filteredCatalog, null, 2));
-console.log(`Successfully generated catalog with ${filteredPlugins.length} plugins at catalog/plugins.json`);
+fs.writeFileSync(path.join(catalogDir, appCatalogName), JSON.stringify(filteredCatalog, null, 2));
+console.log(`Successfully generated catalog with ${filteredPlugins.length} plugins at catalog/${appCatalogName}`);
+console.log(`[channel=${channel}] baseUrl=${baseUrl}`);
 console.log(`(Excluded ${plugins.length - filteredPlugins.length} AI plugins: ${excludedIds.join(', ')})`);

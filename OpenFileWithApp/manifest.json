@@ -21,7 +21,8 @@
         "en": "Open matching selected files with the configured app.",
         "zh": "使用配置的 App 打开匹配的选中文件。"
       },
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "fileAction"
     }
   ],
   "icon": "arrow.up.forward.square",
@@ -44,5 +45,6 @@
       },
       "defaultValue": "{\"rules\":[{\"fileExtension\":\"pdf\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"png\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"jpg\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"jpeg\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"heic\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"webp\",\"appBundleID\":\"com.apple.Preview\"}]}"
     }
-  ]
+  ],
+  "extensionKind": "fileAction"
 }

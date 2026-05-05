@@ -1,22 +1,24 @@
 {
-    "identifier": "com.swiftbiu.qrcode",
-    "name": "QR Code Generator",
-    "author": "SwiftBiu",
-    "description": "Generate custom QR codes instantly.",
-    "version": "1.0.0",
-    "icon": "qrcode",
-    "iconType": "sfSymbol",
-    "actions": [
-        {
-            "title": "Generate QR Code",
-            "script": "script.js"
-        }
-    ],
-    "permissions": [
-        "network",
-        "clipboardWrite"
-    ],
-    "ui": {
-        "main": "ui/index.html"
+  "identifier": "com.swiftbiu.qrcode",
+  "name": "QR Code Generator",
+  "author": "SwiftBiu",
+  "description": "Generate custom QR codes instantly.",
+  "version": "1.0.0",
+  "icon": "qrcode",
+  "iconType": "sfSymbol",
+  "actions": [
+    {
+      "title": "Generate QR Code",
+      "script": "script.js",
+      "extensionKind": "textAction"
     }
+  ],
+  "permissions": [
+    "network",
+    "clipboardWrite"
+  ],
+  "ui": {
+    "main": "ui/index.html"
+  },
+  "extensionKind": "textAction"
 }

@@ -7,7 +7,8 @@
   "actions": [
     {
       "title": "格式化表格",
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "textAction"
     }
   ],
   "icon": "tablecells",
@@ -17,5 +18,6 @@
     "notifications",
     "paste"
   ],
-  "configuration": []
+  "configuration": [],
+  "extensionKind": "textAction"
 }

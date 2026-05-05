@@ -17,6 +17,41 @@ function isAvailable(context) {
     };
 }
 
+const LOCALES = {
+    "zh": {
+        "error_no_app": "未检测到有效的 .app 应用程序，请选中一个应用程序后再重试。",
+        "error_no_interface": "当前 SwiftBiu 版本缺少沙盒版图标提取接口，请先更新 SwiftBiu。",
+        "error_generate_fail": "无法从该应用生成 PNG 图标。",
+        "error_pick_folder": "未选择保存目录。",
+        "error_write_fail": "写入图标失败，请重新选择保存目录后再试。",
+        "extract_fail": "提取失败",
+        "extract_success": "提取成功",
+        "extract_success_msg": "已保存: ",
+        "pick_folder_prompt": "选择保存目录",
+        "pick_folder_msg": "首次使用需要授权保存目录，可选择桌面。",
+        "default_app_name": "应用程序"
+    },
+    "en": {
+        "error_no_app": "No valid .app application detected. Please select an application and try again.",
+        "error_no_interface": "Current SwiftBiu version lacks the sandboxed icon extraction interface. Please update SwiftBiu.",
+        "error_generate_fail": "Could not generate a PNG icon from this application.",
+        "error_pick_folder": "No save folder selected.",
+        "error_write_fail": "Failed to write the icon. Please choose a different save folder and try again.",
+        "extract_fail": "Extraction Failed",
+        "extract_success": "Extraction Successful",
+        "extract_success_msg": "Saved to: ",
+        "pick_folder_prompt": "Select Save Folder",
+        "pick_folder_msg": "Initial use requires folder authorization. You can choose the Desktop.",
+        "default_app_name": "Application"
+    }
+};
+
+function t(key, context) {
+    const lang = (context && context.languageCode) || "en";
+    const strings = LOCALES[lang] || LOCALES["en"];
+    return strings[key] || key;
+}
+
 function performAction(context) {
     const files = resolveSelectedFiles(context, true);
     let targetFile = null;
@@ -32,15 +67,15 @@ function performAction(context) {
     }
 
     if (!targetFile) {
-        SwiftBiu.showNotification("提取失败", "未检测到有效的 .app 应用程序，请选中一个应用程序后再重试。");
+        SwiftBiu.showNotification(t("extract_fail", context), t("error_no_app", context));
         return;
     }
 
     var appPath = targetFile.path;
-    var appName = targetFile.fileName.replace(/\.app$/i, "");
+    var appName = appDisplayName(targetFile, context);
 
     if (typeof SwiftBiu.extractFileIcon !== "function") {
-        SwiftBiu.showNotification("提取失败", "当前 SwiftBiu 版本缺少沙盒版图标提取接口，请先更新 SwiftBiu。");
+        SwiftBiu.showNotification(t("extract_fail", context), t("error_no_interface", context));
         return;
     }
 
@@ -49,23 +84,22 @@ function performAction(context) {
     try {
         const iconResult = SwiftBiu.extractFileIcon(appPath, { size: 1024 });
         if (!iconResult || iconResult.success !== true || !iconResult.base64) {
-            throw new Error((iconResult && iconResult.error) || "无法从该应用生成 PNG 图标。");
+            throw new Error((iconResult && iconResult.error) || t("error_generate_fail", context));
         }
 
-        const outputDirectory = resolveOutputDirectory();
+        const outputDirectory = resolveOutputDirectory(context);
         const fileName = iconResult.fileName || sanitizeFileName(appName) + "_Icon.png";
-        const savedPath = writeUniqueLocalFile(outputDirectory, fileName, iconResult.base64);
+        const savedPath = writeUniqueLocalFile(outputDirectory, fileName, iconResult.base64, context);
 
         SwiftBiu.hideLoadingIndicator();
-        // SwiftBiu.showNotification("图标提取成功", "已保存: " + fileNameFromPath(savedPath));
-        // SwiftBiu.openFileInPreview(savedPath);
+        SwiftBiu.showNotification(t("extract_success", context), t("extract_success_msg", context) + fileNameFromPath(savedPath));
     } catch (error) {
         SwiftBiu.hideLoadingIndicator();
-        SwiftBiu.showNotification("提取失败", error && error.message ? error.message : String(error));
+        SwiftBiu.showNotification(t("extract_fail", context), error && error.message ? error.message : String(error));
     }
 }
 
-function resolveOutputDirectory() {
+function resolveOutputDirectory(context) {
     let outputDirectory = "";
     try {
         outputDirectory = SwiftBiu.getConfig("outputDirectory") || "";
@@ -79,17 +113,17 @@ function resolveOutputDirectory() {
         return outputDirectory;
     }
 
-    SwiftBiu.showNotification("选择保存目录", "首次使用需要授权保存目录，可选择桌面。");
+    SwiftBiu.showNotification(t("pick_folder_prompt", context), t("pick_folder_msg", context));
     outputDirectory = SwiftBiu.pickLocalDirectory();
     if (!outputDirectory) {
-        throw new Error("未选择保存目录。");
+        throw new Error(t("error_pick_folder", context));
     }
 
     SwiftBiu.setConfig("outputDirectory", outputDirectory);
     return outputDirectory;
 }
 
-function writeUniqueLocalFile(directoryPath, fileName, base64) {
+function writeUniqueLocalFile(directoryPath, fileName, base64, context) {
     const normalizedName = sanitizeFileName(fileName).replace(/\.png$/i, "") || "App_Icon";
     let candidatePath = joinPath(directoryPath, normalizedName + ".png");
     let index = 2;
@@ -101,7 +135,7 @@ function writeUniqueLocalFile(directoryPath, fileName, base64) {
 
     let savedPath = SwiftBiu.createLocalFile(candidatePath, base64);
     if (!savedPath) {
-        throw new Error("写入图标失败，请重新选择保存目录后再试。");
+        throw new Error(t("error_write_fail", context));
     }
 
     return savedPath;
@@ -200,6 +234,10 @@ function normalizeFileCandidate(raw) {
     return buildFileDescriptor(path);
 }
 
+function appDisplayName(file, context) {
+    return String((file && file.fileName) || t("default_app_name", context)).replace(/\.app$/i, "");
+}
+
 function decodeFileURL(fileURL) {
     try {
         return decodeURIComponent(fileURL.replace(/^file:\/\//, ""));
@@ -210,7 +248,7 @@ function decodeFileURL(fileURL) {
 }
 
 function buildFileDescriptor(path) {
-    const normalizedPath = path.replace(/\/+$/, "");
+    const normalizedPath = String(path || "").replace(/\/+$/, "");
     const pathParts = normalizedPath.split("/");
     const fileName = pathParts[pathParts.length - 1] || "";
     if (!fileName) return null;

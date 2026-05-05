@@ -7,7 +7,8 @@
   "actions": [
     {
       "title": "统计字数",
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "textAction"
     }
   ],
   "icon": "text.alignleft",
@@ -15,5 +16,6 @@
   "permissions": [
     "notifications"
   ],
-  "configuration": []
+  "configuration": [],
+  "extensionKind": "textAction"
 }
