@@ -3,7 +3,7 @@
   "name": "Currency Converter (Lite)",
   "author": "SwiftBiu",
   "description": "Convert currency instantly and copy the result. (Pure JS)",
-  "version": "1.0",
+  "version": "1.0.1",
   "icon": "banknote.fill",
   "iconType": "sfSymbol",
   "actions": [

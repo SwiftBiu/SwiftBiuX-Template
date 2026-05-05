@@ -5,7 +5,7 @@
     "zh": "桌面引力"
   },
   "author": "SwiftBiu Team",
-  "version": "1.3",
+  "version": "1.3.1",
   "description": {
     "en": "Automatically organize selected files into categorized folders.",
     "zh": "一键将选中的文件按类型自动分类到文件夹中。"

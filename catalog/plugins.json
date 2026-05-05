@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-05T07:57:17.979Z",
+  "generatedAt": "2026-05-05T08:05:07.751Z",
   "categories": [
     {
       "id": "text-processing",
@@ -62,7 +62,7 @@
         "zh": "使用 AI 润色、重写并优化您的文本。"
       },
       "icon": "vibrant.text.highlighter",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -81,7 +81,7 @@
         "zh": "Use preset prompt to rewrite the selected text by AI Compatible API"
       },
       "icon": "extension",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Network",
       "extensionKind": "textAction",
       "author": "kweizh",
@@ -100,7 +100,7 @@
         "zh": "A powerful translation plugin that uses custom UI and supports multiple translation services."
       },
       "icon": "translate",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "SwiftBiu Team",
@@ -119,7 +119,7 @@
         "zh": "从选中的应用程序中提取图标并保存到已授权目录。"
       },
       "icon": "photo.artframe",
-      "version": "1.2",
+      "version": "1.2.1",
       "type": "Local",
       "extensionKind": "fileAction",
       "author": "Developer",
@@ -138,7 +138,7 @@
         "zh": "使用选中的图片替换 macOS 应用程序图标，兼容 App Store 沙盒访问方式。"
       },
       "icon": "app.badge",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "type": "Local",
       "extensionKind": "fileAction",
       "author": "Developer",
@@ -157,7 +157,7 @@
         "zh": "在插件窗口中本地移除图片背景。"
       },
       "icon": "person.crop.square",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "type": "Web App",
       "extensionKind": "fileAction",
       "author": "SwiftBiu",
@@ -176,7 +176,7 @@
         "zh": "智能 Base64 编码与解码。"
       },
       "icon": "arrow.triangle.2.circlepath",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -195,7 +195,7 @@
         "zh": "英文字母大小写转换 (Cycle: Lower -> Upper -> Title -> Camel -> Snake -> Kebab)。"
       },
       "icon": "textformat",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -214,7 +214,7 @@
         "zh": "Real-time currency conversion with support for multiple currencies."
       },
       "icon": "banknote",
-      "version": "1.2",
+      "version": "1.2.1",
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -233,7 +233,7 @@
         "zh": "Convert currency instantly and copy the result. (Pure JS)"
       },
       "icon": "banknote.fill",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -252,7 +252,7 @@
         "zh": "一键将选中的文件按类型自动分类到文件夹中。"
       },
       "icon": "square.grid.3x3.topright.filled",
-      "version": "1.3",
+      "version": "1.3.1",
       "type": "Local",
       "extensionKind": "fileAction",
       "author": "SwiftBiu Team",
@@ -271,7 +271,7 @@
         "zh": "使用豆包文生图模型生成图像，并直接预览。"
       },
       "icon": "photo.on.rectangle.angled",
-      "version": "1.3",
+      "version": "1.3.1",
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu Team",
@@ -290,7 +290,7 @@
         "zh": "使用豆包大语言模型生成文本，并将结果直接粘贴。"
       },
       "icon": "text.bubble",
-      "version": "1.6",
+      "version": "1.6.1",
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu Team",
@@ -309,7 +309,7 @@
         "zh": "Send the selected text to Google Gemini and get the response."
       },
       "icon": "gemini.png",
-      "version": "1.7",
+      "version": "1.7.1",
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -328,7 +328,7 @@
         "zh": "Generates images from selected text in a native SwiftBiu studio window."
       },
       "icon": "nano-banana.png",
-      "version": "1.2",
+      "version": "1.2.1",
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -347,7 +347,7 @@
         "zh": "计算选中文本的 MD5, SHA-1, SHA-256 摘要。"
       },
       "icon": "number.circle",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -366,7 +366,7 @@
         "zh": "美化和验证 JSON 字符串。"
       },
       "icon": "curlybraces",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -385,7 +385,7 @@
         "zh": "将杂乱的文本一键整理为对齐的 Markdown 表格。"
       },
       "icon": "tablecells",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -404,7 +404,7 @@
         "zh": "实时预览选中的 Mermaid 图表文本 (流程图、时序图等)。"
       },
       "icon": "diagram.2",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "官方",
@@ -423,7 +423,7 @@
         "zh": "使用配置的 macOS App 打开选中文件，可按文件后缀过滤。"
       },
       "icon": "arrow.up.forward.square",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Local",
       "extensionKind": "fileAction",
       "author": "SwiftBiu",
@@ -442,7 +442,7 @@
         "zh": "Sandbox-compatible SwiftBiuX plugin packager. Uses JSZip and native Save Panel."
       },
       "icon": "shippingbox.fill",
-      "version": "2.0",
+      "version": "2.0.1",
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "Antigravity",
@@ -461,7 +461,7 @@
         "zh": "Generate custom QR codes instantly."
       },
       "icon": "qrcode",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -480,7 +480,7 @@
         "zh": "使用正则表达式批量提取文本中的关键信息（如邮箱、URL、手机号等）。"
       },
       "icon": "magnifyingglass.circle",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -499,7 +499,7 @@
         "zh": "选择文字并附带自定义关键字进行搜索（如：'苹果' + '官网'）。"
       },
       "icon": "plus.magnifyingglass",
-      "version": "1.1",
+      "version": "1.1.1",
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -518,7 +518,7 @@
         "zh": "将标题文本转换为 URL 友好的 Slug。"
       },
       "icon": "link",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -537,7 +537,7 @@
         "zh": "针对多行文本的处理工具：可按行去重、排序、去除空行/空格、全角转半角等（可在设置中配置）。"
       },
       "icon": "wand.and.stars",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -556,7 +556,7 @@
         "zh": "时间戳和日期时间格式互相转换。"
       },
       "icon": "clock",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -575,7 +575,7 @@
         "zh": "统计选中内容的单词数、字符数、行数等。"
       },
       "icon": "text.alignleft",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -594,7 +594,7 @@
         "zh": "将选中的数字金额转换为大写人民币并复制到剪贴板。"
       },
       "icon": "dollarsign.circle",
-      "version": "1.0",
+      "version": "1.0.1",
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",

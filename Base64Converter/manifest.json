@@ -3,7 +3,7 @@
   "name": "Base64 编解码",
   "author": "SwiftBiu",
   "description": "智能 Base64 编码与解码。",
-  "version": "1.0",
+  "version": "1.0.1",
   "actions": [
     {
       "title": "Base64 转换",

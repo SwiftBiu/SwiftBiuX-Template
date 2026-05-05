@@ -3,7 +3,7 @@
   "name": "Advanced Translator",
   "author": "SwiftBiu Team",
   "description": "A powerful translation plugin that uses custom UI and supports multiple translation services.",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "icon": "translate",
   "iconType": "sfSymbol",
   "actions": [

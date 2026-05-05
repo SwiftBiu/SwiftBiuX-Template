@@ -9,7 +9,7 @@
     "en": "Open selected files with a configured macOS app, optionally filtered by file suffix.",
     "zh": "使用配置的 macOS App 打开选中文件，可按文件后缀过滤。"
   },
-  "version": "1.0",
+  "version": "1.0.1",
   "actions": [
     {
       "title": {

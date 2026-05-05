@@ -9,7 +9,7 @@
     "en": "Extract the icon from the selected application and save it to an authorized folder.",
     "zh": "从选中的应用程序中提取图标并保存到已授权目录。"
   },
-  "version": "1.2",
+  "version": "1.2.1",
   "icon": "photo.artframe",
   "iconType": "sfSymbol",
   "actions": [

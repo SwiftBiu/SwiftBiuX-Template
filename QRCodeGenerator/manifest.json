@@ -3,7 +3,7 @@
   "name": "QR Code Generator",
   "author": "SwiftBiu",
   "description": "Generate custom QR codes instantly.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "icon": "qrcode",
   "iconType": "sfSymbol",
   "actions": [

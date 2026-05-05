@@ -9,7 +9,7 @@
     "en": "Select text and search with a custom keyword (e.g., 'Apple' + 'Official').",
     "zh": "选择文字并附带自定义关键字进行搜索（如：'苹果' + '官网'）。"
   },
-  "version": "1.1",
+  "version": "1.1.1",
   "icon": "plus.magnifyingglass",
   "iconType": "sfSymbol",
   "actions": [

@@ -9,7 +9,7 @@
     "en": "Remove image backgrounds locally in the plugin window.",
     "zh": "在插件窗口中本地移除图片背景。"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "icon": "person.crop.square",
   "iconType": "sfSymbol",
   "actions": [

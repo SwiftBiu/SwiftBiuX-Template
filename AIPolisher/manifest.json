@@ -9,7 +9,7 @@
     "en": "Polish, rewrite, and refine your text using AI.",
     "zh": "使用 AI 润色、重写并优化您的文本。"
   },
-  "version": "1.1.0",
+  "version": "1.1.1",
   "icon": "vibrant.text.highlighter",
   "iconType": "sfSymbol",
   "actions": [

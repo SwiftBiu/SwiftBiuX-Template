@@ -3,7 +3,7 @@
   "name": "CNY",
   "author": "SwiftBiu",
   "description": "将选中的数字金额转换为大写人民币并复制到剪贴板。",
-  "version": "1.0",
+  "version": "1.0.1",
   "actions": [
     {
       "title": "CNY",

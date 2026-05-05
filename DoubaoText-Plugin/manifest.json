@@ -1,7 +1,7 @@
 {
   "identifier": "com.swiftbiu.plugin.doubaotext",
   "name": "豆包问答AI",
-  "version": "1.6",
+  "version": "1.6.1",
   "author": "SwiftBiu Team",
   "description": "使用豆包大语言模型生成文本，并将结果直接粘贴。",
   "icon": "text.bubble",

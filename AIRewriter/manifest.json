@@ -3,7 +3,7 @@
   "name": "AI Rewriter",
   "author": "kweizh",
   "description": "Use preset prompt to rewrite the selected text by AI Compatible API",
-  "version": "1.0",
+  "version": "1.0.1",
   "actions": [
     {
       "title": "OAIRewrite",

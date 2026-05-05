@@ -3,7 +3,7 @@
   "name": "哈希计算器",
   "author": "SwiftBiu",
   "description": "计算选中文本的 MD5, SHA-1, SHA-256 摘要。",
-  "version": "1.0",
+  "version": "1.0.1",
   "actions": [
     {
       "title": "计算哈希",

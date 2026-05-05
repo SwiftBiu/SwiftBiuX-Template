@@ -3,7 +3,7 @@
   "name": "时间戳转换",
   "author": "SwiftBiu",
   "description": "时间戳和日期时间格式互相转换。",
-  "version": "1.0",
+  "version": "1.0.1",
   "actions": [
     {
       "title": "时间戳转换",

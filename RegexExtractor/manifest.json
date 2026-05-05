@@ -3,7 +3,7 @@
   "name": "正则提取器",
   "author": "SwiftBiu",
   "description": "使用正则表达式批量提取文本中的关键信息（如邮箱、URL、手机号等）。",
-  "version": "1.0",
+  "version": "1.0.1",
   "actions": [
     {
       "title": "提取信息",
