@@ -1,0 +1,85 @@
+name: Build and Release Beta Plugins
+
+on:
+  push:
+    branches:
+      - beta
+  workflow_dispatch:
+
+jobs:
+  build-and-release-beta:
+    runs-on: macos-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[beta-release]'))
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Beta Tag
+        id: beta_tag
+        run: |
+          TAG="beta-$(date -u +%Y%m%d-%H%M%S)"
+          echo "TAG=${TAG}" >> $GITHUB_OUTPUT
+          echo "BASE_URL=https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/${TAG}/" >> $GITHUB_OUTPUT
+
+      - name: Validate extension kind and catalog channels
+        run: node scripts/test_extension_channels.js
+
+      - name: Create distribution directory
+        run: mkdir -p dist
+
+      - name: Build all plugins
+        run: ./scripts/build_plugin.sh --all --output-dir dist
+
+      - name: Generate beta catalogs
+        run: node scripts/generate_catalog.js
+        env:
+          CATALOG_CHANNEL: beta
+          CATALOG_BASE_URL: ${{ steps.beta_tag.outputs.BASE_URL }}
+
+      - name: Prepare gh-pages beta payload
+        run: |
+          mkdir -p catalog-beta
+          cp catalog/plugins.beta.json catalog-beta/plugins.beta.json
+          cp catalog/webPlugins.beta.json catalog-beta/webPlugins.beta.json
+
+      - name: Deploy beta catalogs to gh-pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./catalog-beta
+          publish_branch: gh-pages
+          keep_files: true
+          force_orphan: false
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: "chore: Update beta plugin catalogs [skip ci]"
+
+      - name: Create and Push Git Tag
+        run: |
+          git tag "${{ steps.beta_tag.outputs.TAG }}"
+          git push origin "${{ steps.beta_tag.outputs.TAG }}"
+
+      - name: List packaged assets
+        run: find dist -maxdepth 1 -name '*.swiftbiux' -print | sort
+
+      - name: Create GitHub Beta Release
+        run: |
+          gh release create "${{ steps.beta_tag.outputs.TAG }}" \
+            --title "Beta Release ${{ steps.beta_tag.outputs.TAG }}" \
+            --generate-notes \
+            --prerelease
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload beta plugin assets
+        run: gh release upload "${{ steps.beta_tag.outputs.TAG }}" dist/*.swiftbiux
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

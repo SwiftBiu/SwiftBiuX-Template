@@ -386,7 +386,7 @@ function requestDoubaoCompletion(options) {
           contentLength: content.length
         });
         SwiftBiu.pasteText(buildPasteContent(context.selectedText, content, mode));
-        SwiftBiu.showNotification("文本生成成功", mode === "append" ? "结果已追加到原文后。" : "结果已替换原文。");
+        // SwiftBiu.showNotification("文本生成成功", mode === "append" ? "结果已追加到原文后。" : "结果已替换原文。");
       } catch (error) {
         debugLog("Failed to handle Doubao response", {
           message: error.message,

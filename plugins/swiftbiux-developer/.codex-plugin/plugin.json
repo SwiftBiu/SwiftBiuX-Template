@@ -1,0 +1,41 @@
+{
+  "name": "swiftbiux-developer",
+  "version": "1.0.0",
+  "description": "Create, modify, and review SwiftBiuX plugins for SwiftBiu.",
+  "author": {
+    "name": "SwiftBiu",
+    "url": "https://github.com/SwiftBiu"
+  },
+  "homepage": "https://swiftbiu.com/developer",
+  "repository": "https://github.com/SwiftBiu/SwiftBiuX-Template",
+  "license": "MIT",
+  "keywords": [
+    "swiftbiu",
+    "swiftbiux",
+    "codex",
+    "plugins",
+    "macos",
+    "javascript",
+    "webview"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "SwiftBiuX Developer",
+    "shortDescription": "Build SwiftBiu plugins with Codex.",
+    "longDescription": "Gives Codex a dedicated workflow for creating, modifying, and reviewing SwiftBiuX plugins, including plugin type selection, permissions, file workflows, Web UI patterns, local-first decisions, and third-party API integration checks.",
+    "developerName": "SwiftBiu",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Code",
+      "Write",
+      "Workflow"
+    ],
+    "websiteURL": "https://swiftbiu.com/developer",
+    "defaultPrompt": [
+      "Create a SwiftBiu text plugin",
+      "Build a SwiftBiu file plugin",
+      "Review this SwiftBiuX plugin"
+    ],
+    "brandColor": "#0A84FF"
+  }
+}

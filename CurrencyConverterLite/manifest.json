@@ -3,13 +3,14 @@
   "name": "Currency Converter (Lite)",
   "author": "SwiftBiu",
   "description": "Convert currency instantly and copy the result. (Pure JS)",
-  "version": "1.0",
+  "version": "1.0.1",
   "icon": "banknote.fill",
   "iconType": "sfSymbol",
   "actions": [
     {
       "title": "Convert Currency (Lite)",
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "textAction"
     }
   ],
   "permissions": [
@@ -295,5 +296,6 @@
       "type": "boolean",
       "defaultValue": false
     }
-  ]
+  ],
+  "extensionKind": "textAction"
 }

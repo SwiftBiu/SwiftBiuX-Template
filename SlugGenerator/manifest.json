@@ -3,11 +3,12 @@
   "name": "Slug 生成器",
   "author": "SwiftBiu",
   "description": "将标题文本转换为 URL 友好的 Slug。",
-  "version": "1.0",
+  "version": "1.0.1",
   "actions": [
     {
       "title": "生成 Slug",
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "textAction"
     }
   ],
   "icon": "link",
@@ -17,5 +18,6 @@
     "notifications",
     "paste"
   ],
-  "configuration": []
+  "configuration": [],
+  "extensionKind": "textAction"
 }

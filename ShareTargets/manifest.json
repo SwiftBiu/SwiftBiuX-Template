@@ -1,0 +1,73 @@
+{
+  "identifier": "com.swiftbiu.sharetargets",
+  "name": {
+    "en": "Native Share Targets",
+    "zh": "原生分享目标"
+  },
+  "author": "SwiftBiu",
+  "description": {
+    "en": "Declarative examples for sharing selected text, links, images, and files through native macOS sharing bridges.",
+    "zh": "通过原生 macOS 分享桥声明式分享选中文本、链接、图片和文件的示例。"
+  },
+  "version": "1.0.0",
+  "actions": [],
+  "shareTargets": [
+    {
+      "id": "system",
+      "name": {
+        "en": "System Share",
+        "zh": "系统分享"
+      },
+      "icon": "square.and.arrow.up",
+      "description": {
+        "en": "Open the macOS share picker for the current selection.",
+        "zh": "为当前选择内容打开 macOS 分享面板。"
+      },
+      "kind": "systemPicker",
+      "supportedContent": ["text", "url", "file", "image"]
+    },
+    {
+      "id": "whatsapp",
+      "name": {
+        "en": "Share to WhatsApp",
+        "zh": "分享到 WhatsApp"
+      },
+      "icon": "message.badge",
+      "description": {
+        "en": "Share selected text or links through WhatsApp, with a web fallback when the app is unavailable.",
+        "zh": "通过 WhatsApp 分享选中文本或链接；未安装 App 时回退到网页版。"
+      },
+      "kind": "urlScheme",
+      "supportedContent": ["text", "url"],
+      "urlTemplate": "whatsapp://send?text={{encodedText}}",
+      "webFallback": "https://wa.me/?text={{encodedText}}"
+    },
+    {
+      "id": "wechat",
+      "name": {
+        "en": "Open in WeChat",
+        "zh": "用微信打开"
+      },
+      "icon": "bubble.left.and.bubble.right",
+      "description": {
+        "en": "Open selected files or images with WeChat when the macOS app is installed.",
+        "zh": "在已安装微信 macOS 客户端时，用微信打开选中的文件或图片。"
+      },
+      "kind": "openWithApp",
+      "supportedContent": ["file", "image"],
+      "supportedFileExtensions": ["jpg", "jpeg", "png", "gif", "heic", "webp", "pdf", "zip"],
+      "bundleIdentifiers": [
+        "com.tencent.xinWeChat",
+        "com.tencent.WeChat"
+      ]
+    }
+  ],
+  "icon": "square.and.arrow.up",
+  "iconType": "sfSymbol",
+  "permissions": [
+    "share",
+    "localFileRead",
+    "notifications"
+  ],
+  "extensionKind": "fileAction"
+}

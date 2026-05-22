@@ -1,0 +1,20 @@
+{
+  "name": "swiftbiu",
+  "interface": {
+    "displayName": "SwiftBiu"
+  },
+  "plugins": [
+    {
+      "name": "swiftbiux-developer",
+      "source": {
+        "source": "local",
+        "path": "./plugins/swiftbiux-developer"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

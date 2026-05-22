@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Local Background Remover</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg: #f4f5f7;
+            --surface: rgba(255, 255, 255, 0.86);
+            --surface-strong: #ffffff;
+            --text: #1d1d1f;
+            --muted: #6e7278;
+            --line: rgba(25, 28, 33, 0.12);
+            --accent: #0a84ff;
+            --accent-strong: #0066d6;
+            --success: #2f9f5f;
+            --warning: #b26a00;
+            --danger: #cf2f2f;
+            --shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+            --radius: 8px;
+            --checker-a: #d8dde5;
+            --checker-b: #ffffff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #17191d;
+                --surface: rgba(35, 38, 43, 0.88);
+                --surface-strong: #272b31;
+                --text: #f5f5f7;
+                --muted: #a7adb7;
+                --line: rgba(255, 255, 255, 0.12);
+                --accent: #5aa9ff;
+                --accent-strong: #78baff;
+                --success: #54c981;
+                --warning: #d39a3a;
+                --danger: #ff6961;
+                --shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+                --checker-a: #3c414a;
+                --checker-b: #252930;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            background-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.42;
+            color: var(--text);
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0)),
+                var(--bg);
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            min-height: 36px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 0 13px;
+            color: var(--text);
+            background: var(--surface-strong);
+            cursor: pointer;
+            transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease, opacity 0.16s ease;
+        }
+
+        button:hover:not(:disabled) {
+            border-color: color-mix(in srgb, var(--accent) 58%, var(--line));
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            cursor: default;
+            opacity: 0.5;
+        }
+
+        .primary {
+            border-color: transparent;
+            color: white;
+            background: var(--accent);
+        }
+
+        .primary:hover:not(:disabled) {
+            background: var(--accent-strong);
+        }
+
+        .ghost {
+            background: transparent;
+        }
+
+        .danger {
+            color: var(--danger);
+        }
+
+        .app {
+            display: grid;
+            grid-template-rows: auto auto minmax(0, 1fr);
+            min-height: 100vh;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px 12px;
+            border-bottom: 1px solid var(--line);
+            background: color-mix(in srgb, var(--surface) 88%, transparent);
+            backdrop-filter: blur(18px);
+        }
+
+        .title {
+            min-width: 176px;
+            margin-right: auto;
+        }
+
+        .title h1 {
+            margin: 0;
+            font-size: 17px;
+            line-height: 1.18;
+            font-weight: 700;
+            letter-spacing: 0;
+        }
+
+        .title p {
+            margin: 2px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .statusbar {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 12px;
+            min-height: 37px;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--line);
+            background: color-mix(in srgb, var(--surface) 70%, transparent);
+        }
+
+        .status {
+            min-width: 0;
+            overflow: hidden;
+            color: var(--muted);
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status.busy {
+            color: var(--accent);
+        }
+
+        .status.warn {
+            color: var(--warning);
+        }
+
+        .status.error {
+            color: var(--danger);
+        }
+
+        .progress {
+            width: 160px;
+            height: 5px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--line) 62%, transparent);
+        }
+
+        .progress span {
+            display: block;
+            width: 0%;
+            height: 100%;
+            border-radius: inherit;
+            background: var(--accent);
+            transition: width 0.2s ease;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 284px;
+            gap: 14px;
+            min-height: 0;
+            padding: 14px;
+        }
+
+        .previews {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            height: 100%;
+            min-height: 0;
+        }
+
+        .preview {
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr) auto;
+            min-width: 0;
+            min-height: 360px;
+            height: 100%;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 42px;
+            padding: 0 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .preview-title {
+            min-width: 0;
+            overflow: hidden;
+            font-weight: 650;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .preview-meta {
+            color: var(--muted);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .preview-stage {
+            position: relative;
+            display: grid;
+            place-items: center;
+            min-height: 0;
+            overflow: hidden;
+            padding: 14px;
+            background:
+                linear-gradient(45deg, var(--checker-a) 25%, transparent 25%),
+                linear-gradient(-45deg, var(--checker-a) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, var(--checker-a) 75%),
+                linear-gradient(-45deg, transparent 75%, var(--checker-a) 75%),
+                var(--checker-b);
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+            background-size: 20px 20px;
+        }
+
+        .preview-stage.white {
+            background: #ffffff;
+        }
+
+        .preview-stage.black {
+            background: #111318;
+        }
+
+        .preview-stage img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-width: 0;
+            min-height: 0;
+            object-fit: contain;
+        }
+
+        .empty {
+            display: grid;
+            place-items: center;
+            width: min(260px, 80%);
+            min-height: 120px;
+            padding: 18px;
+            border: 1px dashed color-mix(in srgb, var(--line) 80%, var(--muted));
+            border-radius: 8px;
+            color: var(--muted);
+            text-align: center;
+            background: color-mix(in srgb, var(--surface-strong) 58%, transparent);
+        }
+
+        .preview-footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 45px;
+            padding: 0 12px;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .side {
+            display: grid;
+            align-content: start;
+            gap: 12px;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        .panel {
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+
+        .panel h2 {
+            margin: 0;
+            padding: 12px 12px 9px;
+            border-bottom: 1px solid var(--line);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0;
+        }
+
+        .panel-content {
+            display: grid;
+            gap: 14px;
+            padding: 12px;
+        }
+
+        .field {
+            display: grid;
+            gap: 7px;
+        }
+
+        .field-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .label {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .value {
+            color: var(--text);
+            font-variant-numeric: tabular-nums;
+            font-size: 12px;
+        }
+
+        select {
+            width: 100%;
+            min-height: 34px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 0 10px;
+            color: var(--text);
+            background: var(--surface-strong);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+        }
+
+        .segmented {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            padding: 4px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: color-mix(in srgb, var(--line) 20%, transparent);
+        }
+
+        .segmented button {
+            min-height: 30px;
+            border: 0;
+            padding: 0 8px;
+            color: var(--muted);
+            background: transparent;
+        }
+
+        .segmented button.active {
+            color: var(--text);
+            background: var(--surface-strong);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .actions .wide {
+            grid-column: 1 / -1;
+        }
+
+        .drop-active .preview {
+            border-color: var(--accent);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #fileInput {
+            position: fixed;
+            left: -9999px;
+            top: -9999px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+        }
+
+        @media (max-width: 800px) {
+            body {
+                font-size: 15px;
+            }
+
+            button,
+            select {
+                min-height: 44px;
+                font-size: 16px;
+            }
+
+            .toolbar {
+                flex-wrap: wrap;
+                padding: 12px;
+            }
+
+            .title {
+                flex: 1 1 100%;
+            }
+
+            .statusbar {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 8px 12px;
+            }
+
+            .progress {
+                width: 100%;
+            }
+
+            .workspace {
+                grid-template-columns: 1fr;
+                padding: 12px;
+            }
+
+            .previews {
+                grid-template-columns: 1fr;
+            }
+
+            .preview {
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/heic,image/heif,image/bmp,image/gif,image/tiff">
+    <main class="app" id="app">
+        <header class="toolbar">
+            <div class="title">
+                <h1>本地抠图</h1>
+                <p id="engineLine">IMG.LY ISNet</p>
+            </div>
+            <button id="chooseBtn" type="button">选择图片</button>
+            <button id="authorizeBtn" type="button" class="ghost hidden">授权并加载原图</button>
+            <button id="runBtn" class="primary" type="button" disabled>开始抠图</button>
+            <button id="resetBtn" class="ghost danger" type="button" disabled>清空</button>
+        </header>
+
+        <section class="statusbar">
+            <div id="status" class="status">就绪</div>
+            <div class="progress" aria-hidden="true"><span id="progressFill"></span></div>
+        </section>
+
+        <section class="workspace">
+            <div class="previews">
+                <article class="preview">
+                    <div class="preview-header">
+                        <div class="preview-title">原图</div>
+                        <div id="sourceMeta" class="preview-meta">未选择</div>
+                    </div>
+                    <div id="sourceStage" class="preview-stage">
+                        <div id="sourceEmpty" class="empty">选择一张图片开始</div>
+                        <img id="sourceImage" class="hidden" alt="原图预览">
+                    </div>
+                    <div class="preview-footer">
+                        <span id="sourceName">PNG、JPEG、WebP、HEIC</span>
+                    </div>
+                </article>
+
+                <article class="preview">
+                    <div class="preview-header">
+                        <div class="preview-title">结果</div>
+                        <div id="resultMeta" class="preview-meta">透明 PNG</div>
+                    </div>
+                    <div id="resultStage" class="preview-stage">
+                        <div id="resultEmpty" class="empty">等待处理</div>
+                        <img id="resultImage" class="hidden" alt="抠图结果预览">
+                    </div>
+                    <div class="preview-footer">
+                        <span id="resultName">Alpha 预览</span>
+                    </div>
+                </article>
+            </div>
+
+            <aside class="side">
+                <section class="panel">
+                    <h2>模型</h2>
+                    <div class="panel-content">
+                        <label class="field">
+                            <span class="label">质量</span>
+                            <select id="modelSelect">
+                                <option value="isnet_fp16">均衡</option>
+                                <option value="isnet">高质量</option>
+                                <option value="isnet_quint8">快速</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span class="label">设备</span>
+                            <select id="deviceSelect">
+                                <option value="auto">自动</option>
+                                <option value="gpu">GPU</option>
+                                <option value="cpu">CPU</option>
+                            </select>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <h2>边缘</h2>
+                    <div class="panel-content">
+                        <label class="field">
+                            <span class="field-row">
+                                <span class="label">背景清理</span>
+                                <span id="thresholdValue" class="value">8</span>
+                            </span>
+                            <input id="thresholdRange" type="range" min="0" max="80" step="1" value="8">
+                        </label>
+                        <label class="field">
+                            <span class="field-row">
+                                <span class="label">边缘柔化</span>
+                                <span id="featherValue" class="value">1 px</span>
+                            </span>
+                            <input id="featherRange" type="range" min="0" max="8" step="1" value="1">
+                        </label>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <h2>预览</h2>
+                    <div class="panel-content">
+                        <div class="segmented" role="group" aria-label="背景预览">
+                            <button class="active" type="button" data-bg="checker">透明</button>
+                            <button type="button" data-bg="white">白色</button>
+                            <button type="button" data-bg="black">黑色</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <h2>导出</h2>
+                    <div class="panel-content actions">
+                        <button id="saveBtn" class="primary wide" type="button" disabled>保存 PNG</button>
+                        <button id="saveMaskBtn" type="button" disabled>保存 Mask</button>
+                        <button id="recomposeBtn" type="button" disabled>重新合成</button>
+                    </div>
+                </section>
+            </aside>
+        </section>
+    </main>
+
+    <script type="module">
+        const ENGINE_URLS = [
+            "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm",
+            "https://esm.sh/@imgly/background-removal@1.7.0?bundle"
+        ];
+        const SUPPORTED_MODELS = ["isnet_fp16", "isnet", "isnet_quint8"];
+        const IMAGE_FILE_EXTENSIONS = ["png", "jpg", "jpeg", "webp", "heic", "heif", "bmp", "gif", "tif", "tiff"];
+        const IMAGE_EXTENSIONS = /\.(png|jpe?g|webp|heic|heif|bmp|gif|tiff?)$/i;
+
+        const dom = {
+            app: document.getElementById("app"),
+            fileInput: document.getElementById("fileInput"),
+            chooseBtn: document.getElementById("chooseBtn"),
+            runBtn: document.getElementById("runBtn"),
+            resetBtn: document.getElementById("resetBtn"),
+            saveBtn: document.getElementById("saveBtn"),
+            saveMaskBtn: document.getElementById("saveMaskBtn"),
+            recomposeBtn: document.getElementById("recomposeBtn"),
+            modelSelect: document.getElementById("modelSelect"),
+            deviceSelect: document.getElementById("deviceSelect"),
+            thresholdRange: document.getElementById("thresholdRange"),
+            featherRange: document.getElementById("featherRange"),
+            thresholdValue: document.getElementById("thresholdValue"),
+            featherValue: document.getElementById("featherValue"),
+            engineLine: document.getElementById("engineLine"),
+            status: document.getElementById("status"),
+            authorizeBtn: document.getElementById("authorizeBtn"),
+            progressFill: document.getElementById("progressFill"),
+            sourceStage: document.getElementById("sourceStage"),
+            resultStage: document.getElementById("resultStage"),
+            sourceEmpty: document.getElementById("sourceEmpty"),
+            resultEmpty: document.getElementById("resultEmpty"),
+            sourceImage: document.getElementById("sourceImage"),
+            resultImage: document.getElementById("resultImage"),
+            sourceMeta: document.getElementById("sourceMeta"),
+            resultMeta: document.getElementById("resultMeta"),
+            sourceName: document.getElementById("sourceName"),
+            resultName: document.getElementById("resultName")
+        };
+
+        const state = {
+            source: null,
+            rawMaskBlob: null,
+            adjustedMaskBlob: null,
+            resultBlob: null,
+            assetPath: "",
+            model: "isnet_fp16",
+            device: "auto",
+            busy: false,
+            enginePromise: null,
+            recomposeTimer: 0,
+            pendingContextImageFile: null
+        };
+
+        window.swiftBiu_initialize = async function(context) {
+            await loadPluginConfiguration();
+            await bindInitialContext(context || {});
+            warmUpEngine();
+            resizeWindowSoon();
+        };
+
+        dom.chooseBtn.addEventListener("click", () => dom.fileInput.click());
+        dom.authorizeBtn.addEventListener("click", async () => {
+            if (!state.pendingContextImageFile) {
+                setStatus("没有可授权的触发图片，请手动选择图片", "warn");
+                return;
+            }
+            await requestImageAuthorization(state.pendingContextImageFile, new Error("manual authorization request"));
+        });
+        dom.runBtn.addEventListener("click", runBackgroundRemoval);
+        dom.resetBtn.addEventListener("click", resetWorkspace);
+        dom.saveBtn.addEventListener("click", () => saveBlob(state.resultBlob, makeOutputName("cutout.png")));
+        dom.saveMaskBtn.addEventListener("click", () => saveBlob(state.adjustedMaskBlob, makeOutputName("mask.png")));
+        dom.recomposeBtn.addEventListener("click", () => composeCurrentMask(true));
+        dom.modelSelect.addEventListener("change", () => {
+            state.model = dom.modelSelect.value;
+            updateEngineLine();
+        });
+        dom.deviceSelect.addEventListener("change", () => {
+            state.device = dom.deviceSelect.value;
+            updateEngineLine();
+        });
+        dom.thresholdRange.addEventListener("input", () => {
+            syncRangeLabels();
+            scheduleRecompose();
+        });
+        dom.featherRange.addEventListener("input", () => {
+            syncRangeLabels();
+            scheduleRecompose();
+        });
+
+        document.querySelectorAll("[data-bg]").forEach((button) => {
+            button.addEventListener("click", () => setPreviewBackground(button.dataset.bg));
+        });
+
+        dom.fileInput.addEventListener("change", async () => {
+            const file = dom.fileInput.files && dom.fileInput.files[0];
+            if (file) await loadBrowserFile(file);
+            dom.fileInput.value = "";
+        });
+
+        ["dragenter", "dragover"].forEach((eventName) => {
+            document.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                dom.app.classList.add("drop-active");
+            });
+        });
+
+        ["dragleave", "drop"].forEach((eventName) => {
+            document.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                dom.app.classList.remove("drop-active");
+            });
+        });
+
+        document.addEventListener("drop", async (event) => {
+            const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+            if (file) await loadBrowserFile(file);
+        });
+
+        window.swiftBiu_cleanup = cleanupPluginResources;
+        window.addEventListener("pagehide", cleanupPluginResources, { once: true });
+        window.addEventListener("beforeunload", cleanupPluginResources, { once: true });
+
+        async function bindInitialContext(context) {
+            const selectedFiles = Array.isArray(context.selectedFiles) ? context.selectedFiles : [];
+            const imageFile = selectedFiles.map(normalizeSelectedFile).find((file) => IMAGE_EXTENSIONS.test(file.lookupName));
+            console.log("[UI] bindInitialContext selectedFiles:", selectedFiles.length, "matched:", imageFile ? imageFile.path : "(none)");
+            if (!imageFile) {
+                state.pendingContextImageFile = null;
+                toggleAuthorizeButton(false);
+                setStatus("就绪", "ok");
+                return;
+            }
+            state.pendingContextImageFile = imageFile;
+            if (!window.swiftBiu || !window.swiftBiu.readLocalFile) {
+                setStatus("文件读取接口未就绪", "warn");
+                return;
+            }
+
+            try {
+                await loadLocalImageFile(imageFile, "正在读取已选择的图片");
+                toggleAuthorizeButton(false);
+                setStatus("图片已载入", "ok");
+            } catch (error) {
+                console.error("[UI] initial read failed:", readableError(error), imageFile.path || "");
+                await requestImageAuthorization(imageFile, error);
+            }
+        }
+
+        async function loadLocalImageFile(imageFile, statusMessage) {
+            const normalizedFile = normalizeSelectedFile(imageFile);
+            if (!normalizedFile.path) throw new Error("图片路径为空");
+
+            setBusy(true);
+            try {
+                setStatus(statusMessage || "正在读取图片", "busy");
+                const payload = await window.swiftBiu.readLocalFile(normalizedFile.path);
+                const base64 = extractBase64(payload);
+                console.log("[UI] readLocalFile result length:", base64 ? base64.length : 0, "path:", normalizedFile.path);
+                if (!base64) throw new Error("未读取到图片数据");
+                const mimeType = mimeFromName(normalizedFile.lookupName || normalizedFile.displayName || normalizedFile.path || "image.png");
+                const blob = base64ToBlob(base64, mimeType);
+                await setSourceBlob(blob, normalizedFile.displayName || lastPathComponent(normalizedFile.path) || "image.png");
+                toggleAuthorizeButton(false);
+            } finally {
+                setBusy(false);
+            }
+        }
+
+        async function requestImageAuthorization(imageFile, originalError) {
+            if (!window.swiftBiu || !window.swiftBiu.pickLocalFile) {
+                setStatus(`读取图片失败：${readableError(originalError)}`, "error");
+                return;
+            }
+
+            const displayName = imageFile.displayName || lastPathComponent(imageFile.path) || "这张图片";
+            const pickerOptions = {
+                kind: "image",
+                prompt: "授权图片",
+                message: `请重新选择“${displayName}”，授权插件读取这张图片。`,
+                allowedExtensions: IMAGE_FILE_EXTENSIONS
+            };
+            const directoryPath = parentDirectory(imageFile.path);
+            if (directoryPath) pickerOptions.directoryPath = directoryPath;
+
+            try {
+                setStatus("需要授权访问图片，正在打开选择窗口", "warn");
+                const picked = await window.swiftBiu.pickLocalFile(pickerOptions);
+                const pickedPath = extractPickedPath(picked);
+                console.log("[UI] pickLocalFile returned:", pickedPath || "(cancel)");
+                if (!pickedPath) {
+                    toggleAuthorizeButton(true);
+                    setStatus("未授权图片访问", "warn");
+                    return;
+                }
+
+                await loadLocalImageFile({
+                    path: pickedPath,
+                    displayName: lastPathComponent(pickedPath) || displayName,
+                    lookupName: pickedPath
+                }, "正在读取已授权的图片");
+                state.pendingContextImageFile = {
+                    path: pickedPath,
+                    displayName: lastPathComponent(pickedPath) || displayName,
+                    lookupName: pickedPath
+                };
+                toggleAuthorizeButton(false);
+                setStatus("图片已载入", "ok");
+            } catch (error) {
+                toggleAuthorizeButton(true);
+                setStatus(`授权后读取失败：${readableError(error)}`, "error");
+            }
+        }
+
+        async function loadPluginConfiguration() {
+            if (!window.swiftBiu || !window.swiftBiu.storage || !window.swiftBiu.storage.get) {
+                syncRangeLabels();
+                updateEngineLine();
+                return;
+            }
+
+            try {
+                const [assetPath, defaultModel] = await Promise.all([
+                    window.swiftBiu.storage.get("assetPath"),
+                    window.swiftBiu.storage.get("defaultModel")
+                ]);
+                state.assetPath = String((assetPath && assetPath.result) || "").trim();
+                const modelValue = String((defaultModel && defaultModel.result) || "").trim();
+                if (SUPPORTED_MODELS.includes(modelValue)) state.model = modelValue;
+                dom.modelSelect.value = state.model;
+            } catch (error) {
+                setStatus(`读取配置失败：${readableError(error)}`, "warn");
+            }
+
+            syncRangeLabels();
+            updateEngineLine();
+        }
+
+        async function loadBrowserFile(file) {
+            const looksLikeImage = file && (String(file.type || "").startsWith("image/") || IMAGE_EXTENSIONS.test(file.name || ""));
+            if (!looksLikeImage) {
+                setStatus("请选择图片文件", "warn");
+                return;
+            }
+
+            try {
+                setBusy(true);
+                setStatus("正在读取图片", "busy");
+                const buffer = await file.arrayBuffer();
+                const blob = new Blob([buffer], { type: file.type || mimeFromName(file.name) });
+                await setSourceBlob(blob, file.name || "image.png");
+                setStatus("图片已载入", "ok");
+            } catch (error) {
+                setStatus(`读取图片失败：${readableError(error)}`, "error");
+            } finally {
+                setBusy(false);
+            }
+        }
+
+        async function setSourceBlob(blob, name) {
+            const dataUrl = await blobToDataURL(blob);
+            const image = await loadImage(dataUrl);
+            state.source = {
+                blob,
+                dataUrl,
+                image,
+                name,
+                width: image.naturalWidth || image.width,
+                height: image.naturalHeight || image.height
+            };
+            state.rawMaskBlob = null;
+            state.adjustedMaskBlob = null;
+            state.resultBlob = null;
+
+            dom.sourceImage.src = dataUrl;
+            dom.sourceImage.classList.remove("hidden");
+            dom.sourceEmpty.classList.add("hidden");
+            dom.resultImage.removeAttribute("src");
+            dom.resultImage.classList.add("hidden");
+            dom.resultEmpty.classList.remove("hidden");
+
+            dom.sourceName.textContent = name;
+            dom.sourceMeta.textContent = `${state.source.width} x ${state.source.height}`;
+            dom.resultMeta.textContent = "透明 PNG";
+            dom.resultName.textContent = "等待处理";
+            updateButtons();
+            resizeWindowSoon();
+        }
+
+        async function warmUpEngine() {
+            try {
+                setProgress(0);
+                setStatus("正在准备模型资源", "busy");
+                const engine = await loadEngine();
+                if (engine.preload) {
+                    await engine.preload(buildImglyConfig("mask"));
+                }
+                setProgress(0);
+                setStatus("模型已就绪", "ok");
+            } catch (error) {
+                setProgress(0);
+                setStatus(`模型准备失败：${readableError(error)}`, "warn");
+            }
+        }
+
+        async function runBackgroundRemoval() {
+            if (!state.source || state.busy) return;
+
+            try {
+                setBusy(true);
+                state.rawMaskBlob = null;
+                state.adjustedMaskBlob = null;
+                state.resultBlob = null;
+                updateButtons();
+
+                setProgress(0);
+                setStatus("正在加载抠图引擎", "busy");
+                const engine = await loadEngine();
+
+                setStatus("正在生成 Alpha Mask", "busy");
+                const maskFunction = engine.segmentForeground || engine.removeBackground;
+                const maskBlob = await maskFunction(state.source.blob, buildImglyConfig("mask"));
+                state.rawMaskBlob = maskBlob;
+                await composeCurrentMask(false);
+                setProgress(0);
+                setStatus("抠图完成", "ok");
+            } catch (error) {
+                setProgress(0);
+                setStatus(`抠图失败：${readableError(error)}`, "error");
+            } finally {
+                setBusy(false);
+                updateButtons();
+            }
+        }
+
+        async function loadEngine() {
+            if (!state.enginePromise) {
+                state.enginePromise = loadEngineFromUrls();
+            }
+            return state.enginePromise;
+        }
+
+        async function loadEngineFromUrls() {
+            let lastError = null;
+            for (const url of ENGINE_URLS) {
+                try {
+                    const module = await import(url);
+                    const removeBackground = module.default || module.removeBackground || module.imglyRemoveBackground;
+                    if (typeof removeBackground !== "function") {
+                        throw new Error("IMG.LY module loaded without removeBackground");
+                    }
+                    return {
+                        removeBackground,
+                        segmentForeground: typeof module.segmentForeground === "function" ? module.segmentForeground : null,
+                        preload: typeof module.preload === "function" ? module.preload : null
+                    };
+                } catch (error) {
+                    lastError = error;
+                }
+            }
+            throw lastError || new Error("IMG.LY module failed to load");
+        }
+
+        function buildImglyConfig(outputType) {
+            const config = {
+                model: state.model,
+                output: {
+                    format: "image/png",
+                    quality: 1,
+                    type: outputType
+                },
+                progress: (key, current, total) => {
+                    if (typeof total === "number" && total > 0) {
+                        const percent = Math.max(0, Math.min(100, Math.round((current / total) * 100)));
+                        setProgress(percent);
+                        setStatus(`正在下载模型资源 ${percent}%`, "busy");
+                    } else {
+                        setStatus("正在下载模型资源", "busy");
+                    }
+                }
+            };
+
+            config.device = resolveDevice();
+            if (state.assetPath) config.publicPath = normalizeAssetPath(state.assetPath);
+            return config;
+        }
+
+        function resolveDevice() {
+            if (state.device === "cpu" || state.device === "gpu") return state.device;
+            return navigator.gpu ? "gpu" : "cpu";
+        }
+
+        async function composeCurrentMask(showStatus) {
+            if (!state.source || !state.rawMaskBlob) return;
+
+            if (showStatus) setStatus("正在重新合成", "busy");
+            const maskUrl = await blobToDataURL(state.rawMaskBlob);
+            const maskImage = await loadImage(maskUrl);
+            const width = state.source.width;
+            const height = state.source.height;
+            const sourceImage = state.source.image;
+
+            const maskCanvas = document.createElement("canvas");
+            maskCanvas.width = width;
+            maskCanvas.height = height;
+            const maskContext = maskCanvas.getContext("2d", { willReadFrequently: true });
+            maskContext.drawImage(maskImage, 0, 0, width, height);
+
+            let maskData = maskContext.getImageData(0, 0, width, height);
+            maskData = applyMaskControls(maskData);
+            maskContext.putImageData(maskData, 0, 0);
+
+            const feather = Number(dom.featherRange.value);
+            if (feather > 0) {
+                const blurred = document.createElement("canvas");
+                blurred.width = width;
+                blurred.height = height;
+                const blurContext = blurred.getContext("2d");
+                blurContext.filter = `blur(${feather}px)`;
+                blurContext.drawImage(maskCanvas, 0, 0);
+                maskContext.clearRect(0, 0, width, height);
+                maskContext.drawImage(blurred, 0, 0);
+            }
+
+            const outputCanvas = document.createElement("canvas");
+            outputCanvas.width = width;
+            outputCanvas.height = height;
+            const outputContext = outputCanvas.getContext("2d");
+            outputContext.imageSmoothingQuality = "high";
+            outputContext.drawImage(sourceImage, 0, 0, width, height);
+            outputContext.globalCompositeOperation = "destination-in";
+            outputContext.drawImage(maskCanvas, 0, 0);
+            outputContext.globalCompositeOperation = "source-over";
+
+            const maskExportCanvas = createOpaqueMaskCanvas(maskCanvas);
+            state.resultBlob = await canvasToBlob(outputCanvas);
+            state.adjustedMaskBlob = await canvasToBlob(maskExportCanvas);
+
+            const resultUrl = await blobToDataURL(state.resultBlob);
+            dom.resultImage.src = resultUrl;
+            dom.resultImage.classList.remove("hidden");
+            dom.resultEmpty.classList.add("hidden");
+            dom.resultName.textContent = makeOutputName("cutout.png");
+            dom.resultMeta.textContent = `${width} x ${height}`;
+
+            updateButtons();
+            if (showStatus) setStatus("重新合成完成", "ok");
+            resizeWindowSoon();
+        }
+
+        function applyMaskControls(maskData) {
+            const data = maskData.data;
+            const threshold = Number(dom.thresholdRange.value);
+            for (let index = 0; index < data.length; index += 4) {
+                const alpha = data[index + 3];
+                const luma = Math.max(data[index], data[index + 1], data[index + 2], alpha);
+                let nextAlpha = luma;
+                if (threshold > 0) {
+                    nextAlpha = nextAlpha < threshold ? 0 : Math.round(((nextAlpha - threshold) / (255 - threshold)) * 255);
+                }
+                nextAlpha = clamp(nextAlpha, 0, 255);
+                data[index] = 255;
+                data[index + 1] = 255;
+                data[index + 2] = 255;
+                data[index + 3] = nextAlpha;
+            }
+            return maskData;
+        }
+
+        function createOpaqueMaskCanvas(maskCanvas) {
+            const canvas = document.createElement("canvas");
+            canvas.width = maskCanvas.width;
+            canvas.height = maskCanvas.height;
+            const context = canvas.getContext("2d", { willReadFrequently: true });
+            context.drawImage(maskCanvas, 0, 0);
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            for (let index = 0; index < data.length; index += 4) {
+                const alpha = data[index + 3];
+                data[index] = alpha;
+                data[index + 1] = alpha;
+                data[index + 2] = alpha;
+                data[index + 3] = 255;
+            }
+            context.putImageData(imageData, 0, 0);
+            return canvas;
+        }
+
+        function scheduleRecompose() {
+            if (!state.rawMaskBlob || state.busy) return;
+            clearTimeout(state.recomposeTimer);
+            state.recomposeTimer = window.setTimeout(() => composeCurrentMask(false), 120);
+        }
+
+        async function saveBlob(blob, filename) {
+            if (!blob) return;
+
+            try {
+                const dataUrl = await blobToDataURL(blob);
+                const base64 = dataUrl.split(",")[1] || "";
+                if (window.swiftBiu && window.swiftBiu.saveLocalFile) {
+                    await window.swiftBiu.saveLocalFile(base64, filename);
+                    setStatus("文件已保存", "ok");
+                    return;
+                }
+                downloadBlob(blob, filename);
+                setStatus("文件已下载", "ok");
+            } catch (error) {
+                setStatus(`保存失败：${readableError(error)}`, "error");
+            }
+        }
+
+        function resetWorkspace() {
+            clearTimeout(state.recomposeTimer);
+            state.source = null;
+            state.rawMaskBlob = null;
+            state.adjustedMaskBlob = null;
+            state.resultBlob = null;
+            state.pendingContextImageFile = null;
+            dom.sourceImage.removeAttribute("src");
+            dom.resultImage.removeAttribute("src");
+            dom.sourceImage.classList.add("hidden");
+            dom.resultImage.classList.add("hidden");
+            dom.sourceEmpty.classList.remove("hidden");
+            dom.resultEmpty.classList.remove("hidden");
+            dom.sourceName.textContent = "PNG、JPEG、WebP、HEIC";
+            dom.resultName.textContent = "Alpha 预览";
+            dom.sourceMeta.textContent = "未选择";
+            dom.resultMeta.textContent = "透明 PNG";
+            toggleAuthorizeButton(false);
+            setStatus("就绪", "ok");
+            setProgress(0);
+            updateButtons();
+            resizeWindowSoon();
+        }
+
+        function cleanupPluginResources() {
+            clearTimeout(state.recomposeTimer);
+            state.source = null;
+            state.rawMaskBlob = null;
+            state.adjustedMaskBlob = null;
+            state.resultBlob = null;
+            state.enginePromise = null;
+            state.pendingContextImageFile = null;
+
+            dom.sourceImage.onload = null;
+            dom.sourceImage.onerror = null;
+            dom.resultImage.onload = null;
+            dom.resultImage.onerror = null;
+            dom.sourceImage.removeAttribute("src");
+            dom.resultImage.removeAttribute("src");
+
+            if (dom.fileInput) dom.fileInput.value = "";
+        }
+
+        function updateButtons() {
+            const hasSource = Boolean(state.source);
+            const hasResult = Boolean(state.resultBlob);
+            dom.runBtn.disabled = !hasSource || state.busy;
+            dom.resetBtn.disabled = !hasSource || state.busy;
+            dom.saveBtn.disabled = !hasResult || state.busy;
+            dom.saveMaskBtn.disabled = !state.adjustedMaskBlob || state.busy;
+            dom.recomposeBtn.disabled = !state.rawMaskBlob || state.busy;
+        }
+
+        function setBusy(isBusy) {
+            state.busy = isBusy;
+            updateButtons();
+            if (dom.authorizeBtn && !dom.authorizeBtn.classList.contains("hidden")) {
+                dom.authorizeBtn.disabled = state.busy;
+            }
+        }
+
+        function toggleAuthorizeButton(visible) {
+            if (!dom.authorizeBtn) return;
+            dom.authorizeBtn.classList.toggle("hidden", !visible);
+            dom.authorizeBtn.disabled = !visible || state.busy;
+        }
+
+        function syncRangeLabels() {
+            dom.thresholdValue.textContent = dom.thresholdRange.value;
+            dom.featherValue.textContent = `${dom.featherRange.value} px`;
+        }
+
+        function setPreviewBackground(kind) {
+            document.querySelectorAll("[data-bg]").forEach((button) => {
+                button.classList.toggle("active", button.dataset.bg === kind);
+            });
+            dom.resultStage.classList.toggle("white", kind === "white");
+            dom.resultStage.classList.toggle("black", kind === "black");
+        }
+
+        function updateEngineLine() {
+            const modelName = {
+                isnet_fp16: "均衡",
+                isnet: "高质量",
+                isnet_quint8: "快速"
+            }[state.model] || "均衡";
+            const deviceName = state.device === "auto" ? (navigator.gpu ? "自动 GPU" : "自动 CPU") : state.device.toUpperCase();
+            dom.engineLine.textContent = `IMG.LY ISNet / ${modelName} / ${deviceName}`;
+        }
+
+        function setStatus(message, tone) {
+            dom.status.textContent = message;
+            dom.status.classList.remove("busy", "warn", "error");
+            if (tone === "busy") dom.status.classList.add("busy");
+            if (tone === "warn") dom.status.classList.add("warn");
+            if (tone === "error") dom.status.classList.add("error");
+        }
+
+        function setProgress(percent) {
+            dom.progressFill.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+        }
+
+        function normalizeAssetPath(path) {
+            return path.endsWith("/") ? path : `${path}/`;
+        }
+
+        function makeOutputName(suffix) {
+            const sourceName = state.source && state.source.name ? state.source.name : "image.png";
+            const stem = sourceName.replace(/\.[^.]+$/, "") || "image";
+            return `${stem}-${suffix}`;
+        }
+
+        function lastPathComponent(path) {
+            return String(path || "").split("/").filter(Boolean).pop() || "";
+        }
+
+        function parentDirectory(path) {
+            const normalizedPath = normalizeLocalPath(String(path || ""));
+            const index = normalizedPath.lastIndexOf("/");
+            return index > 0 ? normalizedPath.slice(0, index) : "";
+        }
+
+        function normalizeSelectedFile(file) {
+            if (typeof file === "string") {
+                const path = normalizeLocalPath(file);
+                return {
+                    path,
+                    displayName: lastPathComponent(path),
+                    lookupName: path
+                };
+            }
+
+            const path = normalizeLocalPath(String((file && (file.path || file.fileURL || file.url)) || ""));
+            const displayName = String((file && (file.fileName || file.name)) || lastPathComponent(path) || "image.png");
+            const extension = String((file && file.fileExtension) || "").replace(/^\./, "");
+            const lookupName = [path, displayName, extension ? `.${extension}` : ""].join(" ");
+            return { path, displayName, lookupName };
+        }
+
+        function normalizeLocalPath(path) {
+            if (!path.startsWith("file://")) return path;
+            try {
+                return decodeURIComponent(new URL(path).pathname);
+            } catch (error) {
+                return path.replace(/^file:\/\//, "");
+            }
+        }
+
+        function extractBase64(payload) {
+            if (typeof payload === "string") return payload;
+            if (!payload || typeof payload !== "object") return "";
+            return String(payload.base64 || payload.result || payload.data || "");
+        }
+
+        function extractPickedPath(payload) {
+            if (typeof payload === "string") return normalizeLocalPath(payload);
+            if (!payload || typeof payload !== "object") return "";
+            return normalizeLocalPath(String(payload.path || payload.fileURL || payload.url || ""));
+        }
+
+        function mimeFromName(name) {
+            const lower = String(name || "").toLowerCase();
+            if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
+            if (lower.endsWith(".webp")) return "image/webp";
+            if (lower.endsWith(".heic")) return "image/heic";
+            if (lower.endsWith(".heif")) return "image/heif";
+            if (lower.endsWith(".bmp")) return "image/bmp";
+            if (lower.endsWith(".gif")) return "image/gif";
+            if (lower.endsWith(".tif") || lower.endsWith(".tiff")) return "image/tiff";
+            return "image/png";
+        }
+
+        function base64ToBlob(base64, mimeType) {
+            const binary = atob(base64);
+            const length = binary.length;
+            const bytes = new Uint8Array(length);
+            for (let index = 0; index < length; index += 1) {
+                bytes[index] = binary.charCodeAt(index);
+            }
+            return new Blob([bytes], { type: mimeType || "image/png" });
+        }
+
+        function blobToDataURL(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ""));
+                reader.onerror = () => reject(reader.error || new Error("FileReader failed"));
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        function loadImage(src) {
+            return new Promise((resolve, reject) => {
+                const image = new Image();
+                image.onload = () => resolve(image);
+                image.onerror = () => reject(new Error("Image decode failed"));
+                image.src = src;
+            });
+        }
+
+        function canvasToBlob(canvas) {
+            return new Promise((resolve, reject) => {
+                canvas.toBlob((blob) => {
+                    if (blob) resolve(blob);
+                    else reject(new Error("Canvas export failed"));
+                }, "image/png", 1);
+            });
+        }
+
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement("a");
+            anchor.href = url;
+            anchor.download = filename;
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 500);
+        }
+
+        function clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        function readableError(error) {
+            if (!error) return "未知错误";
+            if (typeof error === "string") return error;
+            return error.message || error.error || JSON.stringify(error);
+        }
+
+        function resizeWindowSoon() {
+            if (!window.swiftBiu || !window.swiftBiu.ui || !window.swiftBiu.ui.resizeWindow) return;
+            window.setTimeout(() => {
+                const height = Math.min(Math.max(document.body.scrollHeight + 8, 560), 820);
+                window.swiftBiu.ui.resizeWindow({ height });
+            }, 80);
+        }
+
+        syncRangeLabels();
+        updateEngineLine();
+        updateButtons();
+    </script>
+</body>
+</html>

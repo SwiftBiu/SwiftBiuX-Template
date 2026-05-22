@@ -3,13 +3,14 @@
   "name": "Currency Converter",
   "author": "SwiftBiu",
   "description": "Real-time currency conversion with support for multiple currencies.",
-  "version": "1.2",
+  "version": "1.2.1",
   "icon": "banknote",
   "iconType": "sfSymbol",
   "actions": [
     {
       "title": "Convert Currency",
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "textAction"
     }
   ],
   "permissions": [
@@ -21,5 +22,6 @@
   "ui": {
     "main": "ui/index.html"
   },
-  "configuration": []
+  "configuration": [],
+  "extensionKind": "textAction"
 }

@@ -3,11 +3,12 @@
   "name": "文本清洗工",
   "author": "SwiftBiu",
   "description": "针对多行文本的处理工具：可按行去重、排序、去除空行/空格、全角转半角等（可在设置中配置）。",
-  "version": "1.0",
+  "version": "1.0.1",
   "actions": [
     {
       "title": "清洗文本",
-      "script": "script.js"
+      "script": "script.js",
+      "extensionKind": "textAction"
     }
   ],
   "icon": "wand.and.stars",
@@ -53,5 +54,6 @@
       "type": "boolean",
       "defaultValue": true
     }
-  ]
+  ],
+  "extensionKind": "textAction"
 }
