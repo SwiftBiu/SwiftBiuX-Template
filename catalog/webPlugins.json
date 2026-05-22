@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-05T08:05:07.751Z",
+  "generatedAt": "2026-05-18T04:06:00.575Z",
   "categories": [
     {
       "id": "text-processing",
@@ -504,6 +504,25 @@
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/SearchPlus.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null
+    },
+    {
+      "id": "com.swiftbiu.sharetargets",
+      "name": {
+        "en": "Native Share Targets",
+        "zh": "原生分享目标"
+      },
+      "description": {
+        "en": "Declarative examples for sharing selected text, links, images, and files through native macOS sharing bridges.",
+        "zh": "通过原生 macOS 分享桥声明式分享选中文本、链接、图片和文件的示例。"
+      },
+      "icon": "square.and.arrow.up",
+      "version": "1.0.0",
+      "type": "Local",
+      "extensionKind": "fileAction",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/ShareTargets.swiftbiux",
       "categoryId": "utilities",
       "requiredHost": null
     },

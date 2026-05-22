@@ -12,6 +12,7 @@ const GENERATE_CATALOG_SCRIPT = path.join(ROOT_DIR, 'scripts', 'generate_catalog
 const STABLE_BASE_URL = 'https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/';
 const BETA_BASE_URL = 'https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/';
 const ALLOWED_KINDS = new Set(['textAction', 'fileAction']);
+const ALLOWED_SHARE_TARGET_KINDS = new Set(['systemPicker', 'airDrop', 'urlScheme', 'openWithApp']);
 
 function fail(message) {
   throw new Error(message);
@@ -48,8 +49,9 @@ function validateManifestKinds() {
     counts[rootKind] += 1;
 
     const actions = Array.isArray(manifest.actions) ? manifest.actions : [];
-    if (actions.length === 0) {
-      fail(`${pluginName}: actions must contain at least one entry`);
+    const shareTargets = Array.isArray(manifest.shareTargets) ? manifest.shareTargets : [];
+    if (actions.length === 0 && shareTargets.length === 0) {
+      fail(`${pluginName}: actions or shareTargets must contain at least one entry`);
     }
 
     actions.forEach((action, index) => {
@@ -59,6 +61,15 @@ function validateManifestKinds() {
       }
       if (actionKind !== rootKind) {
         fail(`${pluginName}: actions[${index}].extensionKind '${actionKind}' must match root '${rootKind}'`);
+      }
+    });
+
+    shareTargets.forEach((target, index) => {
+      if (!target || typeof target.id !== 'string' || target.id.trim().length === 0) {
+        fail(`${pluginName}: shareTargets[${index}].id is required`);
+      }
+      if (!ALLOWED_SHARE_TARGET_KINDS.has(target.kind)) {
+        fail(`${pluginName}: shareTargets[${index}].kind is invalid '${target && target.kind}'`);
       }
     });
   }

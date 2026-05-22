@@ -141,6 +141,12 @@ function inferExtensionKind(manifest) {
         return 'fileAction';
     }
 
+    const shareTargets = Array.isArray(manifest.shareTargets) ? manifest.shareTargets : [];
+    const shareContentKinds = shareTargets.flatMap(target => Array.isArray(target && target.supportedContent) ? target.supportedContent : []);
+    if (shareContentKinds.some(kind => ['file', 'files', 'image', 'images', 'photo', 'photos'].includes(normalizeKind(kind)))) {
+        return 'fileAction';
+    }
+
     const permissions = Array.isArray(manifest.permissions) ? manifest.permissions : [];
     const configuration = Array.isArray(manifest.configuration) ? manifest.configuration : [];
     const hasFilePermission = permissions.includes('localFileRead') || permissions.includes('localFileWrite');
