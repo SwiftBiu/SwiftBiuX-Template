@@ -1,6 +1,6 @@
 # 贡献指南 (Contributing Guidelines)
 
-> 本节为占位翻译,内容将与英文版同步。详细的贡献规范请参阅[英文版本](/developer/contributing/)。
+> 本节为占位翻译,内容将与英文版同步。详细的贡献规范请参阅[英文版本](./contributing.md)。
 
 为了保证项目历史的清晰可读,本仓库对所有 commit 信息强制使用 **Conventional Commits** 规范。
 

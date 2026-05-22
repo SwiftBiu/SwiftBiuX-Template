@@ -2,15 +2,15 @@
 
 The Developer Guide is now organized as one page per topic so each module is bookmarkable, shareable, and easy to maintain. Pick a starting point below or visit the [Developer landing page](https://swiftbiu.com/developer.html) for a full overview.
 
-- [Quick Start](https://swiftbiu.com/developer/quick-start/)
-- [Manifest & Configuration](https://swiftbiu.com/developer/manifest/)
-- [Permissions](https://swiftbiu.com/developer/permissions/)
-- [Internationalization (i18n)](https://swiftbiu.com/developer/i18n/)
-- [Debugging & Logging](https://swiftbiu.com/developer/debugging/)
-- [Best Practices & FAQ](https://swiftbiu.com/developer/faq/)
-- [Examples](https://swiftbiu.com/developer/examples/)
-- [Contributing](https://swiftbiu.com/developer/contributing/)
-- [Stable vs Beta](https://swiftbiu.com/developer/stable-vs-beta/)
-- [Scenarios](https://swiftbiu.com/developer/scenarios/)
+- [Quick Start](./developer-modules/quick-start.md)
+- [Manifest & Configuration](./developer-modules/manifest.md)
+- [Permissions](./developer-modules/permissions.md)
+- [Internationalization (i18n)](./developer-modules/i18n.md)
+- [Debugging & Logging](./developer-modules/debugging.md)
+- [Best Practices & FAQ](./developer-modules/faq.md)
+- [Examples](./developer-modules/examples.md)
+- [Contributing](./developer-modules/contributing.md)
+- [Stable vs Beta](./developer-modules/stable-vs-beta.md)
+- [Scenarios](./developer-modules/scenarios.md)
 
 Source markdown for each module lives under `SwiftBiuX-Template/developer-modules/`.
