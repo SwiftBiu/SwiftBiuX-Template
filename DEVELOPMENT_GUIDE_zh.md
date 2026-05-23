@@ -2,51 +2,105 @@
 
 # SwiftBiu 插件开发指南
 
-欢迎来到 SwiftBiu 插件开发的世界！本指南将帮助您使用现代 Web 技术创建功能强大的插件。
+SwiftBiu 插件可以在任意 macOS 应用中运行——选中文字、拖拽文件、框选屏幕区域，插件立即触发。你写 JavaScript，SwiftBiu 处理其余一切。不需要 Swift，不需要 Xcode，不需要 App Store 审核周期。
 
-借助 SwiftBiu 的“富 Web 应用”模型，您可以使用 HTML、CSS 和 JavaScript 构建具有自定义用户界面的插件，为用户提供无缝、接近原生的体验。
+**一个下午能做出什么：**
+- 用 DeepL 或 Google 翻译在原位翻译选中文字
+- 一键把一堆截图按日期重命名整理
+- 把选中文字发给 OpenAI，把改写结果直接粘贴回去
+- 用 remove.bg 批量去除选中图片的背景
+- 从任意选中文字直接创建 GitHub Issue，内容预填好随时提交
 
-## 🤖 AI 辅助开发 (AI-Assisted Development)
-
-想让 AI 帮您一键生成插件代码？没问题！
-
-我们在这个模板仓库中内置了专门面向大模型的 **AI Skill** 文件，路径为 `AI_SKILL.md`。这个文件包含了 SwiftBiuX 插件开发的全部规范（包括跨端 UI 响应式法则、权限机制、API 降级策略等）。
-
-**如何使用？**
-只需将该 `AI_SKILL.md` 文件作为上下文提供给您常用的 AI 代码助手（如 **Cursor**, **GitHub Copilot**, 或 **Smart AI**），然后直接通过自然语言描述您的需求。
-*Prompt 示例:*
-> "阅读规范：`AI_SKILL.md`。帮我创建一个名为 `TextCounter` 的 Web App 插件，实现实时的字符和单词统计功能。"
-
-AI 将自动遵循规范，为您生成零错误、完美兼容 iOS 移动端的全套插件代码！
+→ [2 分钟内交付你的第一个插件](#-demo-1-文本插件对选中文字说-hello)
 
 ---
 
-## 快速上手
+## 🚀 Demo 1: 文本插件——对选中文字说 Hello
+
+> **无需任何配置。** 把下面的 prompt 复制给任意 AI 助手（Claude、ChatGPT、Cursor、Copilot……），2 分钟内就能拿到一个可安装的 `.swiftbiux` 插件。
+
+```text
+阅读 SwiftBiu 插件规范：
+https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+构建一个 SwiftBiu 插件：
+名称：HelloText
+输入：选中的文字（context.selectedText）
+功能：在选中文字前面加上 "Hello, "
+输出：把结果粘贴回去，替换原来的选中内容
+
+要求：
+- extensionKind: textAction
+- 纯 JS，不需要 Web App UI
+- 生成 manifest.json 和 script.js
+- 用 ./scripts/build_plugin.sh 打包
+- 如果打包失败，保留文件夹并告诉我手动命令
+```
+
+**你会得到什么：** 一个 `HelloText.swiftbiux` 文件。双击安装，选中任意文字，点击插件——完成。
 
 ---
 
-## 🚀 快速开始 (推荐)
+## 📁 Demo 2: 文件插件——按扩展名快速整理文件
 
-开始开发 SwiftBiuX 插件最简单的方法是使用我们官方的 CLI 脚手架工具。它可以瞬间生成一个开箱即用的跨端模板。
+> **纯本地，无需 API Key。** 这个插件读取选中的文件，按扩展名移动到对应子文件夹。数据不离开你的电脑。
+
+```text
+阅读 SwiftBiu 插件规范：
+https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+构建一个 SwiftBiu 插件：
+名称：FileSorter
+输入：选中的文件（context.selectedFiles）
+功能：把每个文件移动到同级目录下以扩展名命名的子文件夹里（例如 pdf/、jpg/、mp4/）
+输出：显示一条 SwiftBiu 通知，内容为"已移动 X 个文件，跳过 Y 个"
+
+要求：
+- extensionKind: fileAction
+- permissions: ["localFileRead", "localFileWrite", "notifications"]
+- 只用本地文件 API，不发网络请求，不需要 API Key
+- 如果没有选中文件，显示通知说明并直接返回，不做任何操作
+- 如果单个文件移动失败，计入跳过数量并继续处理其余文件
+- 用 ./scripts/build_plugin.sh 打包
+```
+
+**你会得到什么：** 在 Finder 里选中一堆混杂的文件，触发插件，它们自动分类整理好。
+
+---
+
+## 🛠 手动配置（想完全掌控的开发者）
+
+上面的 AI Demo 已经能直接生成可安装的插件。这一节是给想了解结构、手写插件或搭建完整开发工作流的你。
+
+### 方式 A：CLI 脚手架（最快）
 
 ```bash
 npx create-swiftbiux-plugin <你的插件名>
 ```
 
-或者，如果你更倾向于克隆整个官方模板仓库：
+自动生成包含 `manifest.json`、`script.js` 和打包脚本的完整目录。
+
+### 方式 B：克隆模板仓库
+
 ```bash
 git clone https://github.com/SwiftBiu/SwiftBiuX-Template.git
 cd SwiftBiuX-Template
 ```
 
-> **💡 提示**：SwiftBiu 支持两种复杂度的插件（无界面的纯逻辑插件，和带原生界面的 Web App 插件）。为了让您能最快体验完整流程，这里的入门教程将带您编写一个最简单的**纯逻辑动作插件 (Standard Plugin)**。
+### Codex 一键安装
 
-### 第二步：编写 Hello World
-在仓库目录下，新建一个名为 `HelloWorld` 的文件夹。一个极其轻量级的 SwiftBiu 插件至少需要两个文件。
+如果你使用 Codex，先安装 SwiftBiuX skill。安装后重启 Codex 或打开新会话，搜索 `swiftbiux`。
 
-**1. 创建 `manifest.json` (插件配置)**
-这是插件的身份证。在 `HelloWorld` 目录中创建此文件并贴入：
+```bash
+curl -fsSL https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/scripts/install-codex-skill.sh \
+  | bash
+```
 
+### 最小插件结构
+
+一个插件只需要两个文件：
+
+**`manifest.json`**
 ```json
 {
   "identifier": "com.yourname.helloworld",
@@ -65,37 +119,238 @@ cd SwiftBiuX-Template
 }
 ```
 
-**2. 创建 `script.js` (核心逻辑)**
-依然在 `HelloWorld` 目录中创建 `script.js`。当用户在 SwiftBiu 中点击您的插件时，将执行此代码：
-
+**`script.js`**
 ```javascript
 function isAvailable(context) {
-    // 返回 true 表示此插件动作始终在菜单中可见
-    return true; 
+    return true;
 }
 
 function performAction(context) {
-    // 弹出一个系统通知
     SwiftBiu.showNotification("🎉 Hello!", "欢迎来到 SwiftBiu 插件开发的世界！");
 }
 ```
 
-### 第三步：打包与见证奇迹
-代码已经准备完毕！返回包含 `scripts` 文件夹的仓库根目录，在终端运行打包脚本，并将您的插件文件夹名作为参数传入：
+### 打包与安装
 
 ```bash
 ./scripts/build_plugin.sh HelloWorld
 ```
 
-**🎉 成功！**
-命令执行完毕后，您会在目录下发现一个生成的 `HelloWorld.swiftbiux` 分发文件。
-直接**双击**该文件，SwiftBiu 将自动唤起并安装您的插件。呼出 SwiftBiu 菜单，点击“打个招呼”按钮，看看右上角弹出的通知吧！
+双击生成的 `HelloWorld.swiftbiux`——SwiftBiu 立即安装。
 
-> 掌握了基础流程后，您可以继续阅读下一节，了解更深入的插件架构设计。
+> 如果打包脚本失败，请查看[调试与日志](#调试与日志)章节。
+
+---
+
+## 🗺 插件场景与 API 参考
+
+以下每个场景都是真实用例，附带你需要的 API 文档链接。把 AI prompt 复制过去，填上 API Key，就能得到一个可用的插件。
+
+### 场景 1：用 DeepL 在原位翻译
+
+**功能：** 选中任意文字 → 翻译成目标语言 → 粘贴回原位替换。
+
+- **插件类型：** `textAction`
+- **权限：** `["network", "paste"]`
+- **API 文档：** [developers.deepl.com/docs](https://developers.deepl.com/docs)
+- **API Key：** 通过 `manifest.json` 的 `configuration`（`type: "secure"`）存储
+
+```text
+阅读：https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+构建一个 SwiftBiu textAction 插件，名称"DeepL 翻译"：
+- 输入：context.selectedText
+- 调用 DeepL Free API（https://api-free.deepl.com/v2/translate）翻译选中文字
+- 目标语言通过名为 "target_lang" 的 string 配置项设置（默认 "ZH"）
+- API Key 通过名为 "deepl_api_key" 的 secure 配置项存储
+- 输出：用 SwiftBiu.pasteText() 把翻译结果粘贴回去
+- 如果 API Key 为空，显示通知提示用户配置
+- API 文档：https://developers.deepl.com/docs/api-reference/translate
+```
+
+---
+
+### 场景 2：用 OpenAI 改写文字
+
+**功能：** 选中一段文字 → 按选定风格（专业、轻松、简洁）改写 → 粘贴回去。
+
+- **插件类型：** `textAction`
+- **权限：** `["network", "paste", "notifications"]`
+- **API 文档：** [platform.openai.com/docs/api-reference/chat](https://platform.openai.com/docs/api-reference/chat)
+- **API Key：** 通过 `type: "secure"` 配置项存储
+
+```text
+阅读：https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+构建一个 SwiftBiu textAction 插件，名称"AI 改写"：
+- 输入：context.selectedText
+- 调用 OpenAI Chat Completions API（https://api.openai.com/v1/chat/completions），模型 gpt-4o-mini
+- System prompt："把下面的文字改写得更{tone}。只返回改写后的文字。"
+- "tone" 是一个 option 配置项，选项：专业、轻松、简洁、友好
+- API Key 通过名为 "openai_api_key" 的 secure 配置项存储
+- 用 SwiftBiu.fetchStream() 流式输出，流式过程中显示加载指示器
+- 最终用 SwiftBiu.pasteText() 粘贴结果
+- API 文档：https://platform.openai.com/docs/api-reference/chat
+```
+
+---
+
+### 场景 3：用 Anthropic Claude 润色文案
+
+**功能：** 选中文字 → Claude 修正语法、提升表达流畅度 → 粘贴回去。
+
+- **插件类型：** `textAction`
+- **权限：** `["network", "paste"]`
+- **API 文档：** [docs.anthropic.com/en/api/messages](https://docs.anthropic.com/en/api/messages)
+- **API Key：** 通过 `type: "secure"` 配置项存储
+
+```text
+阅读：https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+构建一个 SwiftBiu textAction 插件，名称"Claude 润色"：
+- 输入：context.selectedText
+- 调用 Anthropic Messages API（https://api.anthropic.com/v1/messages），模型 claude-3-haiku-20240307
+- System prompt："润色以下文字，使其更清晰流畅。只返回润色后的文字。"
+- API Key 通过名为 "anthropic_api_key" 的 secure 配置项存储
+- 用 SwiftBiu.fetch() 发起请求
+- 用 SwiftBiu.pasteText() 粘贴结果
+- API 文档：https://docs.anthropic.com/en/api/messages
+```
+
+---
+
+### 场景 4：用 remove.bg 批量去除图片背景
+
+**功能：** 在 Finder 中选中图片文件 → 调用 remove.bg API 去除背景 → 把结果 PNG 保存在原文件旁边。
+
+- **插件类型：** `fileAction`
+- **权限：** `["localFileRead", "localFileWrite", "network", "notifications"]`
+- **API 文档：** [www.remove.bg/api](https://www.remove.bg/api)
+- **API Key：** 通过 `type: "secure"` 配置项存储
+
+```text
+阅读：https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+构建一个 SwiftBiu fileAction 插件，名称"去除背景"：
+- 输入：context.selectedFiles（图片：jpg、jpeg、png、webp）
+- 对每张图片，用 SwiftBiu.readLocalFile() 读取，POST 到 https://api.remove.bg/v1.0/removebg，图片以 base64 形式传入
+- 用 SwiftBiu.createLocalFile() 把结果 PNG 保存在原文件旁边，文件名加 "_nobg" 后缀
+- 显示进度通知和最终汇总通知
+- API Key 通过名为 "removebg_api_key" 的 secure 配置项存储
+- 跳过非图片文件并计入跳过数量
+- API 文档：https://www.remove.bg/api#remove-background
+```
+
+---
+
+### 场景 5：按日期批量重命名文件（纯本地）
+
+**功能：** 选中一堆截图 → 按文件修改日期重命名为 `YYYY-MM-DD_HH-MM-SS_原文件名.ext`。无网络，无 API Key。
+
+- **插件类型：** `fileAction`
+- **权限：** `["localFileRead", "localFileWrite", "notifications"]`
+- **API 文档：** 纯本地，无需网络
+
+```text
+阅读：https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+构建一个 SwiftBiu fileAction 插件，名称"按日期重命名"：
+- 输入：context.selectedFiles
+- 对每个文件，用 SwiftBiu.getFileMetadata() 读取修改日期
+- 用 SwiftBiu.renameLocalFile() 重命名为 YYYY-MM-DD_HH-MM-SS_<原文件名>.<ext>
+- 显示汇总通知："已重命名 X 个文件，跳过 Y 个"
+- 如果文件名已有日期前缀，跳过
+- 纯本地，不发网络请求
+```
+
+---
+
+### 场景 6：从选中文字直接创建 GitHub Issue
+
+**功能：** 选中 bug 描述或任务文字 → 在浏览器打开预填好内容的 GitHub Issue 创建页面。
+
+- **插件类型：** `textAction`
+- **权限：** `[]`（只需打开 URL，无需特殊权限）
+- **API 文档：** [docs.github.com/en/rest/issues/issues](https://docs.github.com/en/rest/issues/issues)
+
+```text
+阅读：https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+构建一个 SwiftBiu textAction 插件，名称"新建 GitHub Issue"：
+- 输入：context.selectedText
+- 对选中文字进行 URL 编码，打开：
+  https://github.com/<owner>/<repo>/issues/new?title=<第一行>&body=<完整文字>
+- "owner" 和 "repo" 是 string 配置项
+- 用 SwiftBiu.openURL() 打开浏览器
+- 不需要 API Key，只是打开一个预填好的 GitHub Issue 表单
+```
+
+---
+
+### 场景 7：用 Prettier 格式化代码（Web App）
+
+**功能：** 选中代码 → 打开浮动面板显示格式化后的版本 → 复制或粘贴回去。
+
+- **插件类型：** Web App（`displayUI`）
+- **权限：** `["paste", "clipboardWrite"]`
+- **API 文档：** [prettier.io/docs/en/api](https://prettier.io/docs/en/api)（在浏览器沙盒内本地运行，无需网络）
+
+```text
+阅读：https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+构建一个 SwiftBiu Web App 插件，名称"代码格式化"：
+- 输入：context.selectedText（代码）
+- 打开一个浮动窗口（400x500），显示 Prettier 格式化后的代码
+- 在 Web UI 内从 CDN 加载 Prettier（https://unpkg.com/prettier@3/standalone.js）
+- 根据代码内容自动检测语言（JS、TS、CSS、JSON、Markdown）
+- 显示两个按钮："复制"（复制格式化后的代码）和"粘贴"（粘贴回去）
+- 粘贴动作用 window.swiftBiu.pasteText()
+- 面板适配深色/浅色模式
+```
+
+---
+
+### 场景 8：分享选中文字到 WhatsApp / 微信（shareTargets）
+
+**功能：** 选中文字 → 通过 macOS 原生分享直接发到 WhatsApp 或微信——不需要写 JavaScript。
+
+- **插件类型：** `shareTargets`（声明式，无脚本）
+- **权限：** `["share"]`
+- **API 文档：** 纯本地，无需网络（使用 URL Scheme）
+
+```json
+{
+  "identifier": "com.yourname.share-text",
+  "name": "分享文字",
+  "author": "Your Name",
+  "version": "1.0",
+  "actions": [],
+  "permissions": ["share"],
+  "shareTargets": [
+    {
+      "id": "whatsapp",
+      "name": { "en": "Share to WhatsApp", "zh": "分享到 WhatsApp" },
+      "kind": "urlScheme",
+      "supportedContent": ["text", "url"],
+      "urlTemplate": "whatsapp://send?text={{encodedText}}",
+      "webFallback": "https://wa.me/?text={{encodedText}}"
+    },
+    {
+      "id": "wechat",
+      "name": { "en": "Open in WeChat", "zh": "用微信打开" },
+      "kind": "openWithApp",
+      "supportedContent": ["file", "image"],
+      "bundleIdentifiers": ["com.tencent.xinWeChat", "com.tencent.WeChat"]
+    }
+  ]
+}
+```
+
+---
 
 ## 两种插件动作类型
 
-为了满足不同复杂度的需求，SwiftBiu 支持两种不同的插件架构。为了更直观地理解它们的区别，我们以“汇率转换”这一相同功能为例进行对比：
+为了满足不同复杂度的需求，SwiftBiu 支持两种不同的插件架构。为了更直观地理解它们的区别，我们以"汇率转换"这一相同功能为例进行对比：
 
 ### 1. 标准动作 (纯后台逻辑)
 **示例**: `CurrencyConverterLite` (极简汇率换算)
@@ -109,7 +364,7 @@ function performAction(context) {
 "actions": [
   {
     "title": "Lite: 转换选中货币",
-    "script": "script.js" 
+    "script": "script.js"
   }
 ]
 ```
@@ -123,10 +378,7 @@ function performAction(context) {
     function performAction(context) {
         // ... (调用汇率 API 的计算逻辑) ...
         const result = "720 CNY";
-        
-        // 使用原生剪贴板 API 反馈结果
-        SwiftBiu.copyText(result); 
-        // 使用原生通知 API 提示用户
+        SwiftBiu.copyText(result);
         SwiftBiu.showNotification("转换成功", `已复制: ${result}`);
     }
     ```
@@ -140,52 +392,39 @@ function performAction(context) {
 这是最强大灵活的模式。适用于需要复杂交互、表单输入、动画或完整视觉展现的场景。此模式将您的插件变成一个包含 HTML/CSS/JS 的完整微型 Web 应用程序。
 
 #### `manifest.json` 配置
-除了和标准动作一样的入口脚本配置外，您还必须通过根级别的 `ui` 属性声明 Web UI 的入口点：
 
 ```json
 "actions": [
   {
     "title": "Pro: 汇率计算大屏",
-    "script": "script.js" // 用于接收点击事件并拉起 UI
+    "script": "script.js"
   }
 ],
 "ui": {
-  "main": "ui/index.html" // Web App 的入口页面
+  "main": "ui/index.html"
 }
 ```
 
 #### 引发流程与架构隔离 (核心差异)
-在 Web App 模式中，后台脚本 (`script.js`) 不再承担业务计算的任务，而是变成了“启动器”。整个流程分成了清晰的两步，并且**前后台运行在两个物理隔离的沙盒环境中**：
 
-**第一步：后台触发唤起** 
-必须在 `script.js` 的 `performAction` 中**显式地唤起 UI 窗口**：
+**第一步：后台触发唤起**
 ```javascript
 function performAction(context) {
-    const screenSize = SwiftBiu.screenSize;
-    // 拉起承载 index.html 的自定义 Web 窗口
     SwiftBiu.displayUI({
         htmlPath: "ui/index.html",
         width: 320,
         height: 480,
-        // ... 其他配置
     });
 }
 ```
 
 **第二步：前台接管与上下文注入**
-一旦 `displayUI()` 被调用，用户看到的界面将由 `index.html` 中的前端代码接管。并且，您**不需要手动在这两个隔离的沙盒中传递数据**。
-SwiftBiu 会自动将相同的 `context` (如选中的文本) 直接注入到页面的 window 对象中。您只需要在 `ui/index.html` 中定义一个 `swiftBiu_initialize` 钩子即可接收：
-
 ```javascript
 // 在 ui/index.html 中
 window.swiftBiu_initialize = async function (context) {
-    // UI 直接拿到了上下文！
     const text = context.selectedText || "";
     const selectedFiles = context.selectedFiles || [];
     console.log("用户选中了:", text);
-    
-    // 接下来您可以使用 window.swiftBiu.fetch 继续调用 API 
-    // 并将结果更新到 DOM 中...
 };
 ```
 
