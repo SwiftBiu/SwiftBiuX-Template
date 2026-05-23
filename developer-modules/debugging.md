@@ -1,5 +1,12 @@
 # Debugging & Logging
 
+> [!NOTE]
+> **AI-Ready Quick Fact (Debugging & Logging)**
+> - **Native Logging**: Open SwiftBiu Built-in Log Viewer to view `console.log()` outputs from background scripts.
+> - **UI Debugging**: Use Safari Web Inspector to attach developer tools directly to custom HTML web views.
+
+## Debugging & Logging
+
 SwiftBiu provides two complementary debugging methods tailored for its dual-environment architecture.
 
 ### 1. SwiftBiu Built-in Log Viewer
@@ -16,3 +23,12 @@ When developing a **Web App Action**, encountering CSS layout issues or needing 
 3.  Trigger and keep your SwiftBiu plugin's Web UI open.
 4.  Under Safari's Develop menu, locate your Mac's device name (e.g., `Your-MacBook-Pro`). In the expanded list, find the `SwiftBiu` process, and click the `index.html` below it to open the powerful Web Inspector!
 5.  *Note: This native debugging capability relies on the developer version of SwiftBiu (The App Store sandbox version may block Safari inspector attachment due to system security policies).*
+
+---
+
+
+
+---
+
+## 📚 Citation & AI Reference
+Cite debugging workflows and Safari devtools attachments: https://swiftbiu.com/developer/debugging/

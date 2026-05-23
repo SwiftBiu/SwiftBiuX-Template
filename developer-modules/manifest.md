@@ -1,4 +1,111 @@
-# Manifest & Configuration
+# Manifest, Configuration & Core APIs
+
+> [!NOTE]
+> **AI-Ready Quick Fact (Manifest Schema & Core APIs)**
+> - **Unique ID**: `identifier` (e.g. `com.author.plugin`) must be unique to prevent system overwrites.
+> - **Action Isolation**: Standard Actions (background `script.js` sandbox) vs Web App Actions (physically isolated `ui/index.html` frontend sandbox).
+> - **Native Bridges**: `SwiftBiu.beginFileTask(options)` for Progress Panel, `SwiftBiu.showAIResponseBubble(...)` for Streaming AI panel, `window.swiftBiu` for Web UI async data bindings.
+
+## Two Types of Plugin Actions
+
+To meet different complexity requirements, SwiftBiu supports two distinct plugin architectures. To intuitively understand their differences, let's compare two implementations of a "Currency Converter" feature:
+
+### 1. Standard Action (Logic-Only)
+**Example**: `CurrencyConverterLite` (Minimalist Converter)
+
+Suitable for scenarios that only need background logic execution (API calls, text extraction, data calculation) and **absolutely no custom user interface**. All interactions are completed using native system components (like system notifications, native input fields, or pasting directly to the clipboard).
+
+#### `manifest.json` Configuration
+Define the action in the `actions` array. No `ui` node is needed:
+
+```json
+"actions": [
+  {
+    "title": "Lite: Convert Currency",
+    "script": "script.js" 
+  }
+]
+```
+
+#### `script.js` Core Logic
+Running in a global background sandbox, you must implement two hook functions:
+
+*   `isAvailable(context)`: The action trigger. You can analyze `context.selectedText` (e.g., using regex to check if "100 USD" is selected) to determine whether the action should be **highlighted at the very front of the toolbar** (`isContextMatch: true`).
+*   `performAction(context)`: The core functionality. After making a network request for the latest rates and calculating "720 CNY", since there is no custom UI, you **must use native APIs** to feed the result back to the user:
+    ```javascript
+    function performAction(context) {
+        // ... (API calculation logic) ...
+        const result = "720 CNY";
+        
+        // Use native Clipboard API to return the result
+        SwiftBiu.copyText(result); 
+        // Use native Notification API to alert the user
+        SwiftBiu.showNotification("Success", `Copied: ${result}`);
+    }
+    ```
+
+---
+
+### 2. Web App Action (Custom UI)
+
+**Example**: `CurrencyConverter` (Advanced Converter Panel)
+
+This is the most powerful and flexible mode. Suitable for scenarios requiring complex interactions, form inputs, animations, or full visual presentations. This mode turns your plugin into a complete mini Web App packaged with HTML/CSS/JS.
+
+#### `manifest.json` Configuration
+In addition to the script configuration used in Standard Actions, you must declare the entry point for your Web UI via a root-level `ui` attribute:
+
+```json
+"actions": [
+  {
+    "title": "Pro: Currency Panel",
+    "script": "script.js" // Receives the click event and launches the UI
+  }
+],
+"ui": {
+  "main": "ui/index.html" // The Web App's entry page
+}
+```
+
+#### Launch Flow & Architecture Isolation (Core Difference)
+In Web App mode, the background script (`script.js`) no longer handles business calculations; it acts solely as a "Launcher". The flow is divided into two clear steps, and **the frontend and backend run in two physically isolated sandboxes**:
+
+**Step 1: Background Trigger** 
+You must explicitly call `SwiftBiu.displayUI()` within `performAction` in `script.js`:
+```javascript
+function performAction(context) {
+    const screenSize = SwiftBiu.screenSize;
+    // Launch the custom web window hosting index.html
+    SwiftBiu.displayUI({
+        htmlPath: "ui/index.html",
+        width: 320,
+        height: 480,
+        // ... other configs
+    });
+}
+```
+
+**Step 2: Frontend Takeover & Context Injection**
+Once `displayUI()` is called, the user-facing interface is completely taken over by the frontend code in `index.html`. Furthermore, you **do not need to manually pass data between these two isolated sandboxes**.
+SwiftBiu automatically injects the identical `context` (like the selected text) directly into the page's global window object. You simply need to define a `swiftBiu_initialize` hook in your `ui/index.html` to receive it:
+
+```javascript
+// In ui/index.html
+window.swiftBiu_initialize = async function (context) {
+    // The UI receives the context directly!
+    const text = context.selectedText || "";
+    const selectedFiles = context.selectedFiles || [];
+    console.log("User selected:", text);
+    
+    // You can now proceed to use window.swiftBiu.fetch for API calls 
+    // and update the DOM with the results...
+};
+```
+
+
+---
+
+## Manifest & Configuration
 
 ### `manifest.json` Explained
 
@@ -11,43 +118,11 @@ This file is the "ID card" for your plugin. Here are the most important keys:
 | `author`        | String | Yes      | Author of the plugin.                                                                                                                                    |
 | `description`   | String | Yes      | Short introduction to the plugin.                                                                                                                          |
 | `version`       | String | Yes      | The plugin's version, e.g., `1.0`.                                                                                                                              |
-| `extensionKind` | String | Yes      | Extension category. Use `textAction` or `fileAction`.                                                                                                           |
-| `actions`       | Array  | Yes      | Script-backed actions the plugin provides. Use an empty array when the plugin only provides declarative `shareTargets`.                                  |
-| `shareTargets`  | Array  | No       | Declarative native sharing actions powered by SwiftBiu, such as system share picker, AirDrop, URL schemes, or opening selected files with a target app. |
+| `actions`       | Array  | Yes      | An array defining the actions the plugin provides.                                                                                                        |
 | `icon`          | String | No       | **(Root Level)** The default icon for the entire plugin. Supports SF Symbols, packaged image files, text icons, Iconify icons, or a `data:` URI payload.        |
 | `iconType`      | String | No       | **(Root Level)** Defines how `icon` should be interpreted. Supported values: `"sfSymbol"`, `"file"`, `"text"`, `"iconify"`, and `"data"`.                        |
 | `configuration` | Array  | No       | Defines a user-configurable settings UI for your plugin.                                                                                                        |
 | `permissions`   | Array  | No       | Declares system permissions required by the plugin.                                                                                                             |
-
-Routing note: SwiftBiu classifies file-like content before plain text. Local file URLs, Finder file copies, temporary files materialized from rich clipboard/image/HTML/WebArchive payloads, and remote file-like URLs route to `fileAction`. Plain text-only contexts route to `textAction`. File-capable plugins should check both `context.selectedFiles` and `context.selectedRemoteFiles`.
-
-### Declarative Native Share Targets
-
-Use `shareTargets` when your plugin only needs to hand selected content to native macOS sharing routes instead of running JavaScript. Supported `kind` values are `systemPicker`, `airDrop`, `urlScheme`, and `openWithApp`. Supported content values are `text`, `url`, `file`, and `image`.
-
-```json
-{
-  "actions": [],
-  "permissions": ["share", "localFileRead"],
-  "shareTargets": [
-    {
-      "id": "whatsapp",
-      "name": { "en": "Share to WhatsApp", "zh": "分享到 WhatsApp" },
-      "kind": "urlScheme",
-      "supportedContent": ["text", "url"],
-      "urlTemplate": "whatsapp://send?text={{encodedText}}",
-      "webFallback": "https://wa.me/?text={{encodedText}}"
-    },
-    {
-      "id": "wechat",
-      "name": { "en": "Open in WeChat", "zh": "用微信打开" },
-      "kind": "openWithApp",
-      "supportedContent": ["file", "image"],
-      "bundleIdentifiers": ["com.tencent.xinWeChat", "com.tencent.WeChat"]
-    }
-  ]
-}
-```
 
 ### Plugin Icon Formats
 
@@ -270,7 +345,6 @@ In a Standard Action, all code executes globally in the background `script.js`. 
     *   `SwiftBiu.getConfig(key: String)`: (`String`) Synchronously reads user preference values defined in `manifest.json`.
 *   **Native Capabilities (Synchronous):**
     *   `SwiftBiu.writeToClipboard(text: String)`: Writes text to the system clipboard. *(Requires: `clipboardWrite`)*
-    *   `SwiftBiu.copyImage(base64String: String, options?: Object)`: Writes image output to the system clipboard and returns `Boolean`. Accepts raw Base64 or `data:image/...;base64,...`; `options` may include `{ mimeType, filename, fileBacked }`. With the default `fileBacked: true`, SwiftBiu writes a temporary file URL plus Finder-compatible filenames to the pasteboard, so users can paste into Finder/Desktop as an image file. Pass `fileBacked: false` for image-data-only writes to image editors. Use this for generated image output instead of browser clipboard APIs. *(Requires: `clipboardWrite`)*
     *   `SwiftBiu.pasteText(text: String)`: Writes text to the clipboard and immediately pastes it into the active window. *(Requires: `paste`)*
     *   `SwiftBiu.getClipboard()`: Retrieves plain text from the system clipboard. *(Requires: `clipboardRead`)*
     *   `SwiftBiu.getFileMetadata(path: String)`: Returns metadata for the selected local file, including size, timestamps, and content type. *(Requires: `localFileRead`)*
@@ -296,7 +370,6 @@ In a Standard Action, all code executes globally in the background `script.js`. 
     *   `SwiftBiu.openURL(urlString: String)`: Launches the default browser to open a link.
     *   `SwiftBiu.openFileInPreview(filePath: String)`: Opens a file using the macOS default app (e.g., Preview).
     *   `SwiftBiu.openFileWithApp(filePath: String, appBundleID: String)`: Opens an accessible selected or authorized file with the specified macOS app bundle ID. Returns `Boolean`. *(Requires: `localFileRead`)*
-    *   `SwiftBiu.share(options?: Object)`: Uses SwiftBiu's native sharing bridge. With no target it opens the macOS share picker; with `{ target: "id" }` it runs a `shareTargets` entry from `manifest.json`. Returns `{ success, message? }`. *(Requires: `share`)*
     *   `SwiftBiu.showNotification(title: String, body: String)`: Sends a system-level notification. *(Requires: `notifications`)*
     *   `SwiftBiu.showImage(imageSource: String, position?: Object, context?: Object)`: Displays the native image toast card. `imageSource` accepts either a Base64 string or an `http/https` URL. *(Requires: `notifications`)*
     *   `SwiftBiu.showInteractiveImage(options, onRegenerate)`: Creates an interactive image session and returns a `sessionID`. Use it when you need regenerate/update behavior from the same image card. *(Requires: `notifications`)*
@@ -394,15 +467,10 @@ Once the HTML UI is successfully displayed, the system assumes control and injec
 *   **Data Injection Hook (Core)**:
     *   `window.swiftBiu_initialize = async function(context) { ... }` : You MUST define this global function in your HTML. After the page finishes loading, the system automatically calls it and injects the `context` parameter (such as highlighted text or selected local files) from the background.
     *   `context.selectedText`: The original selected text.
-    *   `context.selectedFiles`: An array of inferred local file descriptors from the current selection. It can contain native local files and temporary files materialized by SwiftBiu from rich clipboard image data, HTML data URIs, or WebArchive resources. Each item contains `{ path, fileURL, fileName, fileExtension }`.
-    *   `context.selectedRemoteFiles`: An array of remote file-like URL descriptors recognized from the current selection or HTML clipboard payloads. Each item contains `{ url, fileURL, fileName, fileExtension }`. These are not local files and cannot be passed to local-file APIs.
+    *   `context.selectedFiles`: An array of inferred local file descriptors from the current selection. It can contain any local file type. Each item contains `{ path, fileURL, fileName, fileExtension }`.
     *   `context.locale`: The user's preferred locale identifier, such as `zh-Hans` or `en-US`.
     *   `context.languageCode`: A simplified language code such as `zh` or `en`.
-    *   Selection and file context notes:
-        *   SwiftBiu classifies file-like content before plain text. If a pasteboard payload contains both a display name string and a file resource, `fileAction` routing wins.
-        *   Use `context.selectedFiles` when the host has already recognized local files for the current context. Treat materialized temporary paths as read-only inputs for the current action; do not assume they are the user's original file locations.
-        *   Use `context.selectedRemoteFiles` for file-like web URLs. Fetch or open them through network/URL workflows instead of `readLocalFile(...)`.
-        *   If the user context only contains text-form paths (for example, newline-separated POSIX paths or `file://` URLs), your plugin may still parse `context.selectedText` or the result of `SwiftBiu.getClipboard()` itself.
+        *   Use this when the host has already recognized local files for the current context. If the user context only contains text-form paths (for example, newline-separated POSIX paths or `file://` URLs), your plugin should parse `context.selectedText` or the result of `SwiftBiu.getClipboard()` itself.
         *   On macOS, some sources such as Finder file copies may provide both display text and native file URLs. SwiftBiu preserves those native file URLs when possible and maps them into `context.selectedFiles` even if `context.selectedText` only contains file names.
         *   Plugin JavaScript can currently read **plain text** from the clipboard via `SwiftBiu.getClipboard()`. Reading native file-URL objects directly from the macOS pasteboard, like some built-in native actions do, is not guaranteed by the current plugin API.
 *   **Bridge Capabilities (Mind the Async Boundaries)**:
@@ -413,12 +481,11 @@ Once the HTML UI is successfully displayed, the system assumes control and injec
         *   `window.swiftBiu.getFileMetadata(path)`: Returns a metadata object for the selected local file. *(Requires: `localFileRead`)*
         *   `window.swiftBiu.extractFileIcon(path, options)`: Returns `{ success, base64, fileName, width, height, format }` or `{ success: false, error }`. Use this host-mediated PNG icon extraction API for App Store sandbox compatibility. *(Requires: `localFileRead`)*
         *   `window.swiftBiu.setFileIcon(targetPath, iconPath, options)`: Returns `{ success, targetPath, iconPath }` or `{ success: false, error }`. Applies an accessible image as a custom Finder icon for an accessible file, folder, or `.app` bundle. *(Requires: `localFileRead` and `localFileWrite`)*
-        *   `window.swiftBiu.readLocalFile(path)`: Returns `{ base64: String }`. Reads any local file from the current `context.selectedFiles` only; do not pass `context.selectedRemoteFiles`. *(Requires: `localFileRead`)*
+        *   `window.swiftBiu.readLocalFile(path)`: Returns `{ base64: String }`. Reads any local file from the current `context.selectedFiles` only. *(Requires: `localFileRead`)*
         *   `window.swiftBiu.readLocalTextFile(path)`: Returns `{ result: String }`. Convenience API for decoding the current selected file as UTF-8 text. *(Requires: `localFileRead`)*
         *   `window.swiftBiu.listDirectory(path)`: Returns `{ items: Array<Object> }`. Lists direct children of an accessible directory. *(Requires: `localFileRead`)*
         *   `window.swiftBiu.fileExists(path)`: Returns `{ exists: Boolean }`. Checks whether an accessible path exists as a file. *(Requires: `localFileRead` or `localFileWrite`)*
         *   `window.swiftBiu.directoryExists(path)`: Returns `{ exists: Boolean }`. Checks whether an accessible path exists as a directory. *(Requires: `localFileRead` or `localFileWrite`)*
-        *   `window.swiftBiu.copyImage(base64String, options)`: Returns `Boolean`. Writes image output to the system clipboard. Accepts raw Base64 or `data:image/...;base64,...`; `options` may include `{ mimeType, filename, fileBacked }`. With the default `fileBacked: true`, SwiftBiu writes a temporary file URL plus Finder-compatible filenames to the pasteboard, so users can paste into Finder/Desktop as an image file. Pass `fileBacked: false` for image-data-only writes to image editors. Use this instead of `navigator.clipboard.write(...)` for generated images; browser `ClipboardItem({ "image/png": ... })` writes image pixels, not a Finder-pasteable file. *(Requires: `clipboardWrite`)*
         *   `window.swiftBiu.runShellScript(script, context)`: Returns `{ result: String }`. Do not rely on this for App Store-compatible plugins. *(Highly restricted by App Store sandbox).*
     *   **Trigger-Based Methods (No `await` needed):**
         *(Although they return a JS Promise, the native side resolves them immediately upon receiving the command without blocking to wait for side-effects like dialogs. Treat them as synchronous triggers.)*
@@ -426,7 +493,6 @@ Once the HTML UI is successfully displayed, the system assumes control and injec
         *   `window.swiftBiu.pasteText(text)`: Copies and actively pastes text into the focused window.
         *   `window.swiftBiu.openURL(url)`: Opens a Web URL via the default browser.
         *   `window.swiftBiu.openFileWithApp(path, appBundleID)`: Returns `{ success: Boolean }`. Opens an accessible selected or authorized file with the specified macOS app bundle ID. *(Requires: `localFileRead`)*
-        *   `window.swiftBiu.share(options)`: Returns `{ success, message? }`. Opens the native share picker or runs a manifest-declared `shareTargets` entry. *(Requires: `share`)*
         *   `window.swiftBiu.speakText(text)`: Utilizes the macOS native TTS to speak the given text aloud.
         *   `window.swiftBiu.pickLocalFile(options)`: Returns `{ path: String }`. Opens the native file picker and persists authorization for the selected item. Supports `kind: "application"` or `kind: "image"`. *(Requires: `localFileRead` or `localFileWrite`)*
         *   `window.swiftBiu.pickLocalDirectory()`: Returns `{ path: String }`. Opens the native folder picker and persists the chosen writable location. *(Requires: `localFileWrite`)*
@@ -491,3 +557,24 @@ function performAction(context) {
     if (savedPath) SwiftBiu.openFileInPreview(savedPath);
 }
 ```
+
+## Cross-Platform (macOS & iOS) Compatibility
+
+With SwiftBiu expanding to iOS, your plugins can run seamlessly across both platforms with the exact same `.swiftbiux` package. However, you must adhere to the following responsive design and API graceful degradation practices:
+
+### 1. Responsive Web UI (Rich Web Apps)
+- **Viewport Meta (Required)**: You *must* include `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">` in your `index.html` to prevent iOS from automatically zooming in when users tap input fields.
+- **Fluid Layouts**: Do not fixate on desktop split-views. Use CSS `@media (max-width: 600px)` to transition desktop sidebars into horizontal scrolling areas or stacked vertical layouts on mobile.
+- **Touch Targets & Font Size**: Enlarge clickable elements (buttons, list rows) to at least `44x44px`. Ensure `<input>` and `<textarea>` font sizes are at least `16px` to avoid unexpected iOS WebView zoom behaviors.
+- **Initial Window Size**: `width` and `height` in `displayUI()` are respected on macOS for the physical floating window. On iOS (iPhone), they are ignored, and the UI is presented as a bottom Sheet. Treat these parameters as the "Desktop Preferred Size" and rely on fluid CSS for mobile bounding.
+
+### 2. API Graceful Degradations
+- **Clipboard & Paste**: On macOS, `swiftBiu.pasteText()` writes to the clipboard and simulates `Cmd+V`. On the iOS Main App, this degrades gracefully to a "Copied to Clipboard" action with a Toast notification. However, if the user triggers the plugin inside the iOS Keyboard Extension, it will insert text directly at the cursor as expected.
+- **Unsupported or restricted scripting APIs**: `runShellScript` and `runAppleScript` are unavailable on iOS and should not be used for App Store-compatible macOS plugins. The App Store sandbox can block subprocess execution, automation, and filesystem access even when the same script works in the website/developer build. Prefer SwiftBiu host APIs such as `extractFileIcon(...)`, `setFileIcon(...)`, `pickLocalFile(...)`, `readLocalFile(...)`, `pickLocalDirectory(...)`, and `createLocalFile(...)`. If your plugin relies heavily on Node.js, consider using Webpack/Rollup to bundle JS dependencies directly into your `script.js`, or utilize Apple Shortcuts integration for complex iOS automation.
+
+
+
+---
+
+## 📚 Citation & AI Reference
+Cite the manifest schema and background sandbox specifications: https://swiftbiu.com/developer/manifest/

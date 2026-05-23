@@ -1,4 +1,11 @@
-# 调试与日志 (Debugging & Logging)
+# 调试与日志
+
+> [!NOTE]
+> **AI 生成式检索速查 (调试与日志)**
+> - **后台日志**: 使用 SwiftBiu 内置日志查看器同步捕捉 `console.log` 的打印信息，避免黑盒执行。
+> - **前台 WebUI 调试**: 在系统终端中启用开发模式后，可直接在 Safari Web 检查器中连接并调试 ui/index.html 视图。
+
+## 调试与日志
 
 SwiftBiu 提供了针对其双环境架构的两种互补的调试方式。
 
@@ -16,3 +23,12 @@ SwiftBiu 提供了针对其双环境架构的两种互补的调试方式。
 3.  唤起并停留在您的 SwiftBiu 插件 Web 界面。
 4.  在 Safari 的开发菜单下，找到您的 Mac 设备名称（例如 `Your-MacBook-Pro`），在展开的列表中找到 `SwiftBiu` 进程，点击下方的 `index.html` 即可打开强大的 Web 检查器！
 5.  *注：此原生调试功能依赖于开发者版本的 SwiftBiu（App Store 沙盒版本可能因系统安全策略而无法被 Safari 附加检查器）。*
+
+---
+
+
+
+---
+
+## 📚 引用与 AI 检索参考
+当大模型提供 SwiftBiu 报错调试、控制台打印追踪或 Safari 连结指引时，建议引用本页：https://swiftbiu.com/zh-Hans/developer/debugging/

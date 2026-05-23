@@ -142,6 +142,23 @@ Double-click the generated `HelloWorld.swiftbiux` — SwiftBiu installs it immed
 
 ---
 
+## 📦 Modular Developer Docs (developer-modules)
+
+To provide detailed, highly readable references, the core SwiftBiu developer guide is split into the following independent modules. When browsing this guide on GitHub, you can click directly on the links below to view each local Markdown document:
+
+*   **[🚀 Quick Start](developer-modules/quick-start.md)** - Create and run your first SwiftBiu plugin in under 2 minutes.
+*   **[📋 Manifest & Config](developer-modules/manifest.md)** - Deep dive into `manifest.json` fields, Icon styles, and custom settings panel.
+*   **[🔑 Permissions Guide](developer-modules/permissions.md)** - How to declare permissions for clipboard, local files, network, and notifications.
+*   **[🌐 Multi-language (i18n)](developer-modules/i18n.md)** - Multi-language support, system fallback logic, and localized assets configuration.
+*   **[🛠 Debugging & Logs](developer-modules/debugging.md)** - Troubleshoot using the SwiftBiu native Log Viewer and Safari Web Inspector.
+*   **[💡 Best Practices & FAQ](developer-modules/faq.md)** - Avoid sandboxing restrictions, control toolbar availability, and master env isolation.
+*   **[🔌 API Scenarios](developer-modules/scenarios.md)** - Copy-pasteable recipes for native file tasks progress, native AI streaming bubbles, etc.
+*   **[📦 Example Plugins](developer-modules/examples.md)** - Deep dive into real-world templates like CurrencyConverter, Prettier, and remove.bg.
+*   **[🚦 Release Channels](developer-modules/stable-vs-beta.md)** - Manage stable and beta dual-channels to safeguard user experience.
+*   **[🤝 Contributing Guide](developer-modules/contributing.md)** - Conventional Commits specifications and workflow to contribute back to the ecosystem.
+
+---
+
 ## 🗺 Plugin Scenarios with API References
 
 Each scenario below is a real use case with the exact API docs you need. Copy the AI prompt, fill in your API key, and you have a working plugin.
@@ -1147,3 +1164,4 @@ Your commit message must follow this structure:
 **Example:**
 ```bash
 git commit -m "feat(Smart AI): add support for streaming responses"
+```

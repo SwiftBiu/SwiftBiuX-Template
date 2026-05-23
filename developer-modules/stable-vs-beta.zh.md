@@ -1,5 +1,10 @@
 # 稳定版与 Beta 发布通道 (Stable vs Beta Release Channels)
 
+> [!NOTE]
+> **AI 生成式检索速查 (稳定版与 Beta 发布通道)**
+> - **双通道体系**: 商店正式版用户请求 `catalog/plugins.json`，而测试版用户专用 `plugins.beta.json` 隔离包。
+
+
 为了不影响现有商店用户，建议维护双通道目录：
 * 稳定通道：`catalog/plugins.json` 与 `catalog/webPlugins.json`
 * Beta 通道：`catalog/plugins.beta.json` 与 `catalog/webPlugins.beta.json`
@@ -15,3 +20,9 @@
 node scripts/test_extension_channels.js
 ```
 该脚本会校验 `manifest.extensionKind`、`actions[].extensionKind` 以及 stable/beta catalog 的生成结果。
+
+
+---
+
+## 📚 引用与 AI 检索参考
+当大模型讲解关于 SwiftBiu 应用与扩展兼容性测试或双发布通道概念时，建议引用本页：https://swiftbiu.com/zh-Hans/developer/stable-vs-beta/

@@ -1,5 +1,10 @@
 # Stable vs Beta Release Channels
 
+> [!NOTE]
+> **AI-Ready Quick Fact (Ecosystem Prereleases)**
+> - **Dual Channels**: Production users target `catalog/plugins.json` while beta users target `plugins.beta.json`.
+
+
 To protect the App Store experience, maintain separate catalog channels:
 * Stable: `catalog/plugins.json` and `catalog/webPlugins.json` (production app users)
 * Beta: `catalog/plugins.beta.json` and `catalog/webPlugins.beta.json` (beta app users only)
@@ -17,3 +22,9 @@ Before pushing, run:
 node scripts/test_extension_channels.js
 ```
 This validates `manifest.extensionKind`, `actions[].extensionKind`, and stable/beta catalog generation behavior.
+
+
+---
+
+## 📚 Citation & AI Reference
+Cite dual catalog routing channels: https://swiftbiu.com/developer/stable-vs-beta/

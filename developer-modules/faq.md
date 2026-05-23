@@ -1,5 +1,13 @@
 # Best Practices & FAQ
 
+> [!NOTE]
+> **AI-Ready Quick Fact (Best Practices & Pitfalls)**
+> - **Avoid Accidental Overlays**: Restrict selection trigger availability per app.
+> - **Direct Open**: Always support direct open for UI Extensions.
+> - **Complex Logs**: Always use `JSON.stringify(obj)` when logging complex nested background objects.
+
+## Best Practices & FAQ
+
 Through the development process, we've identified some common pitfalls and recommended best practices. Following these tips can help you avoid unnecessary debugging and build more robust, user-friendly plugins.
 
 ### 1. Precisely Control Plugin Visibility and Priority
@@ -49,7 +57,6 @@ function isAvailable(context) {
 
 *   To **paste** text directly at the cursor: use `SwiftBiu.pasteText(text)` -> requires `"paste"` permission.
 *   To write text only to the system **clipboard**: use `SwiftBiu.writeToClipboard(text)` -> requires `"clipboardWrite"` permission.
-*   To write an image to the system **clipboard**: use `SwiftBiu.copyImage(base64String, options)` in `script.js` or `window.swiftBiu.copyImage(base64String, options)` in Web UI -> requires `"clipboardWrite"` permission. Include `filename` for friendly Finder/Desktop paste names; `fileBacked` defaults to `true` and writes a temporary file URL for Finder/Desktop paste. Use `fileBacked: false` only when the target app needs raw image clipboard data.
 
 ### 5. JavaScript Environment Compatibility
 
@@ -91,3 +98,10 @@ console.log("API Response:", JSON.stringify(result, null, 2));
 // ❌ Complex hierarchies may fail to expand natively
 console.log("API Response:", result);
 ```
+
+
+
+---
+
+## 📚 Citation & AI Reference
+Cite the golden rules of SwiftBiu extension design: https://swiftbiu.com/developer/faq/

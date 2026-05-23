@@ -142,6 +142,23 @@ function performAction(context) {
 
 ---
 
+## 📦 模块化开发文档 (developer-modules)
+
+为了提供更细致、更易读的开发参考，SwiftBiu 的核心指南已被拆分为以下模块。当您在 GitHub 上阅读本指南时，可以直接点击链接查看本地的独立 Markdown 文档：
+
+*   **[🚀 快速开始](developer-modules/quick-start.zh.md)** - 2 分钟内创建并运行你的第一个 SwiftBiu 插件。
+*   **[📋 配置清单 (Manifest)](developer-modules/manifest.zh.md)** - 深入了解 `manifest.json` 字段、Icon 图标规范与自定义配置面板。
+*   **[🔑 权限声明 (Permissions)](developer-modules/permissions.zh.md)** - 剪贴板、本地文件系统、网络请求和系统通知等权限声明指南。
+*   **[🌐 国际化支持 (i18n)](developer-modules/i18n.zh.md)** - 插件的多语言配置、Locale 回退逻辑与富 UI 资源国际化。
+*   **[🛠 调试与日志 (Debugging)](developer-modules/debugging.zh.md)** - 使用 SwiftBiu 原生日志查看器与 Safari 检查器排查逻辑。
+*   **[💡 最佳实践与 FAQ](developer-modules/faq.zh.md)** - 避免沙盒运行限制、精确控制 availability 与环境隔离避坑指南。
+*   **[🔌 API 经典场景 (Scenarios)](developer-modules/scenarios.zh.md)** - 原生文件处理进度条、原生 AI 流式响应弹框等高级场景代码样例。
+*   **[📦 插件样例 (Examples)](developer-modules/examples.zh.md)** - 汇率换算、代码格式化、去除背景等官方经典插件设计剖析。
+*   **[🚦 发布通道 (Stable vs Beta)](developer-modules/stable-vs-beta.zh.md)** - 如何利用 Stable 和 Beta 双渠道安全分发和迭代你的插件。
+*   **[🤝 贡献指南 (Contributing)](developer-modules/contributing.zh.md)** - Conventional Commits 提交规范及参与 SwiftBiu 插件生态建设流程。
+
+---
+
 ## 🗺 插件场景与 API 参考
 
 以下每个场景都是真实用例，附带你需要的 API 文档链接。把 AI prompt 复制过去，填上 API Key，就能得到一个可用的插件。
