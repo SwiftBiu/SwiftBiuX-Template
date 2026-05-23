@@ -2,56 +2,105 @@
 
 # SwiftBiu Plugin Development Guide
 
-Welcome to the SwiftBiu plugin development world! This guide will help you create powerful plugins using modern web technologies.
+SwiftBiu plugins run in any macOS app — select text, drag files, or capture a screen region, and your plugin fires instantly. You write JavaScript; SwiftBiu handles the rest. No Swift, no Xcode, no App Store review cycle.
 
-With SwiftBiu's "Rich Web Application" model, you can build plugins with custom user interfaces using HTML, CSS, and JavaScript, providing a seamless, native-like experience for users.
+**What you can build in one afternoon:**
+- Translate selected text inline with DeepL or Google Translate
+- Rename a folder of screenshots by date with a single click
+- Send selected text to OpenAI and paste the rewritten result back
+- Remove image backgrounds from selected files using remove.bg
+- Open a GitHub issue from any selected text, pre-filled and ready to submit
 
-## 🤖 AI-Assisted Development
-
-Want AI to generate plugin code for you instantly?
-
-This template repository includes our official **AI Skill** document located at `AI_SKILL.md`. This file contains the complete SwiftBiuX plugin development specifications (including cross-platform UI responsiveness rules, permission mechanisms, and API degradation strategies).
-
-**How to use it:**
-Simply provide the `AI_SKILL.md` file as context to your favorite AI code assistant (like **Cursor**, **GitHub Copilot**, or **Smart AI**) and describe your idea in natural language.
-*Prompt Example:*
-> "Read the `AI_SKILL.md` file. Build a Rich Web App plugin named `TextCounter` that provides real-time character and word counting."
-
-The AI will intelligently follow our guidelines to generate flawless, mobile-ready plugin code for you!
+→ [Ship your first plugin in under 2 minutes](#-demo-1-text-plugin-say-hello-to-selected-text)
 
 ---
 
-## Quick Start
+## 🚀 Demo 1: Text Plugin — Say "Hello" to Selected Text
 
-This section will guide you to create and run your first "Hello World" plugin within 5 minutes.
+> **No setup needed.** Copy the prompt below, paste it into any AI assistant (Claude, ChatGPT, Cursor, Copilot…), and you'll have a working `.swiftbiux` plugin in under 2 minutes.
 
-> **💡 Tip**: SwiftBiu supports two plugin complexities (UI-less logic plugins, and Web App plugins with native interfaces). To help you experience the full workflow as fast as possible, this tutorial will guide you in writing the simplest **Logic-only Action Plugin (Standard Plugin)**.
+```text
+Read the SwiftBiu plugin specification:
+https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
 
-## 🚀 Quick Start (Recommended)
+Build a SwiftBiu plugin:
+Name: HelloText
+Input: selected text (context.selectedText)
+Job: prepend "Hello, " to the selected text
+Output: paste the result back in place of the original selection
 
-The easiest way to start building a SwiftBiuX plugin is using our official CLI scaffolding tool. It generates a ready-to-use, cross-platform template in seconds.
+Requirements:
+- extensionKind: textAction
+- Pure JS, no Web App UI needed
+- Generate manifest.json and script.js
+- Package with ./scripts/build_plugin.sh
+- If packaging fails, leave the folder and tell me the manual command
+```
+
+**What you get:** a `HelloText.swiftbiux` file. Double-click it, SwiftBiu installs it. Select any text, click the plugin — done.
+
+---
+
+## 📁 Demo 2: File Plugin — Quick-Move Files by Extension
+
+> **Local only, no API key.** This plugin reads selected files and moves them into subfolders grouped by file extension. Nothing leaves your machine.
+
+```text
+Read the SwiftBiu plugin specification:
+https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+Build a SwiftBiu plugin:
+Name: FileSorter
+Input: selected files (context.selectedFiles)
+Job: move each file into a subfolder named after its extension (e.g. pdf/, jpg/, mp4/) inside the same parent directory
+Output: show a SwiftBiu notification with "Moved X files, skipped Y"
+
+Requirements:
+- extensionKind: fileAction
+- permissions: ["localFileRead", "localFileWrite", "notifications"]
+- Local file APIs only — no network calls, no API key
+- If no files are selected, show a notification explaining that and return without doing anything
+- If a single move fails, count it as skipped and continue with the rest
+- Package with ./scripts/build_plugin.sh
+```
+
+**What you get:** select a pile of mixed files in Finder, trigger the plugin, and they sort themselves.
+
+---
+
+## 🛠 Manual Setup (for developers who want full control)
+
+The AI demos above already produce installable plugins. This section is for you if you want to understand the structure, write plugins by hand, or set up a proper dev workflow.
+
+### Option A: CLI scaffold (fastest)
 
 ```bash
 npx create-swiftbiux-plugin <YourPluginName>
 ```
 
-Alternatively, if you prefer to clone this entire repository:
+This generates a ready-to-use folder with `manifest.json`, `script.js`, and the packaging script wired up.
 
-### Step 1: Get the Development Template
-To jumpstart your development, we provide an out-of-the-box plugin template repository with built-in packaging scripts and directory structures.
-Open your terminal, clone the template to your local machine, and enter the directory:
+### Option B: Clone the template repo
 
 ```bash
 git clone https://github.com/SwiftBiu/SwiftBiuX-Template.git
 cd SwiftBiuX-Template
 ```
 
-### Step 2: Write Hello World
-Inside the repository directory, create a new folder named `HelloWorld`. A minimalistic SwiftBiu plugin requires at least two files.
+### Codex one-command install
 
-**1. Create `manifest.json` (Plugin Configuration)**
-This is the identity card of your plugin. Create this file in the `HelloWorld` directory and paste the following:
+If you use Codex, install the SwiftBiuX skill first. After installation, restart Codex or open a new session, then search for `swiftbiux`.
 
+```bash
+curl -fsSL https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/scripts/install-codex-skill.sh \
+  | bash
+```
+
+### Minimal plugin structure
+
+A plugin needs exactly two files:
+
+**`manifest.json`**
 ```json
 {
   "identifier": "com.yourname.helloworld",
@@ -70,33 +119,233 @@ This is the identity card of your plugin. Create this file in the `HelloWorld` d
 }
 ```
 
-**2. Create `script.js` (Core Logic)**
-Still in the `HelloWorld` directory, create `script.js`. When a user clicks your plugin in SwiftBiu, this code will execute:
-
+**`script.js`**
 ```javascript
 function isAvailable(context) {
-    // Returning true means this plugin action is always visible in the menu
-    return true; 
+    return true;
 }
 
 function performAction(context) {
-    // Pop up a system notification
-    SwiftBiu.showNotification("🎉 Hello!", "Welcome to the world of SwiftBiu plugin development!");
+    SwiftBiu.showNotification("🎉 Hello!", "Welcome to SwiftBiu plugin development!");
 }
 ```
 
-### Step 3: Package and Witness the Magic
-The code is ready! Return to the repository root directory (which contains the `scripts` folder) and run the packaging script in your terminal, passing your plugin folder name as an argument:
+### Package and install
 
 ```bash
 ./scripts/build_plugin.sh HelloWorld
 ```
 
-**🎉 Success!**
-Once the command finishes, you will find a generated `HelloWorld.swiftbiux` distribution file in the directory.
-Simply **double-click** this file, and SwiftBiu will automatically launch and install your plugin. Bring up the SwiftBiu menu, click the "Say Hello" button, and look at the notification popping up in the top right corner!
+Double-click the generated `HelloWorld.swiftbiux` — SwiftBiu installs it immediately.
 
-> Once you've mastered the basic flow, you can continue reading the next section to learn about deeper plugin architecture design.
+> If the build script fails, check the [Debugging & Logging](#debugging--logging) section.
+
+---
+
+## 🗺 Plugin Scenarios with API References
+
+Each scenario below is a real use case with the exact API docs you need. Copy the AI prompt, fill in your API key, and you have a working plugin.
+
+### Scenario 1: Inline Translation with DeepL
+
+**What it does:** Select any text → translate it to your target language → paste the result back in place.
+
+- **Plugin type:** `textAction`
+- **Permissions:** `["network", "paste"]`
+- **API docs:** [developers.deepl.com/docs](https://developers.deepl.com/docs)
+- **API key:** stored in `manifest.json` `configuration` with `type: "secure"`
+
+```text
+Read: https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+Build a SwiftBiu textAction plugin named "DeepL Translate":
+- Input: context.selectedText
+- Call the DeepL Free API (https://api-free.deepl.com/v2/translate) with the selected text
+- Target language is configurable via a "secure" configuration key named "deepl_api_key" and a "string" key named "target_lang" (default "EN-US")
+- Output: paste the translated text back in place using SwiftBiu.pasteText()
+- Show a notification if the API key is missing
+- API docs: https://developers.deepl.com/docs/api-reference/translate
+```
+
+---
+
+### Scenario 2: AI Rewriting with OpenAI
+
+**What it does:** Select a paragraph → rewrite it in a chosen tone (professional, casual, concise) → paste the result back.
+
+- **Plugin type:** `textAction`
+- **Permissions:** `["network", "paste", "notifications"]`
+- **API docs:** [platform.openai.com/docs/api-reference/chat](https://platform.openai.com/docs/api-reference/chat)
+- **API key:** stored as `type: "secure"` in configuration
+
+```text
+Read: https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+Build a SwiftBiu textAction plugin named "AI Rewriter":
+- Input: context.selectedText
+- Call OpenAI Chat Completions API (https://api.openai.com/v1/chat/completions) with model gpt-4o-mini
+- System prompt: "Rewrite the following text to be more {tone}. Return only the rewritten text."
+- "tone" is a dropdown configuration key with options: professional, casual, concise, friendly
+- API key stored as secure configuration key "openai_api_key"
+- Use SwiftBiu.fetchStream() for streaming output and show a loading indicator while streaming
+- Paste the final result with SwiftBiu.pasteText()
+- API docs: https://platform.openai.com/docs/api-reference/chat
+```
+
+---
+
+### Scenario 3: AI Writing Polish with Anthropic Claude
+
+**What it does:** Select text → Claude polishes grammar, clarity, and flow → paste back.
+
+- **Plugin type:** `textAction`
+- **Permissions:** `["network", "paste"]`
+- **API docs:** [docs.anthropic.com/en/api/messages](https://docs.anthropic.com/en/api/messages)
+- **API key:** stored as `type: "secure"` in configuration
+
+```text
+Read: https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+Build a SwiftBiu textAction plugin named "Claude Polish":
+- Input: context.selectedText
+- Call Anthropic Messages API (https://api.anthropic.com/v1/messages) with claude-3-haiku-20240307
+- System prompt: "Polish the following text for clarity and flow. Return only the improved text."
+- API key stored as secure configuration key "anthropic_api_key"
+- Use SwiftBiu.fetch() for the request
+- Paste the result with SwiftBiu.pasteText()
+- API docs: https://docs.anthropic.com/en/api/messages
+```
+
+---
+
+### Scenario 4: Image Background Removal with remove.bg
+
+**What it does:** Select image files in Finder → remove backgrounds via remove.bg API → save the result as PNG next to the originals.
+
+- **Plugin type:** `fileAction`
+- **Permissions:** `["localFileRead", "localFileWrite", "network", "notifications"]`
+- **API docs:** [www.remove.bg/api](https://www.remove.bg/api)
+- **API key:** stored as `type: "secure"` in configuration
+
+```text
+Read: https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+Build a SwiftBiu fileAction plugin named "Remove Background":
+- Input: context.selectedFiles (images: jpg, jpeg, png, webp)
+- For each image file, read it with SwiftBiu.readLocalFile(), POST to https://api.remove.bg/v1.0/removebg with the image as base64
+- Save the result PNG next to the original with "_nobg" suffix using SwiftBiu.createLocalFile()
+- Show a progress notification and a final summary notification
+- API key stored as secure configuration key "removebg_api_key"
+- Skip non-image files and count them as skipped
+- API docs: https://www.remove.bg/api#remove-background
+```
+
+---
+
+### Scenario 5: Batch File Rename by Date (Local Only)
+
+**What it does:** Select a folder of screenshots → rename each file to `YYYY-MM-DD_HH-MM-SS_original.ext` using the file's modification date. No network, no API key.
+
+- **Plugin type:** `fileAction`
+- **Permissions:** `["localFileRead", "localFileWrite", "notifications"]`
+- **API docs:** Local only — no network
+
+```text
+Read: https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+Build a SwiftBiu fileAction plugin named "Rename by Date":
+- Input: context.selectedFiles
+- For each file, read its modification date using SwiftBiu.getFileMetadata()
+- Rename it to YYYY-MM-DD_HH-MM-SS_<original-name>.<ext> using SwiftBiu.renameLocalFile()
+- Show a summary notification: "Renamed X files, skipped Y"
+- If a file already has the date prefix, skip it
+- Local only — no network calls
+```
+
+---
+
+### Scenario 6: Open a GitHub Issue from Selected Text
+
+**What it does:** Select a bug description or task → open a pre-filled GitHub issue creation page in the browser.
+
+- **Plugin type:** `textAction`
+- **Permissions:** `[]` (no special permissions needed — just opens a URL)
+- **API docs:** [docs.github.com/en/rest/issues/issues](https://docs.github.com/en/rest/issues/issues)
+
+```text
+Read: https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+Build a SwiftBiu textAction plugin named "New GitHub Issue":
+- Input: context.selectedText
+- URL-encode the selected text and open:
+  https://github.com/<owner>/<repo>/issues/new?title=<first-line>&body=<full-text>
+- "owner" and "repo" are string configuration keys
+- Use SwiftBiu.openURL() to open the browser
+- No API key needed — this just opens a pre-filled GitHub issue form
+```
+
+---
+
+### Scenario 7: Code Formatter with Prettier (Web App)
+
+**What it does:** Select code → open a floating panel showing the formatted version → copy or paste back.
+
+- **Plugin type:** Web App (`displayUI`)
+- **Permissions:** `["paste", "clipboardWrite"]`
+- **API docs:** [prettier.io/docs/en/api](https://prettier.io/docs/en/api) (runs locally in the browser sandbox — no network needed)
+
+```text
+Read: https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
+
+Build a SwiftBiu Web App plugin named "Code Formatter":
+- Input: context.selectedText (code)
+- Open a floating window (400x500) showing the Prettier-formatted code
+- Load Prettier from CDN (https://unpkg.com/prettier@3/standalone.js) inside the Web UI
+- Auto-detect language (JS, TS, CSS, JSON, Markdown) from the code content
+- Show two buttons: "Copy" (copies formatted code) and "Paste" (pastes it back)
+- Use window.swiftBiu.pasteText() for the paste action
+- The panel should adapt to dark/light mode
+```
+
+---
+
+### Scenario 8: Share Selected Text to WhatsApp / WeChat (shareTargets)
+
+**What it does:** Select text → share it directly to WhatsApp or WeChat via native macOS sharing — no JavaScript needed.
+
+- **Plugin type:** `shareTargets` (declarative, no script)
+- **Permissions:** `["share"]`
+- **API docs:** Local only — no network (uses URL schemes)
+
+```json
+{
+  "identifier": "com.yourname.share-text",
+  "name": "Share Text",
+  "author": "Your Name",
+  "version": "1.0",
+  "actions": [],
+  "permissions": ["share"],
+  "shareTargets": [
+    {
+      "id": "whatsapp",
+      "name": { "en": "Share to WhatsApp", "zh": "分享到 WhatsApp" },
+      "kind": "urlScheme",
+      "supportedContent": ["text", "url"],
+      "urlTemplate": "whatsapp://send?text={{encodedText}}",
+      "webFallback": "https://wa.me/?text={{encodedText}}"
+    },
+    {
+      "id": "wechat",
+      "name": { "en": "Open in WeChat", "zh": "用微信打开" },
+      "kind": "openWithApp",
+      "supportedContent": ["file", "image"],
+      "bundleIdentifiers": ["com.tencent.xinWeChat", "com.tencent.WeChat"]
+    }
+  ]
+}
+```
+
+---
 
 ## Two Types of Plugin Actions
 
