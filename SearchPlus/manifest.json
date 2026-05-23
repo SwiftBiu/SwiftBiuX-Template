@@ -9,7 +9,7 @@
     "en": "Select text and search with a custom keyword (e.g., 'Apple' + 'Official').",
     "zh": "选择文字并附带自定义关键字进行搜索（如：'苹果' + '官网'）。"
   },
-  "version": "1.1.1",
+  "version": "1.2.0",
   "icon": "plus.magnifyingglass",
   "iconType": "sfSymbol",
   "actions": [
@@ -34,20 +34,84 @@
       "defaultValue": "https://www.bing.com/search?q={query}",
       "options": [
         {
-          "label": "Google",
-          "value": "https://www.google.com/search?q={query}"
-        },
-        {
-          "label": "Baidu",
-          "value": "https://www.baidu.com/s?wd={query}"
-        },
-        {
-          "label": "Bing",
+          "label": {
+            "en": "Bing",
+            "zh": "必应"
+          },
           "value": "https://www.bing.com/search?q={query}"
+        },
+        {
+          "label": {
+            "en": "Google",
+            "zh": "谷歌"
+          },
+          "value": "https://www.google.com/search?q={query}"
         },
         {
           "label": "DuckDuckGo",
           "value": "https://duckduckgo.com/?q={query}"
+        },
+        {
+          "label": {
+            "en": "Baidu",
+            "zh": "百度"
+          },
+          "value": "https://www.baidu.com/s?wd={query}"
+        },
+        {
+          "label": "GitHub",
+          "value": "https://github.com/search?q={query}"
+        },
+        {
+          "label": "StackOverflow",
+          "value": "https://stackoverflow.com/search?q={query}"
+        },
+        {
+          "label": "YouTube",
+          "value": "https://www.youtube.com/results?search_query={query}"
+        },
+        {
+          "label": {
+            "en": "Zhihu",
+            "zh": "知乎"
+          },
+          "value": "https://www.zhihu.com/search?q={query}"
+        },
+        {
+          "label": {
+            "en": "Bilibili",
+            "zh": "哔哩哔哩"
+          },
+          "value": "https://search.bilibili.com/all?keyword={query}"
+        },
+        {
+          "label": {
+            "en": "Wikipedia",
+            "zh": "维基百科"
+          },
+          "value": "https://en.wikipedia.org/wiki/Special:Search?search={query}"
+        },
+        {
+          "label": "Reddit",
+          "value": "https://www.reddit.com/search/?q={query}"
+        },
+        {
+          "label": {
+            "en": "Xiaohongshu",
+            "zh": "小红书"
+          },
+          "value": "https://www.xiaohongshu.com/search_result?keyword={query}"
+        },
+        {
+          "label": {
+            "en": "Douyin",
+            "zh": "抖音"
+          },
+          "value": "https://www.douyin.com/search/{query}"
+        },
+        {
+          "label": "TikTok",
+          "value": "https://www.tiktok.com/search?q={query}"
         },
         {
           "label": {
