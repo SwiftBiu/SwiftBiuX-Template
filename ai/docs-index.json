@@ -1,0 +1,135 @@
+{
+  "version": "1.0",
+  "purpose": "Route AI assistants and developers to the smallest SwiftBiuX document needed for a plugin task.",
+  "defaultEntry": "AI_SKILL.md",
+  "fullSkill": "AI_SKILL_FULL.md",
+  "documents": [
+    {
+      "id": "ai-entry",
+      "title": "AI Development Entry",
+      "path": "ai/README.md",
+      "zhPath": "ai/README.zh.md",
+      "audience": ["developer", "ai-assisted", "beginner"],
+      "keywords": ["AI", "prompt", "skill", "quick start", "generate plugin", "swiftbiux"],
+      "loadWhen": "The user wants to build a plugin with AI or does not know where to start."
+    },
+    {
+      "id": "skill-core",
+      "title": "SwiftBiuX AI Skill",
+      "path": "AI_SKILL.md",
+      "audience": ["ai-assistant"],
+      "keywords": ["rules", "manifest", "permissions", "runtime API", "plugin generation"],
+      "loadWhen": "Always load this first before generating or modifying a SwiftBiuX plugin."
+    },
+    {
+      "id": "quick-start",
+      "title": "Quick Start",
+      "path": "developer-modules/quick-start.md",
+      "zhPath": "developer-modules/quick-start.zh.md",
+      "audience": ["developer", "beginner", "ai-assisted"],
+      "keywords": ["first plugin", "hello", "file sorter", "package", "install"],
+      "loadWhen": "The user wants to create the first plugin or needs a short end-to-end example."
+    },
+    {
+      "id": "scenario-routing",
+      "title": "Scenario Selection Reference",
+      "path": "references/scenarios.md",
+      "audience": ["ai-assistant", "developer"],
+      "keywords": ["textAction", "fileAction", "local", "network", "Web UI", "choose type"],
+      "loadWhen": "The request is described in plain language and the plugin architecture is not obvious."
+    },
+    {
+      "id": "manifest-basics",
+      "title": "Manifest Basics",
+      "path": "references/manifest-basics.md",
+      "audience": ["ai-assistant", "developer"],
+      "keywords": ["manifest", "identifier", "actions", "extensionKind", "minimal", "permissions"],
+      "loadWhen": "The task only needs the minimal manifest contract, extensionKind, action wiring, or basic permissions."
+    },
+    {
+      "id": "manifest-icons",
+      "title": "Manifest Icons",
+      "path": "references/manifest-icons.md",
+      "audience": ["ai-assistant", "developer"],
+      "keywords": ["icon", "iconType", "sfSymbol", "text icon", "file icon", "data URI"],
+      "loadWhen": "The task only needs to choose or explain plugin icons."
+    },
+    {
+      "id": "manifest",
+      "title": "Full Manifest Configuration",
+      "path": "developer-modules/manifest.md",
+      "zhPath": "developer-modules/manifest.zh.md",
+      "audience": ["developer", "ai-assistant"],
+      "keywords": ["manifest", "identifier", "actions", "extensionKind", "icon", "configuration", "shareTargets", "runtime API"],
+      "loadWhen": "The task involves advanced manifest details, share targets, configuration UI, or host API contracts beyond the minimal manifest."
+    },
+    {
+      "id": "permissions",
+      "title": "Permissions",
+      "path": "developer-modules/permissions.md",
+      "zhPath": "developer-modules/permissions.zh.md",
+      "audience": ["developer", "ai-assistant"],
+      "keywords": ["permissions", "clipboard", "paste", "network", "localFileRead", "localFileWrite", "notifications"],
+      "loadWhen": "The plugin needs clipboard, paste, file, network, notification, or other host permissions."
+    },
+    {
+      "id": "file-workflows",
+      "title": "File Workflows",
+      "path": "references/file-workflows.md",
+      "audience": ["ai-assistant", "developer"],
+      "keywords": ["selectedFiles", "rename", "move", "copy", "save", "trash", "batch files"],
+      "loadWhen": "The plugin reads, writes, renames, moves, copies, saves, opens, or trashes local files."
+    },
+    {
+      "id": "network-api",
+      "title": "Network/API Checklist",
+      "path": "references/network-api-checklist.md",
+      "audience": ["ai-assistant", "developer"],
+      "keywords": ["OpenAI", "Gemini", "DeepL", "remove.bg", "API key", "network", "fetch", "stream"],
+      "loadWhen": "The plugin uses AI, translation, image generation, live web data, or any third-party/internal API."
+    },
+    {
+      "id": "ui-patterns",
+      "title": "UI Patterns",
+      "path": "references/ui-patterns.md",
+      "audience": ["ai-assistant", "developer"],
+      "keywords": ["Web UI", "ui/index.html", "preview", "form", "progress", "displayUI", "resizeWindow"],
+      "loadWhen": "The plugin needs a custom window, preview, form, editable output, progress view, or interactive surface."
+    },
+    {
+      "id": "configuration",
+      "title": "Configuration Reference",
+      "path": "references/configuration.md",
+      "audience": ["ai-assistant", "developer"],
+      "keywords": ["settings", "secure", "API key", "options", "catalog", "packaging"],
+      "loadWhen": "The plugin needs user settings, secure secrets, option fields, packaging, or catalog entries."
+    },
+    {
+      "id": "debugging",
+      "title": "Debugging",
+      "path": "developer-modules/debugging.md",
+      "zhPath": "developer-modules/debugging.zh.md",
+      "audience": ["developer", "ai-assistant"],
+      "keywords": ["logs", "debug", "Safari Web Inspector", "build_plugin", "install"],
+      "loadWhen": "The user reports errors, packaging failures, runtime failures, or UI debugging problems."
+    },
+    {
+      "id": "examples",
+      "title": "Examples",
+      "path": "developer-modules/examples.md",
+      "zhPath": "developer-modules/examples.zh.md",
+      "audience": ["developer"],
+      "keywords": ["examples", "template", "sample plugins", "reuse"],
+      "loadWhen": "The user wants to copy or adapt an existing plugin pattern."
+    },
+    {
+      "id": "release-channels",
+      "title": "Stable vs Beta",
+      "path": "developer-modules/stable-vs-beta.md",
+      "zhPath": "developer-modules/stable-vs-beta.zh.md",
+      "audience": ["maintainer", "developer"],
+      "keywords": ["release", "beta", "stable", "catalog", "publish"],
+      "loadWhen": "The user wants to publish, test, or maintain stable and beta catalog channels."
+    }
+  ]
+}

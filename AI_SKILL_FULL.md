@@ -21,13 +21,18 @@ Use this skill when creating or modifying SwiftBiuX plugins. Plugin code can be 
 
 ## How to Use This Skill
 
-Read this file first for the core workflow, manifest contract, permission mapping, and runtime API rules. Do not load every reference by default. Load the smallest reference that matches the user's request:
+Read this file first for the core workflow, manifest contract, permission mapping, and runtime API rules. Do not load every reference by default. Use `ai/docs-index.json` as the routing map when you need to decide which extra document to load.
+
+Load the smallest reference that matches the user's request:
 
 - `references/scenarios.md`: when the user describes a plugin idea in plain language and needs the right plugin type, prompt shape, or examples.
+- `references/manifest-basics.md`: when the task only needs the minimal `manifest.json` contract, `extensionKind`, action wiring, or basic permission mapping.
+- `references/manifest-icons.md`: when the task only needs to choose or explain plugin icon formats.
 - `references/file-workflows.md`: when the plugin reads, creates, updates, renames, copies, moves, saves, opens, or trashes local files.
 - `references/network-api-checklist.md`: when the plugin uses AI, translation, image generation, live web data, company APIs, or any third-party service.
 - `references/ui-patterns.md`: when the plugin needs a Web UI, preview panel, settings-like form, progress view, native AI/image surface, or direct-open behavior.
 - `references/configuration.md`: when the plugin needs settings, API keys, option fields, file-extension app rules, packaging, or catalog entries.
+- `developer-modules/debugging.md`: when the user reports build, installation, runtime, logging, or Web Inspector problems.
 
 ## Generation Decision Flow
 
