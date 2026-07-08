@@ -1,0 +1,176 @@
+{
+  "identifier": "com.swiftbiu.xai-voice",
+  "name": "xAI Voice",
+  "version": "1.0.1",
+  "description": "Bind text-to-speech and speech-to-text actions to xAI voice models.",
+  "author": "SwiftBiu",
+  "category": "AI",
+  "extensionKind": "textAction",
+  "permissions": [
+    "network",
+    "paste",
+    "notifications",
+    "localFileRead"
+  ],
+  "network": {
+    "domains": [
+      {
+        "host": "api.x.ai",
+        "purpose": "Send voice requests through the configured xAI provider when the host bridge is available.",
+        "data": [
+          "selectedText",
+          "audioFile",
+          "options"
+        ],
+        "usesCredential": "xAI API Key or OAuth login token"
+      },
+      {
+        "host": "auth.x.ai",
+        "purpose": "Allow SwiftBiu to authorize xAI OAuth provider profiles.",
+        "data": [
+          "authorizationCode"
+        ],
+        "usesCredential": "xAI OAuth client credentials"
+      }
+    ]
+  },
+  "actions": [
+    {
+      "id": "speakWithXAITTS",
+      "title": "Speak with xAI TTS",
+      "description": "Use the configured xAI TTS model for selected text.",
+      "extensionKind": "textAction",
+      "script": "script.js",
+      "shortcut": "cmd+shift+s",
+      "ai": {
+        "useCase": "tts",
+        "providerKey": "ttsProvider",
+        "modelKey": "ttsModel"
+      }
+    },
+    {
+      "id": "transcribeWithXAISTT",
+      "title": "Transcribe with xAI STT",
+      "description": "Use the configured xAI speech-to-text model for selected audio files.",
+      "extensionKind": "fileAction",
+      "script": "script.js",
+      "ai": {
+        "useCase": "stt",
+        "providerKey": "sttProvider",
+        "modelKey": "sttModel"
+      }
+    }
+  ],
+  "configuration": [
+    {
+      "key": "ttsProvider",
+      "label": "TTS Provider",
+      "description": "Choose an xAI provider profile for text-to-speech models.",
+      "type": "option",
+      "required": true,
+      "defaultValue": "xai-oauth",
+      "options": [
+        { "value": "xai-oauth", "label": "xAI Login" },
+        { "value": "xai", "label": "xAI API Key" }
+      ]
+    },
+    {
+      "key": "ttsModel",
+      "label": "TTS Model",
+      "description": "Choose the xAI text-to-speech model for this action.",
+      "type": "option",
+      "required": true,
+      "defaultValue": "xai-tts",
+      "options": [
+        {"value": "xai-tts", "label": "xAI TTS"}
+      ]
+    },
+    {
+      "key": "voice",
+      "label": "Voice",
+      "description": "Voice identifier passed to text-to-speech.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "eve",
+      "options": [
+        {"value": "eve", "label": "Eve (Default)"},
+        {"value": "alloy", "label": "Alloy"},
+        {"value": "echo", "label": "Echo"},
+        {"value": "fable", "label": "Fable"},
+        {"value": "onyx", "label": "Onyx"},
+        {"value": "nova", "label": "Nova"},
+        {"value": "shimmer", "label": "Shimmer"}
+      ]
+    },
+    {
+      "key": "ttsFormat",
+      "label": "TTS Format",
+      "description": "Requested text-to-speech audio format.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "mp3",
+      "options": [
+        {
+          "value": "mp3",
+          "label": "MP3"
+        },
+        {
+          "value": "wav",
+          "label": "WAV"
+        },
+        {
+          "value": "opus",
+          "label": "Opus"
+        }
+      ]
+    },
+    {
+      "key": "sttProvider",
+      "label": "STT Provider",
+      "description": "Choose an xAI provider profile for speech-to-text models.",
+      "type": "option",
+      "required": true,
+      "defaultValue": "xai-oauth",
+      "options": [
+        { "value": "xai-oauth", "label": "xAI Login" },
+        { "value": "xai", "label": "xAI API Key" }
+      ]
+    },
+    {
+      "key": "sttModel",
+      "label": "STT Model",
+      "description": "Choose the xAI speech-to-text model for this action.",
+      "type": "option",
+      "required": true,
+      "defaultValue": "grok-stt",
+      "options": [
+        {"value": "grok-stt", "label": "Grok STT"}
+      ]
+    },
+    {
+      "key": "language",
+      "label": "Language",
+      "description": "Optional transcription language hint.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "en",
+      "options": [
+        {"value": "en", "label": "en (English)"},
+        {"value": "zh", "label": "zh (Chinese)"},
+        {"value": "es", "label": "es (Spanish)"},
+        {"value": "fr", "label": "fr (French)"},
+        {"value": "de", "label": "de (German)"},
+        {"value": "it", "label": "it (Italian)"},
+        {"value": "ja", "label": "ja (Japanese)"},
+        {"value": "ko", "label": "ko (Korean)"},
+        {"value": "pt", "label": "pt (Portuguese)"},
+        {"value": "ru", "label": "ru (Russian)"},
+        {"value": "tr", "label": "tr (Turkish)"},
+        {"value": "pl", "label": "pl (Polish)"},
+        {"value": "nl", "label": "nl (Dutch)"},
+        {"value": "hi", "label": "hi (Hindi)"}
+      ]
+    }
+  ],
+  "minimumHostVersion": "1.0.0"
+}

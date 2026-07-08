@@ -1,0 +1,144 @@
+{
+  "identifier": "com.swiftbiu.xai-video",
+  "name": "xAI Video",
+  "version": "1.0.1",
+  "description": "Bind an action to xAI video models and prepare a Grok Imagine video request.",
+  "author": "SwiftBiu",
+  "category": "AI",
+  "extensionKind": "textAction",
+  "permissions": [
+    "network",
+    "paste",
+    "notifications"
+  ],
+  "ai": {
+    "useCase": "videoGeneration",
+    "providerKey": "videoProvider",
+    "modelKey": "videoModel"
+  },
+  "network": {
+    "domains": [
+      {
+        "host": "api.x.ai",
+        "purpose": "Send video generation requests through the configured xAI provider when the host bridge is available.",
+        "data": [
+          "prompt",
+          "options"
+        ],
+        "usesCredential": "xAI API Key or OAuth login token"
+      },
+      {
+        "host": "auth.x.ai",
+        "purpose": "Allow SwiftBiu to authorize xAI OAuth provider profiles.",
+        "data": [
+          "authorizationCode"
+        ],
+        "usesCredential": "xAI OAuth client credentials"
+      }
+    ]
+  },
+  "actions": [
+    {
+      "id": "prepareXAIVideo",
+      "title": "Prepare xAI Video",
+      "description": "Use the configured xAI video model and prepare a video generation request.",
+      "extensionKind": "textAction",
+      "script": "script.js",
+      "shortcut": "cmd+shift+v",
+      "ai": {
+        "useCase": "videoGeneration",
+        "providerKey": "videoProvider",
+        "modelKey": "videoModel"
+      }
+    }
+  ],
+  "configuration": [
+    {
+      "key": "videoProvider",
+      "label": "Video Provider",
+      "description": "Choose an xAI provider profile for video generation models.",
+      "type": "option",
+      "required": true,
+      "defaultValue": "xai-oauth",
+      "options": [
+        { "value": "xai-oauth", "label": "xAI Login" },
+        { "value": "xai", "label": "xAI API Key" }
+      ]
+    },
+    {
+      "key": "videoModel",
+      "label": "Video Model",
+      "description": "Choose the xAI Grok Imagine video model for this action.",
+      "type": "option",
+      "required": true,
+      "defaultValue": "grok-imagine-video",
+      "options": [
+        { "value": "grok-imagine-video", "label": "Grok Imagine Video" },
+        { "value": "grok-imagine-video-1.5-preview", "label": "Grok Imagine Video 1.5 Preview" }
+      ]
+    },
+    {
+      "key": "aspectRatio",
+      "label": "Aspect Ratio",
+      "description": "Aspect ratio passed to video generation.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "16:9",
+      "options": [
+        {
+          "value": "16:9",
+          "label": "Landscape"
+        },
+        {
+          "value": "9:16",
+          "label": "Portrait"
+        },
+        {
+          "value": "1:1",
+          "label": "Square"
+        }
+      ]
+    },
+    {
+      "key": "durationSeconds",
+      "label": "Duration Seconds",
+      "description": "Requested video duration in seconds.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "6",
+      "options": [
+        {
+          "value": "4",
+          "label": "4s"
+        },
+        {
+          "value": "6",
+          "label": "6s"
+        },
+        {
+          "value": "10",
+          "label": "10s"
+        }
+      ]
+    },
+    {
+      "key": "resolution",
+      "label": "Resolution",
+      "description": "Resolution hint passed to video generation.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "720p",
+      "options": [
+        {
+          "value": "480p",
+          "label": "480p"
+        },
+        {
+          "value": "720p",
+          "label": "720p"
+        }
+      ]
+    }
+  ],
+  "minimumHostVersion": "1.0.0"
+}

@@ -1,0 +1,140 @@
+{
+  "identifier": "com.swiftbiu.xai-image",
+  "name": "xAI Image",
+  "version": "1.0.1",
+  "description": "Use SwiftBiu AI Provider to generate an image with an xAI image model.",
+  "author": "SwiftBiu",
+  "category": "AI",
+  "extensionKind": "textAction",
+  "permissions": [
+    "network",
+    "clipboardWrite",
+    "notifications"
+  ],
+  "ai": {
+    "useCase": "imageGeneration",
+    "providerKey": "imageProvider",
+    "modelKey": "imageModel"
+  },
+  "network": {
+    "domains": [
+      {
+        "host": "api.x.ai",
+        "purpose": "Send image generation requests through the configured xAI provider.",
+        "data": [
+          "prompt",
+          "options"
+        ],
+        "usesCredential": "xAI API Key or OAuth login token"
+      },
+      {
+        "host": "auth.x.ai",
+        "purpose": "Allow SwiftBiu to authorize xAI OAuth provider profiles.",
+        "data": [
+          "authorizationCode"
+        ],
+        "usesCredential": "xAI OAuth client credentials"
+      }
+    ]
+  },
+  "actions": [
+    {
+      "id": "generateXAIImage",
+      "title": "Generate xAI Image",
+      "description": "Generate an image from selected text using the configured xAI image model.",
+      "extensionKind": "textAction",
+      "script": "script.js",
+      "shortcut": "cmd+shift+i",
+      "ai": {
+        "useCase": "imageGeneration",
+        "providerKey": "imageProvider",
+        "modelKey": "imageModel"
+      }
+    }
+  ],
+  "configuration": [
+    {
+      "key": "imageProvider",
+      "label": "Image Provider",
+      "description": "Choose an xAI provider profile for image models.",
+      "type": "option",
+      "required": true,
+      "defaultValue": "xai-oauth",
+      "options": [
+        { "value": "xai-oauth", "label": "xAI Login" },
+        { "value": "xai", "label": "xAI API Key" }
+      ]
+    },
+    {
+      "key": "imageModel",
+      "label": "Image Model",
+      "description": "Choose the xAI image model for this action.",
+      "type": "option",
+      "required": true,
+      "defaultValue": "grok-imagine-image",
+      "options": [
+        { "value": "grok-imagine-image", "label": "Grok Imagine Image" },
+        { "value": "grok-imagine-image-quality", "label": "Grok Imagine Image Quality" }
+      ]
+    },
+    {
+      "key": "aspectRatio",
+      "label": "Aspect Ratio",
+      "description": "Aspect ratio passed to xAI image generation.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "1:1",
+      "options": [
+        {
+          "value": "1:1",
+          "label": "Square"
+        },
+        {
+          "value": "16:9",
+          "label": "Landscape"
+        },
+        {
+          "value": "9:16",
+          "label": "Portrait"
+        }
+      ]
+    },
+    {
+      "key": "resolution",
+      "label": "Resolution",
+      "description": "Resolution hint passed to xAI image generation.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "1k",
+      "options": [
+        {
+          "value": "1k",
+          "label": "1K"
+        },
+        {
+          "value": "2k",
+          "label": "2K"
+        }
+      ]
+    },
+    {
+      "key": "autoCopy",
+      "label": "Copy Result",
+      "description": "Copy the generated image to the clipboard after generation.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "true",
+      "options": [
+        {
+          "value": "true",
+          "label": "On"
+        },
+        {
+          "value": "false",
+          "label": "Off"
+        }
+      ]
+    }
+  ],
+  "minimumHostVersion": "1.0.0"
+}

@@ -1,0 +1,113 @@
+{
+  "actions" : [
+    {
+      "ai" : {
+        "modelKey" : "chatModel",
+        "providerKey" : "chatProvider",
+        "useCase" : "chat"
+      },
+      "description" : "Generate or rewrite text using Codex via ChatGPT OAuth login.",
+      "extensionKind" : "textAction",
+      "id" : "codexText",
+      "script" : "script.js",
+      "shortcut" : "cmd+shift+y",
+      "title" : "Codex Text Studio"
+    }
+  ],
+  "ai" : {
+    "modelKey" : "chatModel",
+    "providerKey" : "chatProvider",
+    "useCase" : "chat"
+  },
+  "author" : "SwiftBiu",
+  "category" : "AI",
+  "configuration" : [
+    {
+      "defaultValue" : "codex",
+      "description" : "Choose the Codex login profile for text actions.",
+      "key" : "chatProvider",
+      "label" : "Chat Provider",
+      "required" : true,
+      "type" : "string"
+    },
+    {
+      "defaultValue" : "gpt-5.2-codex",
+      "description" : "Choose the Codex text model.",
+      "key" : "chatModel",
+      "label" : "Chat Model",
+      "required" : true,
+      "type" : "string"
+    },
+    {
+      "defaultValue" : "You are a concise assistant. Answer in the user's language.",
+      "description" : "Instruction sent before user content.",
+      "key" : "systemPrompt",
+      "label" : "System Prompt",
+      "required" : false,
+      "type" : "string"
+    },
+    {
+      "defaultValue" : "0.3",
+      "description" : "Sampling temperature for non-Codex-compatible text models.",
+      "key" : "temperature",
+      "label" : "Temperature",
+      "required" : false,
+      "type" : "string"
+    },
+    {
+      "defaultValue" : "true",
+      "description" : "Show chat responses in a native floating bubble UI instead of pasting directly.",
+      "key" : "enableAIResponseUI",
+      "label" : "Use Floating Bubble",
+      "options" : [
+        {
+          "label" : "On",
+          "value" : "true"
+        },
+        {
+          "label" : "Off",
+          "value" : "false"
+        }
+      ],
+      "required" : false,
+      "type" : "option"
+    }
+  ],
+  "description" : "Send selected text or manual prompts to Codex through ChatGPT OAuth and paste the generated text.",
+  "extensionKind" : "textAction",
+  "icon" : "swiftbiu-custom-icon-lottie.json",
+  "iconLottieStillFrame" : 0,
+  "iconScale" : 2,
+  "iconType" : "lottie",
+  "identifier" : "com.swiftbiu.plugins.codex-text-studio",
+  "minimumHostVersion" : "1.0.0",
+  "name" : "Codex Text Studio",
+  "network" : {
+    "domains" : [
+      {
+        "data" : [
+          "selectedText",
+          "options"
+        ],
+        "host" : "chatgpt.com",
+        "purpose" : "Send chat requests through the configured OpenAI Codex provider.",
+        "usesCredential" : "Codex OAuth login token"
+      },
+      {
+        "data" : [
+          "authorizationCode"
+        ],
+        "host" : "auth.openai.com",
+        "purpose" : "Allow SwiftBiu to authorize OpenAI Codex OAuth provider profiles.",
+        "usesCredential" : "Codex OAuth client credentials"
+      }
+    ]
+  },
+  "permissions" : [
+    "network",
+    "paste",
+    "notifications",
+    "ui"
+  ],
+  "version" : "1.0.0"
+}

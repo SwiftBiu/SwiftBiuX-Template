@@ -1,0 +1,128 @@
+{
+  "identifier": "com.swiftbiu.xai-chat",
+  "name": "xAI Chat",
+  "version": "1.1.0",
+  "description": "Use SwiftBiu AI Provider to run an xAI text model from selected text.",
+  "author": "SwiftBiu",
+  "category": "AI",
+  "extensionKind": "textAction",
+  "permissions": [
+    "network",
+    "paste",
+    "notifications",
+    "ui"
+  ],
+  "ai": {
+    "useCase": "chat",
+    "providerKey": "textProvider",
+    "modelKey": "textModel"
+  },
+  "network": {
+    "domains": [
+      {
+        "host": "api.x.ai",
+        "purpose": "Send chat requests through the configured xAI provider.",
+        "data": [
+          "selectedText",
+          "options"
+        ],
+        "usesCredential": "xAI API Key or OAuth login token"
+      },
+      {
+        "host": "auth.x.ai",
+        "purpose": "Allow SwiftBiu to authorize xAI OAuth provider profiles.",
+        "data": [
+          "authorizationCode"
+        ],
+        "usesCredential": "xAI OAuth client credentials"
+      }
+    ]
+  },
+  "actions": [
+    {
+      "id": "chatWithXAI",
+      "title": "Chat with xAI",
+      "description": "Send selected text to the configured xAI chat model and paste the response.",
+      "extensionKind": "textAction",
+      "script": "script.js",
+      "shortcut": "cmd+shift+g",
+      "ai": {
+        "useCase": "chat",
+        "providerKey": "textProvider",
+        "modelKey": "textModel"
+      }
+    }
+  ],
+  "configuration": [
+    {
+      "key": "textProvider",
+      "label": "Text Provider",
+      "description": "Choose an xAI provider profile for chat models.",
+      "type": "option",
+      "required": true,
+      "defaultValue": "xai-oauth",
+      "options": [
+        { "value": "xai-oauth", "label": "xAI Login" },
+        { "value": "xai", "label": "xAI API Key" }
+      ]
+    },
+    {
+      "key": "textModel",
+      "label": "Text Model",
+      "description": "Choose the xAI text model for this action.",
+      "type": "option",
+      "required": true,
+      "defaultValue": "grok-4.3",
+      "options": [
+        { "value": "grok-4.3", "label": "Grok 4.3" }
+      ]
+    },
+    {
+      "key": "systemPrompt",
+      "label": "System Prompt",
+      "description": "Instruction sent before the selected text.",
+      "type": "string",
+      "required": false,
+      "defaultValue": "You are a concise assistant. Answer in the user's language and keep the result practical."
+    },
+    {
+      "key": "temperature",
+      "label": "Temperature",
+      "description": "Sampling temperature passed to the model.",
+      "type": "string",
+      "required": false,
+      "defaultValue": "0.3"
+    },
+    {
+      "key": "enableXSearch",
+      "label": "Enable X Search",
+      "description": "Pass an x_search tool request when the selected xAI model supports it.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "false",
+      "options": [
+        {
+          "value": "false",
+          "label": "Off"
+        },
+        {
+          "value": "true",
+          "label": "On"
+        }
+      ]
+    },
+    {
+      "key": "enableAIResponseUI",
+      "label": "Use Floating Bubble",
+      "description": "Show chat responses in a native floating bubble UI instead of pasting directly.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "true",
+      "options": [
+        { "value": "true", "label": "On" },
+        { "value": "false", "label": "Off" }
+      ]
+    }
+  ],
+  "minimumHostVersion": "1.0.0"
+}

@@ -1,0 +1,91 @@
+{
+  "identifier": "com.swiftbiu.examples.ai-image-verifier",
+  "name": "AI Image Verifier",
+  "version": "1.0.0",
+  "description": "Verify the image generation path using configured AI models.",
+  "author": "SwiftBiu",
+  "category": "utilities",
+  "extensionKind": "textAction",
+  "iconType": "system",
+  "permissions": [
+    "network",
+    "clipboardWrite",
+    "notifications"
+  ],
+  "ai": {
+    "useCase": "imageGeneration",
+    "providerKey": "imageProvider",
+    "modelKey": "imageModel"
+  },
+  "actions": [
+    {
+      "id": "verifyImage",
+      "title": "Verify AI Image",
+      "description": "Verify the text-to-image path using configured AI model.",
+      "extensionKind": "textAction",
+      "script": "script.js",
+      "shortcut": "cmd+shift+y",
+      "ai": {
+        "useCase": "imageGeneration",
+        "providerKey": "imageProvider",
+        "modelKey": "imageModel"
+      }
+    }
+  ],
+  "configuration": [
+    {
+      "key": "imageProvider",
+      "label": "Image Provider",
+      "description": "Choose an AI provider profile that has image models.",
+      "type": "string",
+      "required": true,
+      "defaultValue": "gemini"
+    },
+    {
+      "key": "imageModel",
+      "label": "Image Model",
+      "description": "Choose the image model for this action.",
+      "type": "string",
+      "required": true,
+      "defaultValue": "gemini-2.5-flash"
+    },
+    {
+      "key": "aspectRatio",
+      "label": "Aspect Ratio",
+      "description": "Aspect ratio passed to image generation.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "1:1",
+      "options": [
+        { "value": "1:1", "label": "Square" },
+        { "value": "16:9", "label": "Landscape" },
+        { "value": "9:16", "label": "Portrait" }
+      ]
+    },
+    {
+      "key": "resolution",
+      "label": "Resolution",
+      "description": "Resolution hint passed to image generation.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "1k",
+      "options": [
+        { "value": "1k", "label": "1K" },
+        { "value": "2k", "label": "2K" }
+      ]
+    },
+    {
+      "key": "autoCopy",
+      "label": "Copy Result",
+      "description": "Copy the generated image to the clipboard after generation.",
+      "type": "option",
+      "required": false,
+      "defaultValue": "true",
+      "options": [
+        { "value": "true", "label": "On" },
+        { "value": "false", "label": "Off" }
+      ]
+    }
+  ],
+  "minimumHostVersion": "1.0.0"
+}
