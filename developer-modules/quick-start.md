@@ -4,9 +4,9 @@
 
 > [!NOTE]
 > **AI quick-start facts**
-> - Ask the AI to read `AI_SKILL.md` first; do not load the full documentation by default.
+> - Ask the AI to read [AI_SKILL.md](../AI_SKILL.md) first; do not load the full documentation by default.
 > - Let the AI choose `textAction` or `fileAction` based on the input.
-> - Package the finished folder with `./scripts/build_plugin.sh <PluginDirectory>` to generate a `.swiftbiux` bundle.
+> - Run [scripts/build_plugin.sh](../scripts/build_plugin.sh) from the SwiftBiuX-Template repository root: `./scripts/build_plugin.sh <PluginDirectory>`.
 
 SwiftBiu plugin development is now **AI-first**. Describe the plugin you want; the SwiftBiuX Skill guides the AI to generate `manifest.json`, `script.js`, optional `ui/index.html`, and a packaged `.swiftbiux` file when possible. Use the manual docs only when you need to fine-tune manifests, permissions, UI, file workflows, or release channels.
 
@@ -19,8 +19,14 @@ You do not need to read the full spec before starting. Ship the first plugin fir
 Paste this into ChatGPT, Claude, Cursor, Codex, or another coding assistant:
 
 ```text
+Repository:
+https://github.com/SwiftBiu/SwiftBiuX-Template
+
 Read the SwiftBiuX Skill:
 https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
+
+Build script:
+https://github.com/SwiftBiu/SwiftBiuX-Template/blob/main/scripts/build_plugin.sh
 
 Create a SwiftBiu plugin:
 
@@ -37,10 +43,10 @@ Requirements:
 - Generate manifest.json and script.js
 - Generate ui/index.html only if an interactive UI is actually needed
 - Prefer local processing unless network/API is necessary
-- Package with ./scripts/build_plugin.sh when finished
+- From the SwiftBiuX-Template repository root, run ./scripts/build_plugin.sh <PluginDirectory> when finished
 ```
 
-For a more specific starting point, use the prompt templates in `ai/prompts/`.
+For a more specific starting point, use the [AI prompt templates](../ai/prompts/) in the repository.
 
 ---
 
@@ -49,8 +55,14 @@ For a more specific starting point, use the prompt templates in `ai/prompts/`.
 Goal: prepend `Hello, ` to selected text and paste the result back.
 
 ```text
+Repository:
+https://github.com/SwiftBiu/SwiftBiuX-Template
+
 Read the SwiftBiuX Skill:
 https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
+
+Build script:
+https://github.com/SwiftBiu/SwiftBiuX-Template/blob/main/scripts/build_plugin.sh
 
 Create a SwiftBiu plugin:
 Name: HelloText
@@ -63,7 +75,7 @@ Requirements:
 - Pure JS, no Web UI
 - Declare only the paste permission
 - Generate manifest.json and script.js
-- Package with ./scripts/build_plugin.sh HelloText
+- From the SwiftBiuX-Template repository root, run ./scripts/build_plugin.sh HelloText
 ```
 
 Expected output:
@@ -85,9 +97,17 @@ Double-click `HelloText.swiftbiux` to install it, select text, and trigger the p
 Goal: select files and move each one into a sibling folder named by its file extension.
 
 ```text
+Repository:
+https://github.com/SwiftBiu/SwiftBiuX-Template
+
 Read the SwiftBiuX Skill:
 https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
-Load references/file-workflows.md only if needed.
+
+Load the file workflow reference only if needed:
+https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/references/file-workflows.md
+
+Build script:
+https://github.com/SwiftBiu/SwiftBiuX-Template/blob/main/scripts/build_plugin.sh
 
 Create a SwiftBiu plugin:
 Name: FileSorter
@@ -101,7 +121,7 @@ Requirements:
 - Use only local file APIs; do not send network requests
 - If no files are selected, show a notification and return
 - If one file fails, count it as skipped and continue processing the rest
-- Package with ./scripts/build_plugin.sh FileSorter
+- From the SwiftBiuX-Template repository root, run ./scripts/build_plugin.sh FileSorter
 ```
 
 This example teaches the three most important file-plugin rules:
@@ -118,15 +138,15 @@ Do not load every document at once. Route by task:
 
 | Scenario | Load |
 | --- | --- |
-| Unsure which plugin type to use | `references/scenarios.md` |
-| Manifest, icons, settings | `developer-modules/manifest.md` |
-| Permissions | `developer-modules/permissions.md` |
-| Local file workflows | `references/file-workflows.md` |
-| Third-party APIs or AI | `references/network-api-checklist.md` |
-| Web UI | `references/ui-patterns.md` |
-| Build or runtime errors | `developer-modules/debugging.md` |
+| Unsure which plugin type to use | [Scenario selection reference](../references/scenarios.md) |
+| Manifest, icons, settings | [Manifest reference](manifest.md) |
+| Permissions | [Permissions reference](permissions.md) |
+| Local file workflows | [File workflow reference](../references/file-workflows.md) |
+| Third-party APIs or AI | [Network/API checklist](../references/network-api-checklist.md) |
+| Web UI | [Web UI patterns](../references/ui-patterns.md) |
+| Build or runtime errors | [Debugging guide](debugging.md) |
 
-Full routing index: `ai/docs-index.json`.
+Full routing index: [ai/docs-index.json](../ai/docs-index.json).
 
 ---
 
@@ -175,7 +195,7 @@ function performAction(context) {
 }
 ```
 
-Package:
+From the [SwiftBiuX-Template repository](https://github.com/SwiftBiu/SwiftBiuX-Template) root, run:
 
 ```bash
 ./scripts/build_plugin.sh MyPlugin
@@ -187,8 +207,8 @@ Package:
 
 - Manifest details: [Manifest Configuration](manifest.md).
 - Permissions: [Permissions](permissions.md).
-- Custom windows: `references/ui-patterns.md`.
-- File workflows: `references/file-workflows.md`.
+- Custom windows: [Web UI patterns](../references/ui-patterns.md).
+- File workflows: [File workflow reference](../references/file-workflows.md).
 - Real examples: [Examples](examples.md).
 
 ---

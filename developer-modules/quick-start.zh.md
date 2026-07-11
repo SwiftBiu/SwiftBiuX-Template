@@ -4,9 +4,9 @@
 
 > [!NOTE]
 > **AI 快速上手速查**
-> - 先让 AI 读取 `AI_SKILL.md`，不要一开始塞完整文档。
+> - 先让 AI 读取 [AI_SKILL.md](../AI_SKILL.md)，不要一开始塞完整文档。
 > - 让 AI 根据需求自动选择 `textAction` 或 `fileAction`。
-> - 完成后用 `./scripts/build_plugin.sh <插件目录>` 打包成 `.swiftbiux`。
+> - 在 SwiftBiuX-Template 仓库根目录运行 [scripts/build_plugin.sh](../scripts/build_plugin.sh)：`./scripts/build_plugin.sh <插件目录>`。
 
 SwiftBiu 插件开发现在推荐 **AI-first**：你先描述想法，AI 根据 SwiftBiuX Skill 生成 `manifest.json`、`script.js`、可选 `ui/index.html`，并尽量打包成可安装插件。等你需要精细调整时，再查看 Manifest、权限、Web UI、文件工作流等模块文档。
 
@@ -19,8 +19,14 @@ SwiftBiu 插件开发现在推荐 **AI-first**：你先描述想法，AI 根据 
 把下面内容复制给 ChatGPT、Claude、Cursor、Codex 或任意代码助手：
 
 ```text
+仓库地址：
+https://github.com/SwiftBiu/SwiftBiuX-Template
+
 阅读 SwiftBiuX Skill：
 https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
+
+打包脚本：
+https://github.com/SwiftBiu/SwiftBiuX-Template/blob/main/scripts/build_plugin.sh
 
 请帮我创建一个 SwiftBiu 插件：
 
@@ -37,15 +43,15 @@ https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
 - 生成 manifest.json 和 script.js
 - 如果需要界面，再生成 ui/index.html
 - 尽量本地处理，只有必要时才使用网络/API
-- 完成后用 ./scripts/build_plugin.sh 打包
+- 完成后在 SwiftBiuX-Template 仓库根目录运行 ./scripts/build_plugin.sh <插件目录>
 ```
 
-如果你已经有明确场景，也可以直接使用 `ai/prompts/` 里的模板：
+如果你已经有明确场景，也可以直接使用仓库中的 [AI Prompt 模板](../ai/prompts/)：
 
-- `ai/prompts/text-action.zh.md`：选中文字后处理、复制或粘贴。
-- `ai/prompts/file-action.zh.md`：选中文件后读取、移动、复制、重命名或保存。
-- `ai/prompts/ai-api-action.zh.md`：接入 OpenAI、Gemini、DeepL、remove.bg 或内部 API。
-- `ai/prompts/web-ui.zh.md`：需要 HTML 界面、表单、预览、进度或编辑面板。
+- [文本动作模板](../ai/prompts/text-action.zh.md)：选中文字后处理、复制或粘贴。
+- [文件动作模板](../ai/prompts/file-action.zh.md)：选中文件后读取、移动、复制、重命名或保存。
+- [AI/API 动作模板](../ai/prompts/ai-api-action.zh.md)：接入 OpenAI、Gemini、DeepL、remove.bg 或内部 API。
+- [Web UI 模板](../ai/prompts/web-ui.zh.md)：需要 HTML 界面、表单、预览、进度或编辑面板。
 
 ---
 
@@ -54,8 +60,14 @@ https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
 目标：选中文字后，在前面加上 `Hello, `，然后粘贴回原处。
 
 ```text
+仓库地址：
+https://github.com/SwiftBiu/SwiftBiuX-Template
+
 阅读 SwiftBiuX Skill：
 https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
+
+打包脚本：
+https://github.com/SwiftBiu/SwiftBiuX-Template/blob/main/scripts/build_plugin.sh
 
 创建一个 SwiftBiu 插件：
 名称：HelloText
@@ -68,7 +80,7 @@ https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
 - 纯 JS，不需要 Web UI
 - permissions 只声明 paste
 - 生成 manifest.json 和 script.js
-- 用 ./scripts/build_plugin.sh HelloText 打包
+- 在 SwiftBiuX-Template 仓库根目录运行 ./scripts/build_plugin.sh HelloText
 ```
 
 你应该得到：
@@ -90,9 +102,17 @@ HelloText.swiftbiux
 目标：选中一批文件，按扩展名移动到同级目录下的子文件夹。
 
 ```text
+仓库地址：
+https://github.com/SwiftBiu/SwiftBiuX-Template
+
 阅读 SwiftBiuX Skill：
 https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
-并按需读取 references/file-workflows.md。
+
+需要时读取文件工作流文档：
+https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/references/file-workflows.md
+
+打包脚本：
+https://github.com/SwiftBiu/SwiftBiuX-Template/blob/main/scripts/build_plugin.sh
 
 创建一个 SwiftBiu 插件：
 名称：FileSorter
@@ -106,7 +126,7 @@ https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
 - 只用本地文件 API，不发网络请求
 - 如果没有选中文件，显示通知说明并返回
 - 单个文件失败时计入跳过数量并继续处理
-- 用 ./scripts/build_plugin.sh FileSorter 打包
+- 在 SwiftBiuX-Template 仓库根目录运行 ./scripts/build_plugin.sh FileSorter
 ```
 
 这个示例能帮助你理解文件插件的三个关键点：
@@ -123,15 +143,15 @@ https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
 
 | 场景 | 让 AI 读取 |
 | --- | --- |
-| 不知道该做什么类型的插件 | `references/scenarios.md` |
-| 写 manifest、图标、配置项 | `developer-modules/manifest.zh.md` |
-| 处理权限 | `developer-modules/permissions.zh.md` |
-| 处理本地文件 | `references/file-workflows.md` |
-| 接入第三方 API 或 AI | `references/network-api-checklist.md` |
-| 做 Web UI 界面 | `references/ui-patterns.md` |
-| 打包失败或运行错误 | `developer-modules/debugging.zh.md` |
+| 不知道该做什么类型的插件 | [场景选择参考](../references/scenarios.md) |
+| 写 manifest、图标、配置项 | [Manifest 参考](manifest.zh.md) |
+| 处理权限 | [权限参考](permissions.zh.md) |
+| 处理本地文件 | [文件工作流参考](../references/file-workflows.md) |
+| 接入第三方 API 或 AI | [网络/API 检查清单](../references/network-api-checklist.md) |
+| 做 Web UI 界面 | [Web UI 模式](../references/ui-patterns.md) |
+| 打包失败或运行错误 | [调试指南](debugging.zh.md) |
 
-完整路由索引：`ai/docs-index.json`。
+完整路由索引：[ai/docs-index.json](../ai/docs-index.json)。
 
 ---
 
@@ -180,7 +200,7 @@ function performAction(context) {
 }
 ```
 
-打包：
+进入 [SwiftBiuX-Template 仓库](https://github.com/SwiftBiu/SwiftBiuX-Template)根目录后运行：
 
 ```bash
 ./scripts/build_plugin.sh MyPlugin
@@ -192,8 +212,8 @@ function performAction(context) {
 
 - 想理解 `manifest.json`：看 [Manifest 配置](manifest.zh.md)。
 - 想处理权限：看 [权限声明](permissions.zh.md)。
-- 想做自定义窗口：看 `references/ui-patterns.md`。
-- 想处理文件：看 `references/file-workflows.md`。
+- 想做自定义窗口：看 [Web UI 模式](../references/ui-patterns.md)。
+- 想处理文件：看 [文件工作流参考](../references/file-workflows.md)。
 - 想参考真实插件：看 [示例插件](examples.zh.md)。
 
 ---
