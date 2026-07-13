@@ -1,12 +1,43 @@
 # SwiftBiuX 插件目录
 
-欢迎来到 SwiftBiuX 官方插件模板库。本文档旨在提供一个清晰的概览，介绍当前可用、正在开发以及计划中的所有插件。
+欢迎来到 SwiftBiuX 官方插件模板库。这里既是官方插件目录，也是 SwiftBiuX 插件开发模板与 AI Skill 仓库。
 
-目前插件的主要触发方式是：**选择文本内容 -> 触发扩展响应**。
+目前插件可以围绕选中文字、选中文件、OCR 内容、快捷键、拖拽方向、分享目标和自定义 Web UI 运行。
 
-**➡️ 想要学习如何开发插件？请查看我们的 [插件开发指南](DEVELOPMENT_GUIDE.md)** ([中文版](DEVELOPMENT_GUIDE_zh.md))
+## 🤖 推荐：AI-first 插件开发
 
-🤖 **觉得从头开发太繁琐？** 本仓库内置了全套 [AI Agent Skill 体系](AI_SKILL.md)，直接通过 Cursor/Gemini 等大模型引入，即可一句话让 AI 全自动生成完美适配的满血插件代码！
+现在开发 SwiftBiu 插件的推荐方式是：**先让 AI 根据 SwiftBiuX Skill 生成可运行插件，再按需查文档微调。**
+
+- AI 开发入口：[`ai/README.zh.md`](ai/README.zh.md) / [`ai/README.md`](ai/README.md)
+- 核心 Skill：[`AI_SKILL.md`](AI_SKILL.md)
+- 完整 Skill：[`AI_SKILL_FULL.md`](AI_SKILL_FULL.md)
+- 快速开始：[`developer-modules/quick-start.zh.md`](developer-modules/quick-start.zh.md) / [`developer-modules/quick-start.md`](developer-modules/quick-start.md)
+- 按需加载索引：[`ai/docs-index.json`](ai/docs-index.json)
+
+复制这个 Prompt 给 ChatGPT、Claude、Cursor、Codex 或其他代码助手即可开始：
+
+```text
+阅读 SwiftBiuX Skill：
+https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
+
+请帮我创建一个 SwiftBiu 插件：
+插件名称：
+输入类型：选中文本 / 选中文件 / 手动输入 / Web UI
+功能目标：
+输出方式：粘贴回原处 / 复制到剪贴板 / 显示通知 / 保存文件 / 打开窗口
+是否需要网络/API：否 / 是，使用哪个服务：
+是否需要配置项：否 / 是，需要哪些配置：
+
+要求：
+- 自动选择 textAction 或 fileAction
+- 只声明必要权限
+- 生成 manifest.json 和 script.js
+- 如果需要界面，再生成 ui/index.html
+- 尽量本地处理，只有必要时才使用网络/API
+- 完成后用 ./scripts/build_plugin.sh 打包
+```
+
+**想手动深入理解规范？** 请查看 [插件开发指南](DEVELOPMENT_GUIDE.md) / [中文版](DEVELOPMENT_GUIDE_zh.md)。
 
 ## 🧩 图例说明 (Legend)
 
