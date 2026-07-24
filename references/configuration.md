@@ -52,9 +52,61 @@ Use `"defaultValue"`, not `"default"`.
     "description": "Add suffixes on the left and choose one macOS app for each suffix on the right.",
     "defaultValue": "{\"rules\":[{\"fileExtension\":\"pdf\",\"appBundleID\":\"com.apple.Preview\"}]}",
     "group": "Files"
+  },
+  {
+    "key": "outputDirectory",
+    "label": "Output Folder",
+    "type": "directory",
+    "description": "Choose the destination folder.",
+    "group": "Files"
   }
 ]
 ```
+
+Supported configuration types:
+
+- `string`: regular text. When its key matches `ai.providerKey` or `ai.modelKey`, SwiftBiu renders the native AI picker.
+- `secure`: secret text stored in Keychain.
+- `boolean`: switch; returned as `"true"` or `"false"`.
+- `option`: fixed dropdown using `options`.
+- `directory`: native folder-path picker.
+- `fileExtensionAppRules`: native file-suffix-to-app rule editor.
+
+All values are returned to JavaScript as strings. Use `defaultValue`, never `default`.
+
+## SwiftBiu-Managed AI Settings
+
+Do not add a plugin-owned `secure` API key when the extension should use an AI account already configured in SwiftBiu. Bind normal configuration keys to the manifest `ai` metadata instead:
+
+```json
+{
+  "ai": {
+    "useCase": "chat",
+    "providerKey": "chatProvider",
+    "modelKey": "chatModel",
+    "allowedProviders": ["codex", "custom-endpoint"]
+  },
+  "configuration": [
+    {
+      "key": "chatProvider",
+      "label": "Provider",
+      "type": "string",
+      "defaultValue": "codex"
+    },
+    {
+      "key": "chatModel",
+      "label": "Model",
+      "type": "string",
+      "defaultValue": "gpt-5.2-codex"
+    }
+  ]
+}
+```
+
+- `allowedProviders` filters the generated native picker and is enforced again for background and Web UI proxy calls.
+- An action-level `ai` declaration replaces the root declaration for that action. Repeat the allowlist and key bindings when overriding it.
+- Add `custom-endpoint` only if the extension is compatible with the request/response protocol used by that account.
+- For use cases, aliases, native AI APIs, runtime errors, and provider restrictions, read [SwiftBiu-Managed AI Provider Contract](native-ai.md).
 
 ## Packaging
 

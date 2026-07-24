@@ -2,11 +2,15 @@
   "actions" : [
     {
       "ai" : {
+        "allowedProviders" : [
+          "codex",
+          "custom-endpoint"
+        ],
         "modelKey" : "imageModel",
         "providerKey" : "imageProvider",
         "useCase" : "imageGeneration"
       },
-      "description" : "Generate an image from selected text or a manual prompt.",
+      "description" : "Generate an image using Codex Login or a compatible custom provider.",
       "extensionKind" : "textAction",
       "id" : "codexImage",
       "script" : "script.js",
@@ -15,6 +19,10 @@
     }
   ],
   "ai" : {
+    "allowedProviders" : [
+      "codex",
+      "custom-endpoint"
+    ],
     "modelKey" : "imageModel",
     "providerKey" : "imageProvider",
     "useCase" : "imageGeneration"
@@ -24,7 +32,7 @@
   "configuration" : [
     {
       "defaultValue" : "codex",
-      "description" : "Choose the Codex login profile for image actions.",
+      "description" : "Choose Codex Login or a compatible custom provider.",
       "key" : "imageProvider",
       "label" : "Image Provider",
       "required" : true,
@@ -32,7 +40,7 @@
     },
     {
       "defaultValue" : "gpt-image-2-medium",
-      "description" : "Choose the Codex image model.",
+      "description" : "Choose an image model exposed by the selected Codex-compatible provider.",
       "key" : "imageModel",
       "label" : "Image Model",
       "required" : true,
@@ -97,7 +105,7 @@
       "type" : "option"
     }
   ],
-  "description" : "Generate images from text prompts using Codex Responses image tools through ChatGPT OAuth.",
+  "description" : "Generate images using Codex Login or a compatible custom provider with image tools.",
   "extensionKind" : "textAction",
   "icon" : "swiftbiu-custom-icon.png",
   "iconScale" : 2,

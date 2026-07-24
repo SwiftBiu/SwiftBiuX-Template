@@ -12,6 +12,10 @@
     "notifications"
   ],
   "ai": {
+    "allowedProviders": [
+      "xai-oauth",
+      "xai"
+    ],
     "useCase": "imageGeneration",
     "providerKey": "imageProvider",
     "modelKey": "imageModel"
@@ -46,6 +50,10 @@
       "script": "script.js",
       "shortcut": "cmd+shift+i",
       "ai": {
+        "allowedProviders": [
+          "xai-oauth",
+          "xai"
+        ],
         "useCase": "imageGeneration",
         "providerKey": "imageProvider",
         "modelKey": "imageModel"

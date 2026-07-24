@@ -50,6 +50,9 @@ When the context contains only textual paths, parse `context.selectedText` yours
 
 - `window.swiftBiu.fetch(url, options)`: returns `{ status, data }`. Requires `network`.
 - `window.swiftBiu.storage.get(key)`: returns `{ result }`.
+- `window.swiftBiu.storage.set(key, value)`: persists a known manifest configuration value.
+- `window.swiftBiu.downloadRemoteFile(url, options)`: returns a transient local file result. Requires `network`.
+- `window.swiftBiu.materializeSelectedRemoteFiles(options)`: downloads the current remote selections. Requires `network`.
 - `window.swiftBiu.getFileMetadata(path)`: returns file metadata. Requires `localFileRead`.
 - `window.swiftBiu.extractFileIcon(path, options)`: returns PNG icon data or an error. Requires `localFileRead`.
 - `window.swiftBiu.setFileIcon(targetPath, iconPath, options)`: applies a Finder custom icon. Requires `localFileRead` and `localFileWrite`.
@@ -70,14 +73,33 @@ if (response.status >= 200 && response.status < 300) {
 }
 ```
 
+## SwiftBiu-Managed AI
+
+These Promise-based methods use AI accounts configured in SwiftBiu:
+
+- `window.swiftBiu.ai.providers()` → `{ providers }`
+- `window.swiftBiu.ai.imageModels()` → `{ models }`
+- `window.swiftBiu.ai.chat(options)`
+- `window.swiftBiu.ai.imageGenerate(options)`
+- `window.swiftBiu.ai.videoGenerate(options)`
+- `window.swiftBiu.ai.textToSpeech(options)` / `window.swiftBiu.ai.tts(options)`
+- `window.swiftBiu.ai.speechToText(options)` / `window.swiftBiu.ai.stt(options)` / `window.swiftBiu.ai.transcribe(options)`
+
+All provider requests require `network`; speech-to-text also requires `localFileRead`. The Web UI bridge does not expose streaming chat. Use background `SwiftBiu.aiChatStream(...)` when streaming is required.
+
+Manifest `ai.allowedProviders` controls both the native provider picker and runtime validation. See the [managed AI contract](../references/native-ai.md).
+
 ## Trigger-Based APIs
 
 These methods also return Promises in JavaScript, but the native side resolves immediately after receiving the command. It does not wait for a dialog, paste operation, or window side effect to finish.
 
 - `window.swiftBiu.copyText(text)`: copies text.
+- `window.swiftBiu.copyImage(base64, options)`: copies image data and optionally a Finder-pasteable temporary image file.
 - `window.swiftBiu.pasteText(text)`: copies and pastes into the focused window.
+- `window.swiftBiu.showNotification(titleOrMessage, messageOrOptions, options)`: displays a native notification. Requires `notifications`.
 - `window.swiftBiu.openURL(url)`: opens a web URL.
 - `window.swiftBiu.openFileWithApp(path, appBundleID)`: opens a file with a specific app. Requires `localFileRead`.
+- `window.swiftBiu.share(options)`: invokes a native share target and returns `{ success, message? }`. Requires `share`.
 - `window.swiftBiu.speakText(text)`: uses system TTS.
 - `window.swiftBiu.pickLocalFile(options)`: opens a file picker and returns `{ path }`. Requires `localFileRead` or `localFileWrite`.
 - `window.swiftBiu.pickLocalDirectory()`: selects a folder and returns `{ path }`. Requires `localFileWrite`.

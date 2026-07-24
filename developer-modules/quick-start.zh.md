@@ -12,6 +12,20 @@ SwiftBiu 插件开发现在推荐 **AI-first**：你先描述想法，AI 根据 
 
 你不需要先读完整规范。先跑通第一个插件最重要。
 
+## 先理解扩展会出现在哪里
+
+扩展不绑定某一个按钮。同一项能力可以出现在选中文字旁，也可以处理剪切板、OCR 结果，或由快捷键与拖放手势送入的文件。SwiftBiu 会准备上下文，并按内容类型分发到兼容动作。
+
+<div class="swiftbiu-native-demo" data-demo-start="routing" data-demo-modes="routing,clipboard"></div>
+
+| 用户上下文 | 扩展入口 |
+| --- | --- |
+| 选中文字、OCR 识别文字或剪切板文本 | `textAction`，读取 `context.selectedText` |
+| Finder 选中文件、文件路径，或已转换为本地文件的富剪切板内容 | `fileAction`，读取 `context.selectedFiles` |
+| 需要表单、预览或编辑器 | 后台动作调用 `SwiftBiu.displayUI(...)` |
+
+不要在插件里写死触发方式。快捷键、手势、工具栏方向和应用规则由用户在 SwiftBiu 中配置；扩展只需实现 `isAvailable(context)`，并接受自己确实能处理的内容。
+
 ---
 
 ## 1. 复制这个通用 Prompt

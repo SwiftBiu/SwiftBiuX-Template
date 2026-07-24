@@ -27,6 +27,7 @@
 - `secure`：密码或 API Key，存储在 Keychain。
 - `boolean`：开关。
 - `option`：下拉选项。
+- `directory`：原生目录路径选择器。
 - `fileExtensionAppRules`：文件后缀到 macOS App 的规则编辑器。
 
 旧版 `radioList` 已不再支持。请迁移为普通 `string`，或为不同固定提示词复制独立扩展。
@@ -57,6 +58,7 @@
 | `string` / `secure` | 存储的字符串 | 直接使用 |
 | `boolean` | `"true"` 或 `"false"` | `SwiftBiu.getConfig("key") === "true"` |
 | `option` | 所选选项的 `value` | 直接使用 |
+| `directory` | 所选目录路径 | 直接使用 |
 | `fileExtensionAppRules` | 包含 `rules` 的 JSON 字符串 | 使用 `JSON.parse(...)` 解析 |
 
 ## `option`
@@ -111,6 +113,41 @@ const value = SwiftBiu.getConfig("rules") || "{\"rules\":[]}";
 const rules = JSON.parse(value).rules || [];
 ```
 
+## 限制原生 AI 提供商选择器
+
+插件声明原生 AI 元数据时，可以按提供商身份限制 SwiftBiu 自动生成的选择器：
+
+```json
+{
+  "ai": {
+    "useCase": "chat",
+    "providerKey": "chatProvider",
+    "modelKey": "chatModel",
+    "allowedProviders": ["codex", "custom-endpoint"]
+  },
+  "configuration": [
+    {
+      "key": "chatProvider",
+      "label": "文本提供商",
+      "type": "string",
+      "defaultValue": "codex"
+    },
+    {
+      "key": "chatModel",
+      "label": "文本模型",
+      "type": "string",
+      "defaultValue": "gpt-5.2-codex"
+    }
+  ]
+}
+```
+
+- `allowedProviders` 填写 SwiftBiu 提供商标识或别名。
+- 限制不仅作用于原生选择器，插件调用原生 AI 代理时还会再次校验。
+- 如果希望用户选择自己的兼容服务，可以把 `custom-endpoint` 加入白名单。SwiftBiu 不会改动该账号现有的 API 格式逻辑；自定义服务仍需兼容插件实际使用的请求格式。
+
+如果动作级 `ai` 覆盖了根级 `ai`，需要在动作级声明中重复这些限制。
+
 ## 自定义 Key 与约定 Key
 
 大多数 `key` 都由插件自己定义。SwiftBiu 只负责存储和返回，业务含义由脚本决定。
@@ -141,5 +178,6 @@ const rules = JSON.parse(value).rules || [];
 
 - [Manifest 与动作类型](manifest.md)
 - [后台 SwiftBiu API](background-api.md)
+- [SwiftBiu 托管 AI 提供商契约](../references/native-ai.md)
 - [原生文件任务与 AI 响应 UI](native-workflows.md)
 - [Web UI API](web-ui-api.md)

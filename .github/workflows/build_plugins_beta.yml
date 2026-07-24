@@ -31,6 +31,11 @@ jobs:
       - name: Validate extension kind and catalog channels
         run: node scripts/test_extension_channels.js
 
+      - name: Validate manifests, documentation, and plugin behavior
+        run: |
+          node scripts/test_public_contract.js --template-only
+          node scripts/test_move_files_plugin.js
+
       - name: Create distribution directory
         run: mkdir -p dist
 

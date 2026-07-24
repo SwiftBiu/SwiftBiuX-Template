@@ -43,6 +43,10 @@
       "script": "script.js",
       "shortcut": "cmd+shift+s",
       "ai": {
+        "allowedProviders": [
+          "xai-oauth",
+          "xai"
+        ],
         "useCase": "tts",
         "providerKey": "ttsProvider",
         "modelKey": "ttsModel"
@@ -55,6 +59,10 @@
       "extensionKind": "fileAction",
       "script": "script.js",
       "ai": {
+        "allowedProviders": [
+          "xai-oauth",
+          "xai"
+        ],
         "useCase": "stt",
         "providerKey": "sttProvider",
         "modelKey": "sttModel"

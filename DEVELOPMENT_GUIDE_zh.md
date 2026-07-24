@@ -460,11 +460,18 @@ window.swiftBiu_initialize = async function (context) {
 | `author`        | String | 是       | 插件的作者。                                                                                                |
 | `description`   | String | 是       | 插件的介绍。                                                                                                |
 | `version`       | String | 是       | 插件的版本号，例如 `1.0`。                                                                                  |
-| `actions`       | Array  | 是       | 定义插件提供的一个或多个动作的数组（目前只支持一个动作）。                                                  |
+| `actions`       | Array  | 是       | 定义插件提供的一个或多个动作；每个动作可拥有独立扩展类型与 AI 配置。                                        |
 | `icon`          | String | 否       | **(根级别)** 整个插件的默认图标。支持 SF Symbol、打包图片文件、文本图标、Iconify 图标和 `data:` URI 数据图标。 |
 | `iconType`      | String | 否       | **(根级别)** 定义 `icon` 的解析方式。支持 `"sfSymbol"`、`"file"`、`"text"`、`"iconify"` 和 `"data"`。        |
+| `extensionKind` | String | 是       | 根级动作上下文：`textAction` 或 `fileAction`；每个动作也需要重复声明。 |
 | `configuration` | Array  | 否       | 为您的插件定义一个可由用户配置的设置界面。                                                                  |
 | `permissions`   | Array  | 否       | 声明插件运行所需的系统权限。                                                                                |
+| `ui`            | Object | 否       | 插件 Web UI 入口。 |
+| `shareTargets`  | Array  | 否       | 声明式原生分享目标。 |
+| `network`       | Object | 否       | 外连域名声明及用途元数据。 |
+| `ai`            | Object | 否       | SwiftBiu 托管 AI 的用途、提供商/模型 Key 和可选 `allowedProviders`。 |
+
+原生 AI 扩展应声明 `ai.useCase`、`providerKey` 和 `modelKey`。提供商专用扩展还应声明 `allowedProviders`；原生选择器与每次运行时代理请求都会使用同一白名单。动作级 `ai` 会整体替代该动作的根级声明，因此需要重复全部必要字段。详见 [SwiftBiu 托管 AI 提供商契约](references/native-ai.md)。
 
 ### 插件图标规范 (`icon`)
 
@@ -711,12 +718,15 @@ SwiftBiu 现在支持多种根级别插件图标来源，方便您根据场景�
     *   `SwiftBiu.showImage(imageSource: String, position?: Object, context?: Object)`: 显示原生图片 Toast 卡片。`imageSource` 支持 Base64 字符串或 `http/https` 图片 URL。*(所需权限: `notifications`)*
     *   `SwiftBiu.showInteractiveImage(options, onRegenerate)`: 创建可交互图片会话并返回 `sessionID`。适用于同一张图片卡片上的“重生成/更新”流程。*(所需权限: `notifications`)*
     *   `SwiftBiu.updateInteractiveImage(sessionID, options)` / `SwiftBiu.failInteractiveImage(sessionID, message)`: 更新或失败结束已有的可交互图片会话。
+    *   `SwiftBiu.showVideo(...)` / `showInteractiveVideo(...)` / `updateInteractiveVideo(...)` / `failInteractiveVideo(...)`：展示并更新原生视频结果会话。*(所需权限: `notifications`)*
+    *   `SwiftBiu.showAudio(...)` / `showInteractiveAudio(...)` / `updateInteractiveAudio(...)` / `failInteractiveAudio(...)`：展示并更新原生音频结果会话。*(所需权限: `notifications`)*
     *   `SwiftBiu.showLoadingIndicator(position: Object)` / `SwiftBiu.hideLoadingIndicator()`: 在指定坐标处显示系统原生 Loading 动画。更建议仅用于“无独立界面”的轻量动作；对于 `displayUI(...)`、AI 响应弹框或图片卡片流程，应在各自 UI/会话内管理等待状态。
 *   **进阶操作:**
     *   `SwiftBiu.setConfig(key: String, value: String)`: (同步) 将插件配置值持久化写回原生存储。
     *   `SwiftBiu.fetch(url, options, onSuccess, onError)`: (Callback 异步) 发起底层网络请求。*(所需权限: `network`)*
     *   `SwiftBiu.fetchStream(url, options, onEvent, onError)`: (同步创建) 发起一个流式网络请求，并返回 `streamID`。*(所需权限: `network`)*
     *   `SwiftBiu.cancelFetchStream(streamID: String)`: (同步取消) 取消一个由 `fetchStream(...)` 创建的进行中流式请求。
+    *   SwiftBiu 托管 AI：`aiProviderProfiles`、`aiImageModels`、`aiChat`、`aiChatStream`、`aiImageGenerate`、`aiVideoGenerate`、`aiTextToSpeech` / `aiTTS`、`aiSpeechToText` / `aiTranscribe` / `aiSTT`。提供商请求需要 `network`，STT 还需要 `localFileRead`。详见[原生 AI 契约](references/native-ai.md)。
     *   `SwiftBiu.runShellScript(script, context)`: (同步) 执行 Bash/Zsh 脚本并返回输出。需要兼容 App Store 版的插件应避免依赖它，沙盒环境可能阻止子进程执行和文件系统访问。*(所需权限: `runShellScript`)*
 
 #### 1.4 原生文件任务进度面板（后台脚本）
@@ -913,13 +923,15 @@ function performAction(context) {
 
 为确保您的插件正常工作（尤其是在沙盒化的 App Store 版 SwiftBiu 中），您必须在 `manifest.json` 中声明它需要的权限。
 
-*   `"network"`: `swiftBiu.fetch` 需要此权限。
+*   `"network"`: 直接 fetch/流式请求/下载、远程媒体与 SwiftBiu 托管 `ai*` 提供商请求需要此权限。
 *   `"clipboardRead"`: `SwiftBiu.getClipboard()` 需要此权限 — 允许插件读取当前剪贴板内容。
 *   `"clipboardWrite"`: `swiftBiu.copyText` 需要此权限。
 *   `"localFileRead"`: `SwiftBiu.getFileMetadata(path)`、`SwiftBiu.extractFileIcon(path, options)`、`SwiftBiu.setFileIcon(targetPath, iconPath, options)`、`SwiftBiu.pickLocalFile(options)`、`SwiftBiu.readLocalFile(path)`、`SwiftBiu.readLocalTextFile(path)`、`SwiftBiu.listDirectory(path)`、`SwiftBiu.openFileWithApp(path, appBundleID)`、`window.swiftBiu.getFileMetadata(path)`、`window.swiftBiu.extractFileIcon(path, options)`、`window.swiftBiu.setFileIcon(targetPath, iconPath, options)`、`window.swiftBiu.pickLocalFile(options)`、`window.swiftBiu.readLocalFile(path)`、`window.swiftBiu.readLocalTextFile(path)`、`window.swiftBiu.listDirectory(path)` 与 `window.swiftBiu.openFileWithApp(path, appBundleID)` 需要此权限 — 允许插件检查、选择、提取图标、替换图标、读取或打开本地文件与可访问目录。
 *   `"localFileWrite"`: `setFileIcon`、`pickLocalFile`、`pickLocalDirectory`、`requestDirectoryAuthorization`、`hasAuthorizedDirectoryAccess`、`createLocalDirectory`、`createLocalFile`、`writeLocalTextFile`、`overwriteLocalFile`、`renameLocalFile`、`copyLocalFile`、`moveLocalFile`、`trashLocalItem`、`saveLocalFile`，以及在检查可写目标时的 `fileExists`、`directoryExists` 需要此权限 — 允许插件选择可写文件、替换自定义图标，以及在所选或已授权位置创建、更新、移动、重命名、移入废纸篓、保存文件或检查可写目标。
 *   `"paste"`: `swiftBiu.pasteText` 需要此权限 — 允许插件将文本直接粘贴到用户的活跃应用程序中。
-*   `"notifications"`: `swiftBiu.showNotification`、`SwiftBiu.showImage` 与 `SwiftBiu.showInteractiveImage` 需要此权限。
+*   `"share"`: `shareTargets`、`SwiftBiu.share(...)` 与 `window.swiftBiu.share(...)` 需要此权限。
+*   `"notifications"`: 通知和原生图片、视频、音频展示/交互会话需要此权限。
+*   `"ui"`: 原生 AI 响应弹框会话需要此权限。
 *   `"runAppleScript"`: `SwiftBiu.runAppleScript()` 需要此权限 — 允许插件执行 AppleScript 代码。⚠️ **需要兼容 App Store 版的插件不要使用。**
 *   `"runShellScript"`: `swiftBiu.runShellScript` 需要此权限。⚠️ **需要兼容 App Store 版的插件不要使用。**
 

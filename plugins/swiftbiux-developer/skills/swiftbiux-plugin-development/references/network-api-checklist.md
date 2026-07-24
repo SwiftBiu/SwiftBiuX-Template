@@ -13,9 +13,18 @@ Use a network/API plugin for:
 
 Do not use network just to count, format, rename, copy, move, clean, or generate rule-based reports.
 
+## Native Provider or Direct API?
+
+For chat, vision, image generation, video generation, TTS, and STT, first check whether the extension can use the account and model already configured in SwiftBiu.
+
+- SwiftBiu-managed provider: declare manifest `ai` metadata and call `SwiftBiu.ai*` or `window.swiftBiu.ai.*`. Do not collect a duplicate API key in the plugin.
+- Direct third-party API: use `fetch` only when the service is not supported by the native bridge or the plugin intentionally owns a distinct credential and protocol.
+
+Read [SwiftBiu-Managed AI Provider Contract](native-ai.md) before generating a native AI extension.
+
 ## Required API Documentation
 
-Before provider-specific implementation, require enough documentation to know:
+Before a direct provider-specific `fetch` implementation, require enough documentation to know:
 
 - Base URL and endpoint path
 - HTTP method
@@ -31,7 +40,7 @@ If this information is missing, generate a scaffold with clear placeholders or a
 
 ## Secret Handling
 
-Never hard-code API keys.
+Never hard-code API keys. This section applies to direct API plugins. SwiftBiu-managed AI plugins should use the host provider store described above.
 
 Add `configuration` entries like:
 

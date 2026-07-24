@@ -89,6 +89,14 @@
       "loadWhen": "The plugin uses AI, translation, image generation, live web data, or any third-party/internal API."
     },
     {
+      "id": "native-ai",
+      "title": "SwiftBiu-Managed AI Provider Contract",
+      "path": "references/native-ai.md",
+      "audience": ["ai-assistant", "developer"],
+      "keywords": ["native AI", "provider", "model", "allowedProviders", "aiChat", "aiImageGenerate", "aiVideoGenerate", "TTS", "STT", "custom endpoint"],
+      "loadWhen": "The plugin uses SwiftBiu-managed AI accounts/models, native AI proxy APIs, provider restrictions, or native chat/image/video/voice generation."
+    },
+    {
       "id": "ui-patterns",
       "title": "UI Patterns",
       "path": "references/ui-patterns.md",
@@ -101,8 +109,8 @@
       "title": "Configuration Reference",
       "path": "references/configuration.md",
       "audience": ["ai-assistant", "developer"],
-      "keywords": ["settings", "secure", "API key", "options", "catalog", "packaging"],
-      "loadWhen": "The plugin needs user settings, secure secrets, option fields, packaging, or catalog entries."
+      "keywords": ["settings", "secure", "API key", "options", "directory", "allowedProviders", "catalog", "packaging"],
+      "loadWhen": "The plugin needs user settings, provider/model pickers, secure secrets, option or directory fields, packaging, or catalog entries."
     },
     {
       "id": "debugging",

@@ -15,7 +15,7 @@ Standard Actions and Web App launchers run in the background `script.js` sandbox
 ## Clipboard and Text
 
 - `SwiftBiu.writeToClipboard(text: String)`: writes text to the system clipboard. Requires `clipboardWrite`.
-- `SwiftBiu.copyText(text: String)`: compatible copy helper.
+- `SwiftBiu.copyImage(base64: String, options?: Object)`: writes image data and, by default, a Finder-pasteable temporary file. Requires `clipboardWrite`.
 - `SwiftBiu.getClipboard()`: returns plain text from the clipboard. Requires `clipboardRead`.
 - `SwiftBiu.pasteText(text: String)`: copies and pastes into the previously active window. Requires `paste`.
 
@@ -47,6 +47,8 @@ When access is missing, request authorization immediately. Stop cleanly when the
 - `SwiftBiu.copyLocalFile(sourcePath: String, destinationPath: String)`: copies a file. Requires `localFileWrite`.
 - `SwiftBiu.moveLocalFile(sourcePath: String, destinationPath: String)`: moves a file. Requires `localFileWrite`.
 - `SwiftBiu.trashLocalItem(path: String)`: moves an item to the macOS Trash. Requires `localFileWrite`.
+- `SwiftBiu.saveLocalFile(base64: String, filename: String)`: opens the native Save As panel.
+- `SwiftBiu.exportFile(base64: String, filename: String)`: backward-compatible alias for `saveLocalFile(...)`.
 
 ## File Icons
 
@@ -60,6 +62,8 @@ For App Store compatibility, use these host APIs instead of shell, AppleScript, 
 - `SwiftBiu.openURL(urlString: String)`: opens a link in the default browser.
 - `SwiftBiu.openFileInPreview(filePath: String)`: opens a file in the default macOS app.
 - `SwiftBiu.openFileWithApp(filePath: String, appBundleID: String)`: opens a file with a specific app and returns `Boolean`. Requires `localFileRead`.
+- `SwiftBiu.openImageInPreview(base64: String)`: decodes an image to a temporary file and opens it.
+- `SwiftBiu.share(options?: Object)`: returns `{ success, message? }` after invoking the native share picker or a manifest `shareTargets` entry. Requires `share`.
 
 ## Notifications, Images, and Loading
 
@@ -68,6 +72,10 @@ For App Store compatibility, use these host APIs instead of shell, AppleScript, 
 - `SwiftBiu.showInteractiveImage(options, onRegenerate)`: creates an interactive image session and returns `sessionID`. Requires `notifications`.
 - `SwiftBiu.updateInteractiveImage(sessionID, options)`: updates an image session.
 - `SwiftBiu.failInteractiveImage(sessionID, message)`: fails an image session.
+- `SwiftBiu.showVideo(source, position, context)`: displays a local or remote video card. Requires `notifications`.
+- `SwiftBiu.showInteractiveVideo(options, onRegenerate)`, `updateInteractiveVideo(...)`, `failInteractiveVideo(...)`: manage an in-place video generation session. Require `notifications`.
+- `SwiftBiu.showAudio(source, position, context)`: displays Base64, local, or remote audio. Requires `notifications`.
+- `SwiftBiu.showInteractiveAudio(options, onRegenerate)`, `updateInteractiveAudio(...)`, `failInteractiveAudio(...)`: manage an in-place audio generation session. Require `notifications`.
 - `SwiftBiu.showLoadingIndicator(position: Object)`: shows a native loading indicator.
 - `SwiftBiu.hideLoadingIndicator()`: hides it.
 
@@ -78,10 +86,33 @@ Use the loading indicator only for lightweight actions without their own interfa
 - `SwiftBiu.fetch(url, options, onSuccess, onError)`: callback-based request. Requires `network`.
 - `SwiftBiu.fetchStream(url, options, onEvent, onError)`: starts a stream and returns `streamID`. Requires `network`.
 - `SwiftBiu.cancelFetchStream(streamID: String)`: cancels an active stream.
+- `SwiftBiu.downloadRemoteFile(url, options, onSuccess, onError)`: downloads a remote file into transient local storage. Requires `network`.
+- `SwiftBiu.materializeSelectedRemoteFiles(options, onSuccess, onError)`: downloads `context.selectedRemoteFiles` for the current action. Requires `network`.
+
+## SwiftBiu-Managed AI Providers
+
+These APIs use provider accounts configured in SwiftBiu. They require `network`; speech-to-text also requires `localFileRead`.
+
+- Discovery: `SwiftBiu.aiProviderProfiles()` and `SwiftBiu.aiImageModels()`.
+- Text/vision: `SwiftBiu.aiChat(options, onSuccess, onError)` and streaming `SwiftBiu.aiChatStream(options, onEvent, onError)`.
+- Image/video: `SwiftBiu.aiImageGenerate(...)` and `SwiftBiu.aiVideoGenerate(...)`.
+- Voice: `SwiftBiu.aiTextToSpeech(...)` (`aiTTS` alias) and `SwiftBiu.aiSpeechToText(...)` (`aiTranscribe` / `aiSTT` aliases).
+
+Declare manifest `ai` metadata and use `allowedProviders` for provider-specific extensions. Picker filtering and runtime validation use the same allowlist. See the [managed AI contract](../references/native-ai.md).
+
+## Native and Web UI Sessions
+
+- `SwiftBiu.displayUI(options, onMessage)`, `postMessageToUI(windowID, message)`, and `closeUI(windowID)` manage a packaged Web UI.
+- `SwiftBiu.showAIResponseBubble(...)`, `updateAIResponseBubble(...)`, `failAIResponseBubble(...)`, and `closeAIResponseBubble(...)` manage native text-generation results. Require `ui`.
+- `SwiftBiu.beginFileTask(...)`, `updateFileTask(...)`, `finishFileTask(...)`, and `failFileTask(...)` manage native file progress.
+- `SwiftBiu.openNativeGeminiImageStudio(options)` opens the native Gemini image studio. Requires `network`.
+
+See [Native Workflows](native-workflows.md) for lifecycle and event details.
 
 ## Shell Scripts
 
 - `SwiftBiu.runShellScript(script, context)`: synchronously executes Bash or Zsh. Requires `runShellScript`.
+- `SwiftBiu.runAppleScript(script, context)`: synchronously executes AppleScript. Requires `runAppleScript`.
 
 > [!WARNING]
 > App Store sandboxing can block subprocesses and file-system access. Cross-platform and App Store-compatible plugins should not depend on shell execution as their primary implementation.

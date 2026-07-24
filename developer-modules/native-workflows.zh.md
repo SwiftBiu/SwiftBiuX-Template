@@ -139,6 +139,20 @@ function performAction(context) {
 }
 ```
 
+## 图片、视频与音频交互会话
+
+当生成过程包含等待状态、支持重新生成，或需要在同一张卡片上原位更新时，应使用原生媒体会话。这些 API 在后台 `script.js` 中调用，均需要 `notifications`。
+
+| 媒体 | 创建 | 更新 | 失败 |
+| --- | --- | --- | --- |
+| 图片 | `showInteractiveImage(options, onRegenerate)` | `updateInteractiveImage(sessionID, options)` | `failInteractiveImage(sessionID, message)` |
+| 视频 | `showInteractiveVideo(options, onRegenerate)` | `updateInteractiveVideo(sessionID, options)` | `failInteractiveVideo(sessionID, message)` |
+| 音频 | `showInteractiveAudio(options, onRegenerate)` | `updateInteractiveAudio(sessionID, options)` | `failInteractiveAudio(sessionID, message)` |
+
+创建方法会返回 `sessionID`。先显示等待占位并保存 ID，生成完成后再用 Base64、本地路径或已授权远程 URL 更新同一个会话。只有最终媒体已准备完成时，才适合直接调用非交互式的 `showImage(...)`、`showVideo(...)` 或 `showAudio(...)`。
+
+提供商执行与结果展示是两套独立契约。使用 `aiImageGenerate`、`aiVideoGenerate` 或 TTS API 完成 SwiftBiu 托管生成，再把结果传入对应媒体会话。完整规则见 [SwiftBiu 托管 AI 契约](../references/native-ai.md)。
+
 ## 选择哪一种原生 UI
 
 | 场景 | 推荐 UI |
@@ -147,6 +161,8 @@ function performAction(context) {
 | 流式生成文本并让用户确认 | AI 响应弹框 |
 | 单次快速成功提示 | 系统通知 |
 | 单张图片预览或重新生成 | 交互图片会话 |
+| 带等待或重试状态的视频生成 | 交互视频会话 |
+| 带等待或重试状态的 TTS 或生成音频 | 交互音频会话 |
 | 复杂自定义表单或完整应用界面 | Web App UI |
 
 ## 相关文档

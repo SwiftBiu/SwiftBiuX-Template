@@ -2,7 +2,7 @@
 
 欢迎来到 SwiftBiuX 官方插件模板库。这里既是官方插件目录，也是 SwiftBiuX 插件开发模板与 AI Skill 仓库。
 
-目前插件可以围绕选中文字、选中文件、OCR 内容、快捷键、拖拽方向、分享目标和自定义 Web UI 运行。
+目前插件可以围绕选中文字、选中文件、剪切板、OCR 内容、快捷键、拖拽方向、分享目标和自定义 Web UI 运行。SwiftBiu 1.3.9 还支持按内容智能分发动作、Lottie 工具栏动态图标，以及 `.swiftbiuxs` 可审阅源码与只读 iCloud 链接分享。
 
 ## 🤖 推荐：AI-first 插件开发
 
@@ -37,7 +37,11 @@ https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
 - 完成后用 ./scripts/build_plugin.sh 打包
 ```
 
-**想手动深入理解规范？** 请查看 [插件开发指南](DEVELOPMENT_GUIDE.md) / [中文版](DEVELOPMENT_GUIDE_zh.md)。
+**想手动深入理解规范？** 请查看 [插件开发指南](DEVELOPMENT_GUIDE.md) / [中文版](DEVELOPMENT_GUIDE_zh.md)。开发原生 AI 扩展时请同时查看 [SwiftBiu 托管 AI 契约](references/native-ai.md)。
+
+发布模板前运行 `node scripts/test_public_contract.js --template-only`。当本仓库位于
+`SwiftBiu/SwiftBiuX-Template` 时，运行 `node scripts/test_public_contract.js`
+还会继续对比 Swift 后台接口、Web Bridge 路由与 API 覆盖测试。
 
 ## 🧩 图例说明 (Legend)
 

@@ -1,0 +1,48 @@
+{
+  "identifier": "com.swiftbiu.plugin.movefiles",
+  "name": {
+    "en": "Move Files",
+    "zh": "移动文件"
+  },
+  "author": "SwiftBiu",
+  "description": {
+    "en": "Move selected files and folders to a chosen destination, with conflict details and undo support.",
+    "zh": "将选中的文件或文件夹移动到指定目录，并提供冲突明细与撤销操作。"
+  },
+  "version": "1.1.0",
+  "extensionKind": "fileAction",
+  "icon": "folder.badge.minus",
+  "iconType": "sfSymbol",
+  "actions": [
+    {
+      "title": {
+        "en": "Move to Folder…",
+        "zh": "移动到文件夹…"
+      },
+      "description": {
+        "en": "Choose a destination and review progress, conflicts, failures, and undo actions.",
+        "zh": "选择目标目录，并查看移动进度、冲突、失败原因与撤销操作。"
+      },
+      "script": "script.js",
+      "extensionKind": "fileAction"
+    }
+  ],
+  "configuration": [
+    {
+      "key": "default_dir",
+      "label": {
+        "en": "Quick Move Destination",
+        "zh": "快捷移动目录"
+      },
+      "type": "directory",
+      "description": {
+        "en": "Optional. When set, the action moves items here without asking for a destination. Existing names are skipped, and successful moves can be undone from the task panel.",
+        "zh": "可选。设置后将不再询问目标目录，而是直接移动到这里；同名项目会跳过，成功移动后可在任务面板中撤销。"
+      }
+    }
+  ],
+  "permissions": [
+    "localFileWrite",
+    "notifications"
+  ]
+}

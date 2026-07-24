@@ -42,6 +42,7 @@ AI 应先读取 `AI_SKILL.md`，然后根据任务类型按需加载文档：
 | 图标格式、SF Symbol、文本图标 | `references/manifest-icons.md` |
 | 完整 manifest、配置项、shareTargets | `developer-modules/manifest.zh.md` |
 | 需要剪贴板、文件、网络、通知 | `developer-modules/permissions.zh.md` |
+| 使用 SwiftBiu 托管 AI 提供商、模型或 `allowedProviders` | `references/native-ai.md` |
 | 批量处理本地文件 | `references/file-workflows.md` |
 | 接入 OpenAI、Gemini、DeepL、remove.bg 或内部 API | `references/network-api-checklist.md` |
 | 需要 HTML 界面、预览、表单、进度条 | `references/ui-patterns.md` |

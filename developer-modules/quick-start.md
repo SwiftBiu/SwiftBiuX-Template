@@ -12,6 +12,20 @@ SwiftBiu plugin development is now **AI-first**. Describe the plugin you want; t
 
 You do not need to read the full spec before starting. Ship the first plugin first.
 
+## Understand the Runtime Surfaces
+
+A plugin is not tied to one button. SwiftBiu can surface the same capability beside selected text, from Clipboard history, after OCR, or for files triggered by a shortcut or drag gesture. The host prepares the context and routes it to the compatible action.
+
+<div class="swiftbiu-native-demo" data-demo-start="routing" data-demo-modes="routing,clipboard"></div>
+
+| User context | Plugin entry |
+| --- | --- |
+| Selected text, recognized OCR text, or Clipboard text | `textAction` with `context.selectedText` |
+| Finder selection, file paths, or supported rich Clipboard content materialized as local files | `fileAction` with `context.selectedFiles` |
+| A workflow that needs a form, preview, or editor | A background action calls `SwiftBiu.displayUI(...)` |
+
+Keep trigger configuration out of the plugin. The user chooses shortcuts, gestures, toolbar direction, and app-specific rules in SwiftBiu; your extension should implement `isAvailable(context)` and accept only the content it can process.
+
 ---
 
 ## 1. Copy this universal prompt

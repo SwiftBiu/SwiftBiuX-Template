@@ -479,8 +479,15 @@ This file is the "ID card" for your plugin. Here are the most important keys:
 | `actions`       | Array  | Yes      | An array defining the actions the plugin provides.                                                                                                        |
 | `icon`          | String | No       | **(Root Level)** The default icon for the entire plugin. Supports SF Symbols, packaged image files, text icons, Iconify icons, or a `data:` URI payload.        |
 | `iconType`      | String | No       | **(Root Level)** Defines how `icon` should be interpreted. Supported values: `"sfSymbol"`, `"file"`, `"text"`, `"iconify"`, and `"data"`.                        |
+| `extensionKind` | String | Yes      | Root action context: `textAction` or `fileAction`. Repeat it on every action. |
 | `configuration` | Array  | No       | Defines a user-configurable settings UI for your plugin.                                                                                                        |
 | `permissions`   | Array  | No       | Declares system permissions required by the plugin.                                                                                                             |
+| `ui`            | Object | No       | Packaged Web UI entry point. |
+| `shareTargets`  | Array  | No       | Declarative native sharing targets. |
+| `network`       | Object | No       | Declared outbound domain metadata. |
+| `ai`            | Object | No       | SwiftBiu-managed AI use case, provider/model keys, and optional `allowedProviders`. |
+
+For native AI extensions, declare `ai.useCase`, `providerKey`, and `modelKey`. Provider-specific extensions should also declare `allowedProviders`; SwiftBiu applies the same allowlist to the native picker and every runtime proxy request. Action-level `ai` replaces the root declaration for that action, so repeat all required fields. See the [SwiftBiu-managed AI provider contract](references/native-ai.md).
 
 ### Plugin Icon Formats
 
@@ -732,12 +739,15 @@ In a Standard Action, all code executes globally in the background `script.js`. 
     *   `SwiftBiu.showImage(imageSource: String, position?: Object, context?: Object)`: Displays the native image toast card. `imageSource` accepts either a Base64 string or an `http/https` URL. *(Requires: `notifications`)*
     *   `SwiftBiu.showInteractiveImage(options, onRegenerate)`: Creates an interactive image session and returns a `sessionID`. Use it when you need regenerate/update behavior from the same image card. *(Requires: `notifications`)*
     *   `SwiftBiu.updateInteractiveImage(sessionID, options)` / `SwiftBiu.failInteractiveImage(sessionID, message)`: Updates or fails an existing interactive image session.
+    *   `SwiftBiu.showVideo(...)` / `showInteractiveVideo(...)` / `updateInteractiveVideo(...)` / `failInteractiveVideo(...)`: Displays and updates native video result sessions. *(Requires: `notifications`)*
+    *   `SwiftBiu.showAudio(...)` / `showInteractiveAudio(...)` / `updateInteractiveAudio(...)` / `failInteractiveAudio(...)`: Displays and updates native audio result sessions. *(Requires: `notifications`)*
     *   `SwiftBiu.showLoadingIndicator(position: Object)` / `SwiftBiu.hideLoadingIndicator()`: Displays a native loading spinner at the specified coordinates. Recommended only for lightweight non-UI quick actions. For `displayUI(...)`, AI bubble, or image card flows, manage loading state inside your own UI/session.
 *   **Advanced Operations:**
     *   `SwiftBiu.setConfig(key: String, value: String)`: (Synchronous) Persists a plugin configuration value back to native storage.
     *   `SwiftBiu.fetch(url, options, onSuccess, onError)`: (Callback Async) Initiates a low-level network request. *(Requires: `network`)*
     *   `SwiftBiu.fetchStream(url, options, onEvent, onError)`: (Synchronous Create) Starts a streaming network request and returns a `streamID`. *(Requires: `network`)*
     *   `SwiftBiu.cancelFetchStream(streamID: String)`: (Synchronous Cancel) Cancels an active streaming request created by `fetchStream(...)`.
+    *   SwiftBiu-managed AI: `aiProviderProfiles`, `aiImageModels`, `aiChat`, `aiChatStream`, `aiImageGenerate`, `aiVideoGenerate`, `aiTextToSpeech` / `aiTTS`, and `aiSpeechToText` / `aiTranscribe` / `aiSTT`. Provider requests require `network`; STT also requires `localFileRead`. See [Native AI Contract](references/native-ai.md).
     *   `SwiftBiu.runShellScript(script, context)`: (Synchronous) Executes a Bash/Zsh script and returns the output. Avoid this for App Store-compatible plugins because sandboxed builds can block subprocess execution and file-system access. *(Requires: `runShellScript`)*
 
 #### 1.4 Native File Task Progress Panel (Background Script)
@@ -935,13 +945,15 @@ With SwiftBiu expanding to iOS, your plugins can run seamlessly across both plat
 
 To ensure your plugin functions correctly, especially in the sandboxed App Store version of SwiftBiu, you must declare the permissions it needs in `manifest.json`.
 
-*   `"network"`: Required for `swiftBiu.fetch`.
+*   `"network"`: Required for direct fetch/stream/download calls, remote media, and SwiftBiu-managed `ai*` provider requests.
 *   `"clipboardRead"`: Required for `SwiftBiu.getClipboard()` — allows the plugin to read the current clipboard content.
 *   `"clipboardWrite"`: Required for `swiftBiu.copyText`.
 *   `"localFileRead"`: Required for `SwiftBiu.getFileMetadata(path)`, `SwiftBiu.extractFileIcon(path, options)`, `SwiftBiu.setFileIcon(targetPath, iconPath, options)`, `SwiftBiu.pickLocalFile(options)`, `SwiftBiu.readLocalFile(path)`, `SwiftBiu.readLocalTextFile(path)`, `SwiftBiu.listDirectory(path)`, `SwiftBiu.openFileWithApp(path, appBundleID)`, `window.swiftBiu.getFileMetadata(path)`, `window.swiftBiu.extractFileIcon(path, options)`, `window.swiftBiu.setFileIcon(targetPath, iconPath, options)`, `window.swiftBiu.pickLocalFile(options)`, `window.swiftBiu.readLocalFile(path)`, `window.swiftBiu.readLocalTextFile(path)`, `window.swiftBiu.listDirectory(path)`, and `window.swiftBiu.openFileWithApp(path, appBundleID)` — allows the plugin to inspect, select, extract icons from, replace icons for, read, or open local files and accessible directories.
 *   `"localFileWrite"`: Required for `setFileIcon`, `pickLocalFile`, `pickLocalDirectory`, `requestDirectoryAuthorization`, `hasAuthorizedDirectoryAccess`, `createLocalDirectory`, `createLocalFile`, `writeLocalTextFile`, `overwriteLocalFile`, `renameLocalFile`, `copyLocalFile`, `moveLocalFile`, `trashLocalItem`, `saveLocalFile`, `fileExists`, and `directoryExists` when checking writable destinations — allows the plugin to select writable files, replace custom icons, create, update, move, rename, trash, save, or inspect writable destinations in selected or authorized locations.
 *   `"paste"`: Required for `swiftBiu.pasteText` — allows the plugin to paste text directly into the user's active application.
-*   `"notifications"`: Required for `swiftBiu.showNotification`, `SwiftBiu.showImage`, and `SwiftBiu.showInteractiveImage`.
+*   `"share"`: Required for `shareTargets`, `SwiftBiu.share(...)`, and `window.swiftBiu.share(...)`.
+*   `"notifications"`: Required for notifications and native image, video, and audio display/interactive sessions.
+*   `"ui"`: Required for native AI response bubble sessions.
 *   `"runAppleScript"`: Required for `SwiftBiu.runAppleScript()` — allows the plugin to execute AppleScript code. ⚠️ **Do not use for App Store-compatible plugins.**
 *   `"runShellScript"`: Required for `swiftBiu.runShellScript`. ⚠️ **Do not use for App Store-compatible plugins.**
 

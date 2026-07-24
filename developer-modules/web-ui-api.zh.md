@@ -50,6 +50,9 @@ window.swiftBiu_initialize = async function (context) {
 
 - `window.swiftBiu.fetch(url, options)`：返回 `{ status, data }`。需要 `network`。
 - `window.swiftBiu.storage.get(key)`：返回 `{ result }`。
+- `window.swiftBiu.storage.set(key, value)`：保存 Manifest 中已声明的配置值。
+- `window.swiftBiu.downloadRemoteFile(url, options)`：返回临时本地文件结果。需要 `network`。
+- `window.swiftBiu.materializeSelectedRemoteFiles(options)`：下载当前动作中的远程文件选择。需要 `network`。
 - `window.swiftBiu.getFileMetadata(path)`：返回文件元数据。需要 `localFileRead`。
 - `window.swiftBiu.extractFileIcon(path, options)`：返回 PNG 图标信息或错误。需要 `localFileRead`。
 - `window.swiftBiu.setFileIcon(targetPath, iconPath, options)`：写入 Finder 自定义图标。需要 `localFileRead` 与 `localFileWrite`。
@@ -70,14 +73,33 @@ if (response.status >= 200 && response.status < 300) {
 }
 ```
 
+## SwiftBiu 托管 AI
+
+以下 Promise API 使用用户已在 SwiftBiu 配置的 AI 账号：
+
+- `window.swiftBiu.ai.providers()` → `{ providers }`
+- `window.swiftBiu.ai.imageModels()` → `{ models }`
+- `window.swiftBiu.ai.chat(options)`
+- `window.swiftBiu.ai.imageGenerate(options)`
+- `window.swiftBiu.ai.videoGenerate(options)`
+- `window.swiftBiu.ai.textToSpeech(options)` / `window.swiftBiu.ai.tts(options)`
+- `window.swiftBiu.ai.speechToText(options)` / `window.swiftBiu.ai.stt(options)` / `window.swiftBiu.ai.transcribe(options)`
+
+所有提供商请求都需要 `network`；语音转文字还需要 `localFileRead`。Web UI 桥接目前不提供流式聊天，需要流式输出时请从后台调用 `SwiftBiu.aiChatStream(...)`。
+
+Manifest 的 `ai.allowedProviders` 同时控制原生提供商选择器和运行时请求校验。完整规则见 [SwiftBiu 托管 AI 契约](../references/native-ai.md)。
+
 ## 触发型 API
 
 这些方法在 JavaScript 侧也返回 Promise，但原生层收到指令后会立即 resolve，不会等待窗口、对话框或粘贴动作完成。可以把它们当作触发命令。
 
 - `window.swiftBiu.copyText(text)`：复制文本。
+- `window.swiftBiu.copyImage(base64, options)`：复制图片，并可附带可在 Finder 中粘贴的临时图片文件。
 - `window.swiftBiu.pasteText(text)`：复制并粘贴到焦点窗口。
+- `window.swiftBiu.showNotification(titleOrMessage, messageOrOptions, options)`：显示原生通知。需要 `notifications`。
 - `window.swiftBiu.openURL(url)`：打开网页。
 - `window.swiftBiu.openFileWithApp(path, appBundleID)`：使用指定 App 打开文件。需要 `localFileRead`。
+- `window.swiftBiu.share(options)`：调用原生分享目标并返回 `{ success, message? }`。需要 `share`。
 - `window.swiftBiu.speakText(text)`：系统 TTS 朗读。
 - `window.swiftBiu.pickLocalFile(options)`：打开文件选择器并返回 `{ path }`。需要 `localFileRead` 或 `localFileWrite`。
 - `window.swiftBiu.pickLocalDirectory()`：选择目录并返回 `{ path }`。需要 `localFileWrite`。

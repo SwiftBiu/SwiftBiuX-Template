@@ -135,6 +135,20 @@ function performAction(context) {
 }
 ```
 
+## Interactive Image, Video, and Audio Sessions
+
+Use native media sessions when generation has a pending state, can be regenerated, or should update the same card in place. These APIs run in background `script.js` and require `notifications`.
+
+| Media | Create | Update | Fail |
+| --- | --- | --- | --- |
+| Image | `showInteractiveImage(options, onRegenerate)` | `updateInteractiveImage(sessionID, options)` | `failInteractiveImage(sessionID, message)` |
+| Video | `showInteractiveVideo(options, onRegenerate)` | `updateInteractiveVideo(sessionID, options)` | `failInteractiveVideo(sessionID, message)` |
+| Audio | `showInteractiveAudio(options, onRegenerate)` | `updateInteractiveAudio(sessionID, options)` | `failInteractiveAudio(sessionID, message)` |
+
+The create method returns `sessionID`. Start with a pending placeholder, keep the ID, then update that same session with the generated Base64, local path, or authorized remote URL. The non-interactive `showImage(...)`, `showVideo(...)`, and `showAudio(...)` methods are appropriate only when the final media is already available.
+
+Provider execution is separate from presentation. Use `aiImageGenerate`, `aiVideoGenerate`, or the TTS APIs for SwiftBiu-managed generation, then pass the result to the corresponding media session. See the [managed AI contract](../references/native-ai.md).
+
 ## Choosing a Native Interface
 
 | Scenario | Recommended interface |
@@ -143,6 +157,8 @@ function performAction(context) {
 | Streaming text that requires confirmation | AI response bubble |
 | One short success message | System notification |
 | Image preview or regeneration | Interactive image session |
+| Video generation with pending/retry state | Interactive video session |
+| TTS or generated audio with pending/retry state | Interactive audio session |
 | Complex form or complete application UI | Web App UI |
 
 ## Related Documentation

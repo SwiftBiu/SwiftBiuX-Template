@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-18T04:06:00.633Z",
+  "generatedAt": "2026-07-24T10:30:46.668Z",
   "categories": [
     {
       "id": "text-processing",
@@ -51,6 +51,25 @@
     }
   ],
   "plugins": [
+    {
+      "id": "com.swiftbiu.examples.ai-image-verifier",
+      "name": {
+        "en": "AI Image Verifier",
+        "zh": "AI Image Verifier"
+      },
+      "description": {
+        "en": "Verify the image generation path using configured AI models.",
+        "zh": "Verify the image generation path using configured AI models."
+      },
+      "icon": "extension",
+      "version": "1.0.0",
+      "type": "Network",
+      "extensionKind": "textAction",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/AIImageVerifier.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null
+    },
     {
       "id": "com.swiftbiu.aipolisher",
       "name": {
@@ -128,25 +147,6 @@
       "requiredHost": null
     },
     {
-      "id": "com.developer.appiconreplacer",
-      "name": {
-        "en": "App Icon Replacer",
-        "zh": "应用图标替换器"
-      },
-      "description": {
-        "en": "Replace a macOS application's Finder icon using a selected image, with App Store-compatible native file access.",
-        "zh": "使用选中的图片替换 macOS 应用程序图标，兼容 App Store 沙盒访问方式。"
-      },
-      "icon": "app.badge",
-      "version": "1.0.2",
-      "type": "Local",
-      "extensionKind": "fileAction",
-      "author": "Developer",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/AppIconReplacer.swiftbiux",
-      "categoryId": "utilities",
-      "requiredHost": null
-    },
-    {
       "id": "com.swiftbiu.local-background-remover",
       "name": {
         "en": "Local Background Remover",
@@ -201,6 +201,44 @@
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/CaseConverter.swiftbiux",
       "categoryId": "text-processing",
+      "requiredHost": null
+    },
+    {
+      "id": "com.swiftbiu.plugins.codex-image-studio",
+      "name": {
+        "en": "Codex Image Studio",
+        "zh": "Codex Image Studio"
+      },
+      "description": {
+        "en": "Generate images using Codex Login or a compatible custom provider with image tools.",
+        "zh": "Generate images using Codex Login or a compatible custom provider with image tools."
+      },
+      "icon": "swiftbiu-custom-icon.png",
+      "version": "1.0.0",
+      "type": "Network",
+      "extensionKind": "textAction",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/CodexImageStudio.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null
+    },
+    {
+      "id": "com.swiftbiu.plugins.codex-text-studio",
+      "name": {
+        "en": "Codex Text Studio",
+        "zh": "Codex Text Studio"
+      },
+      "description": {
+        "en": "Send selected text or manual prompts through Codex Login or a compatible custom provider.",
+        "zh": "Send selected text or manual prompts through Codex Login or a compatible custom provider."
+      },
+      "icon": "swiftbiu-custom-icon-lottie.json",
+      "version": "1.0.0",
+      "type": "Network",
+      "extensionKind": "textAction",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/CodexTextStudio.swiftbiux",
+      "categoryId": "utilities",
       "requiredHost": null
     },
     {
@@ -413,6 +451,25 @@
       "requiredHost": null
     },
     {
+      "id": "com.swiftbiu.plugin.movefiles",
+      "name": {
+        "en": "Move Files",
+        "zh": "移动文件"
+      },
+      "description": {
+        "en": "Move selected files and folders to a chosen destination, with conflict details and undo support.",
+        "zh": "将选中的文件或文件夹移动到指定目录，并提供冲突明细与撤销操作。"
+      },
+      "icon": "folder.badge.minus",
+      "version": "1.1.0",
+      "type": "Local",
+      "extensionKind": "fileAction",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/MoveFiles-Plugin.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null
+    },
+    {
       "id": "com.swiftbiu.openfilewithapp",
       "name": {
         "en": "Open File With App",
@@ -429,25 +486,6 @@
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/OpenFileWithApp.swiftbiux",
       "categoryId": "system",
-      "requiredHost": null
-    },
-    {
-      "id": "com.swiftbiu.packager",
-      "name": {
-        "en": "Packager",
-        "zh": "Packager"
-      },
-      "description": {
-        "en": "Sandbox-compatible SwiftBiuX plugin packager. Uses JSZip and native Save Panel.",
-        "zh": "Sandbox-compatible SwiftBiuX plugin packager. Uses JSZip and native Save Panel."
-      },
-      "icon": "shippingbox.fill",
-      "version": "2.0.1",
-      "type": "Web App",
-      "extensionKind": "textAction",
-      "author": "Antigravity",
-      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/PluginPackager.swiftbiux",
-      "categoryId": "devtools",
       "requiredHost": null
     },
     {
@@ -499,7 +537,7 @@
         "zh": "选择文字并附带自定义关键字进行搜索（如：'苹果' + '官网'）。"
       },
       "icon": "plus.magnifyingglass",
-      "version": "1.1.1",
+      "version": "1.2.0",
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
@@ -600,6 +638,82 @@
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/WordCount.swiftbiux",
       "categoryId": "text-processing",
+      "requiredHost": null
+    },
+    {
+      "id": "com.swiftbiu.xai-chat",
+      "name": {
+        "en": "xAI Chat",
+        "zh": "xAI Chat"
+      },
+      "description": {
+        "en": "Use SwiftBiu AI Provider to run an xAI text model from selected text.",
+        "zh": "Use SwiftBiu AI Provider to run an xAI text model from selected text."
+      },
+      "icon": "extension",
+      "version": "1.1.0",
+      "type": "Network",
+      "extensionKind": "textAction",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/XAIChat.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null
+    },
+    {
+      "id": "com.swiftbiu.xai-image",
+      "name": {
+        "en": "xAI Image",
+        "zh": "xAI Image"
+      },
+      "description": {
+        "en": "Use SwiftBiu AI Provider to generate an image with an xAI image model.",
+        "zh": "Use SwiftBiu AI Provider to generate an image with an xAI image model."
+      },
+      "icon": "extension",
+      "version": "1.0.1",
+      "type": "Network",
+      "extensionKind": "textAction",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/XAIImage.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null
+    },
+    {
+      "id": "com.swiftbiu.xai-video",
+      "name": {
+        "en": "xAI Video",
+        "zh": "xAI Video"
+      },
+      "description": {
+        "en": "Bind an action to xAI video models and prepare a Grok Imagine video request.",
+        "zh": "Bind an action to xAI video models and prepare a Grok Imagine video request."
+      },
+      "icon": "extension",
+      "version": "1.0.1",
+      "type": "Network",
+      "extensionKind": "textAction",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/XAIVideo.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null
+    },
+    {
+      "id": "com.swiftbiu.xai-voice",
+      "name": {
+        "en": "xAI Voice",
+        "zh": "xAI Voice"
+      },
+      "description": {
+        "en": "Bind text-to-speech and speech-to-text actions to xAI voice models.",
+        "zh": "Bind text-to-speech and speech-to-text actions to xAI voice models."
+      },
+      "icon": "extension",
+      "version": "1.0.1",
+      "type": "Network",
+      "extensionKind": "textAction",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/XAIVoice.swiftbiux",
+      "categoryId": "utilities",
       "requiredHost": null
     },
     {

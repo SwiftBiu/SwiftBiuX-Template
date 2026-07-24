@@ -9,13 +9,19 @@ Use this skill when creating or modifying SwiftBiuX plugins. Plugin code can be 
 
 ## How to Use This Skill
 
-Read this file first for the core workflow, manifest contract, permission mapping, and runtime API rules. Do not load every reference by default. Load the smallest reference that matches the user's request:
+Read this file first for the core workflow, manifest contract, permission mapping, and runtime API rules. Do not load every reference by default. Use `ai/docs-index.json` as the routing map when you need to decide which extra document to load.
+
+Load the smallest reference that matches the user's request:
 
 - `references/scenarios.md`: when the user describes a plugin idea in plain language and needs the right plugin type, prompt shape, or examples.
+- `references/manifest-basics.md`: when the task only needs the minimal `manifest.json` contract, `extensionKind`, action wiring, or basic permission mapping.
+- `references/manifest-icons.md`: when the task only needs to choose or explain plugin icon formats.
 - `references/file-workflows.md`: when the plugin reads, creates, updates, renames, copies, moves, saves, opens, or trashes local files.
 - `references/network-api-checklist.md`: when the plugin uses AI, translation, image generation, live web data, company APIs, or any third-party service.
+- `references/native-ai.md`: when the plugin uses SwiftBiu-managed providers/models, native AI proxy APIs, provider restrictions, or chat/image/video/voice generation.
 - `references/ui-patterns.md`: when the plugin needs a Web UI, preview panel, settings-like form, progress view, native AI/image surface, or direct-open behavior.
 - `references/configuration.md`: when the plugin needs settings, API keys, option fields, file-extension app rules, packaging, or catalog entries.
+- `developer-modules/debugging.md`: when the user reports build, installation, runtime, logging, or Web Inspector problems.
 
 ## Generation Decision Flow
 
@@ -48,6 +54,7 @@ Do not call network or AI APIs for these unless the user explicitly asks for sem
 
 If a request needs AI rewriting, AI summarization, translation, image generation, live web lookup, or integration with a service such as OpenAI, Gemini, DeepL, Notion, GitHub, Slack, Feishu, or an internal company API:
 
+- Prefer SwiftBiu-managed AI providers for supported chat, image, video, TTS, and STT workflows. Read `references/native-ai.md`; do not add a plugin-owned API key when the user's provider account can stay in SwiftBiu.
 - Ask for or use provided API documentation before implementing provider-specific calls.
 - Do not invent endpoint URLs, request bodies, model names, auth headers, rate-limit rules, or response schemas.
 - Put secrets in `manifest.json` `configuration` entries with `"type": "secure"` and read them through `SwiftBiu.getConfig(...)` or `window.swiftBiu.storage.get(...)`.
@@ -68,7 +75,7 @@ Before returning plugin code, verify:
 
 - `manifest.json` includes root `extensionKind` and every `actions[].extensionKind`.
 - Permissions exactly match the APIs used.
-- Network/AI plugins include secure API key configuration and do not hard-code secrets.
+- Native AI plugins declare `ai.useCase`, matching provider/model configuration keys, and provider-specific `allowedProviders`; direct-API plugins use secure configuration and never hard-code secrets.
 - `script.js` uses callbacks for `SwiftBiu.fetch(...)` and does not use `async/await` or modern JS features unsupported by JavaScriptCore.
 - Web UI code uses `window.swiftBiu`, may use `async/await`, includes the viewport meta tag, supports dark mode and mobile touch targets, and calls `swiftBiu.ui.resizeWindow(...)` when needed.
 - File plugins distinguish `context.selectedFiles` from `context.selectedRemoteFiles`.
@@ -148,7 +155,7 @@ function performAction(context) {
 
 ### Direct-Open Standard for UI Extensions
 
-SwiftBiu shows an explicit Open button for extensions that expose an interactive surface: `manifest.ui`, `SwiftBiu.displayUI(...)`, `SwiftBiu.showAIResponseBubble(...)`, `SwiftBiu.showInteractiveImage(...)`, or `SwiftBiu.openNativeGeminiImageStudio(...)`.
+SwiftBiu shows an explicit Open button for extensions that expose an interactive surface: `manifest.ui`, `SwiftBiu.displayUI(...)`, `SwiftBiu.showAIResponseBubble(...)`, interactive image/video/audio sessions, or `SwiftBiu.openNativeGeminiImageStudio(...)`.
 
 Those extensions must treat `context.selectedText` as optional because a user can launch them from the extension list, a shortcut, or another non-selection entry point.
 
@@ -171,7 +178,9 @@ For complete responsive UI templates and CSS rules, read `references/ui-patterns
   "version": "1.0",                          // REQUIRED
   "extensionKind": "textAction",             // REQUIRED: "textAction" | "fileAction"
   "icon": "swift",                           // Default plugin icon (see supported formats below)
-  "iconType": "sfSymbol",                    // "sfSymbol" | "file" | "text" | "iconify" | "data"
+  "iconType": "sfSymbol",                    // "sfSymbol" | "file" | "lottie" | "text" | "iconify" | "data"
+  "iconLottieStillFrame": "first",           // Optional for Lottie: "first" | "last" | frame number
+  "iconScale": 1.0,                          // Optional; host normalizes to 0.5...2.0
   "actions": [                               // JS/native script actions. May be [] when using shareTargets only
     {
       "title": "Action Title",               // Supports TranslatableString
@@ -192,8 +201,27 @@ For complete responsive UI templates and CSS rules, read `references/ui-patterns
       "webFallback": "https://wa.me/?text={{encodedText}}"
     }
   ],
-  "permissions": [],                         // See Permissions section
-  "configuration": [],                       // See Configuration section
+  "ai": {                                    // Optional SwiftBiu-managed AI metadata
+    "useCase": "chat",                       // chat | imageGeneration | vision | videoGeneration | tts | stt
+    "providerKey": "chatProvider",
+    "modelKey": "chatModel",
+    "allowedProviders": ["codex", "custom-endpoint"]
+  },
+  "permissions": ["network"],                // See Permissions section
+  "configuration": [                         // Native picker keys referenced by ai above
+    {
+      "key": "chatProvider",
+      "label": "Provider",
+      "type": "string",
+      "defaultValue": "codex"
+    },
+    {
+      "key": "chatModel",
+      "label": "Model",
+      "type": "string",
+      "defaultValue": "gpt-5.2-codex"
+    }
+  ],
   "requiredShortcuts": [                     // For AppleScript+Shortcut plugins only
     {
       "name": "ShortcutName",
@@ -220,6 +248,7 @@ Beta builds should publish `.swiftbiux` assets to beta prereleases and generate 
 SwiftBiu supports multiple icon formats for the root-level plugin icon:
 - `sfSymbol`: SF Symbol name, e.g. `"sparkles"`.
 - `file`: Image file bundled in the plugin package, e.g. `"icon.png"` (common formats like png/jpg/pdf/svg supported).
+- `lottie`: Lottie JSON bundled in the plugin package, e.g. `"spark-motion.json"`. Optionally set `iconLottieStillFrame` to `"first"`, `"last"`, or a frame number, and `iconScale` to `0.5`–`2.0`.
 - `text`: Short text label rendered as an icon, e.g. `"AI"`.
 - `iconify`: Iconify icon name, e.g. `"solar:flag-bold"` or `"mdi:robot-happy"`.
 - `data`: A `data:` URI payload, e.g. `"data:image/png;base64,..."`.
@@ -238,14 +267,14 @@ Many fields in `manifest.json` support the `TranslatableString` type, which allo
 
 | Permission       | Required For                           | Notes                          |
 |------------------|----------------------------------------|--------------------------------|
-| `network`        | `SwiftBiu.fetch` / `swiftBiu.fetch`    | Network requests               |
+| `network`        | `SwiftBiu.fetch`, `window.swiftBiu.fetch`, and all `SwiftBiu.ai*` / `window.swiftBiu.ai.*` provider requests | Network and native AI requests |
 | `clipboardWrite` | `SwiftBiu.writeToClipboard`, `SwiftBiu.copyImage`, `window.swiftBiu.copyText`, `window.swiftBiu.copyImage` | Write text or images to clipboard |
 | `clipboardRead`  | `SwiftBiu.getClipboard`               | Read clipboard content         |
 | `localFileRead`  | `SwiftBiu.getFileMetadata`, `SwiftBiu.extractFileIcon`, `SwiftBiu.setFileIcon`, `SwiftBiu.pickLocalFile`, `SwiftBiu.readLocalFile`, `SwiftBiu.readLocalTextFile`, `SwiftBiu.listDirectory`, `SwiftBiu.openFileWithApp`, `window.swiftBiu.getFileMetadata`, `window.swiftBiu.extractFileIcon`, `window.swiftBiu.setFileIcon`, `window.swiftBiu.pickLocalFile`, `window.swiftBiu.readLocalFile`, `window.swiftBiu.readLocalTextFile`, `window.swiftBiu.listDirectory`, `window.swiftBiu.openFileWithApp` | Inspect, select, extract icons from, replace icons for, read, list, or open currently selected local files and accessible files/directories |
 | `localFileWrite` | `setFileIcon`, `pickLocalFile`, `pickLocalDirectory`, `requestDirectoryAuthorization`, `hasAuthorizedDirectoryAccess`, `createLocalDirectory`, `createLocalFile`, `writeLocalTextFile`, `overwriteLocalFile`, `renameLocalFile`, `copyLocalFile`, `moveLocalFile`, `trashLocalItem`, `saveLocalFile`, `fileExists`, `directoryExists` | Select writable files, replace custom icons, create, update, move, rename, trash, save, or inspect writable destinations in selected or authorized locations |
 | `share`          | `shareTargets`, `SwiftBiu.share`, `window.swiftBiu.share` | Share selected text, links, files, or images through SwiftBiu's native sharing bridge |
 | `paste`          | `SwiftBiu.pasteText` / `swiftBiu.pasteText` | Write + paste to active app. On iOS main app, degrades gracefully to a Toast Notification. Works properly on iOS Keyboard Extension |
-| `notifications`  | `SwiftBiu.showNotification` / `showImage` | Show toast/image notifications |
+| `notifications`  | `showNotification`, image/video/audio display and interactive session APIs | Show toast and native media result cards |
 | `ui`             | `SwiftBiu.showAIResponseBubble`, `SwiftBiu.updateAIResponseBubble`, `SwiftBiu.closeAIResponseBubble`, `SwiftBiu.failAIResponseBubble` | Display and update native AI response UI |
 | `runShellScript` | `SwiftBiu.runShellScript`              | Execute shell commands. ⚠️ macOS ONLY. Do not use for App Store-compatible plugins; sandboxed builds may block process execution and file access |
 | `runAppleScript` | `SwiftBiu.runAppleScript`              | Execute AppleScript. ⚠️ macOS ONLY. Do not use for App Store-compatible plugins; sandboxed builds may block automation |
@@ -269,7 +298,7 @@ For file and app-icon examples, read `references/file-workflows.md`. Do not impl
 |----------------|----------|----------|-------|
 | `key`          | String   | ✅       | Unique identifier, used with `getConfig(key)` / `storage.get(key)` |
 | `label`        | TranslatableString | ✅       | Display label in settings UI |
-| `type`         | String   | ✅       | One of: `string`, `secure`, `boolean`, `option`, `fileExtensionAppRules` |
+| `type`         | String   | ✅       | One of: `string`, `secure`, `boolean`, `option`, `directory`, `fileExtensionAppRules` |
 | `placeholder`  | String   | ❌       | Hint text for `string`/`secure` fields |
 | `description`  | TranslatableString | ❌       | **Sub-label / Help text**. Displays in a smaller font below the main label. |
 | `defaultValue` | Any      | ❌       | Default value (String/Bool/Int/Double) |
@@ -298,6 +327,7 @@ For complete configuration examples, read `references/configuration.md`.
 | `secure`    | The stored string (from Keychain) | `"sk-abc123"` |
 | `boolean`   | `"true"` or `"false"` (string!) | `"true"` |
 | `option`    | The `value` of the selected option | `"gpt-4o"` |
+| `directory` | Selected folder path | `"/Users/name/Downloads"` |
 | `fileExtensionAppRules` | JSON string with a `rules` array of `{fileExtension, appBundleID}` objects | `{"rules":[{"fileExtension":"pdf","appBundleID":"com.apple.Preview"}]}` |
 
 **Parsing examples in `script.js`:**
@@ -368,6 +398,22 @@ API object: **`SwiftBiu`** (also accessible as `swiftBiu`, both are injected)
 | `SwiftBiu.showInteractiveImage(options, onRegenerate)` | Sync create → `sessionID` | Requires `notifications`. Native image card with regenerate/update behavior |
 | `SwiftBiu.updateInteractiveImage(sessionID, options)` | Sync | Updates an existing interactive image session |
 | `SwiftBiu.failInteractiveImage(sessionID, message)` | Sync | Marks an interactive image session as failed |
+| `SwiftBiu.showVideo(source, position, context)` | Sync | Displays a local or remote native video card. Requires `notifications`; remote sources also require authorized network access |
+| `SwiftBiu.showInteractiveVideo(options, onRegenerate)` | Sync create → `sessionID` | Requires `notifications`. Native pending/update/retry video session |
+| `SwiftBiu.updateInteractiveVideo(sessionID, options)` | Sync | Updates an interactive video session |
+| `SwiftBiu.failInteractiveVideo(sessionID, message)` | Sync | Marks an interactive video session as failed |
+| `SwiftBiu.showAudio(source, position, context)` | Sync | Displays Base64, local, or remote audio. Requires `notifications`; remote sources also require authorized network access |
+| `SwiftBiu.showInteractiveAudio(options, onRegenerate)` | Sync create → `sessionID` | Requires `notifications`. Native pending/update/retry audio session |
+| `SwiftBiu.updateInteractiveAudio(sessionID, options)` | Sync | Updates an interactive audio session |
+| `SwiftBiu.failInteractiveAudio(sessionID, message)` | Sync | Marks an interactive audio session as failed |
+| `SwiftBiu.aiProviderProfiles()` | Sync → `Array<Object>` | Lists host-managed AI provider profiles |
+| `SwiftBiu.aiImageModels()` | Sync → `Array<Object>` | Lists native image models |
+| `SwiftBiu.aiChat(options, onSuccess, onError)` | Callback-based | Host-managed one-shot chat/vision request. Requires `network` |
+| `SwiftBiu.aiChatStream(options, onEvent, onError)` | Sync create → `streamID` | Host-managed streaming chat request. Requires `network`; cancel with `cancelFetchStream(...)` |
+| `SwiftBiu.aiImageGenerate(options, onSuccess, onError)` | Callback-based | Host-managed image generation. Requires `network` |
+| `SwiftBiu.aiVideoGenerate(options, onSuccess, onError)` | Callback-based | Host-managed video generation. Requires `network` |
+| `SwiftBiu.aiTextToSpeech(options, onSuccess, onError)` | Callback-based | Host-managed TTS. Requires `network`; `aiTTS` is an alias |
+| `SwiftBiu.aiSpeechToText(options, onSuccess, onError)` | Callback-based | Host-managed STT. Requires `network` + `localFileRead`; `aiTranscribe` and `aiSTT` are aliases |
 | `SwiftBiu.openFileInPreview(path)` | Sync | Opens file in Preview.app |
 | `SwiftBiu.openFileWithApp(path, appBundleID)` | Sync → Bool | Requires `localFileRead`. Opens an accessible selected or authorized file with the specified macOS app bundle ID |
 | `SwiftBiu.openImageInPreview(base64)` | Sync | Opens base64 image in Preview.app |
@@ -457,6 +503,16 @@ window.swiftBiu_initialize = function(context) {
 | API | Signature | Notes |
 |-----|-----------|-------|
 | `window.swiftBiu.fetch(url, options)` | Promise → `{status, data}` | Requires `network` |
+| `window.swiftBiu.storage.set(key, value)` | Promise | Persists a known manifest configuration value |
+| `window.swiftBiu.ai.providers()` | Promise → `{providers: Array<Object>}` | Lists host-managed AI providers |
+| `window.swiftBiu.ai.imageModels()` | Promise → `{models: Array<Object>}` | Lists native image models |
+| `window.swiftBiu.ai.chat(options)` | Promise → `Object` | Host-managed chat/vision request. Requires `network` |
+| `window.swiftBiu.ai.imageGenerate(options)` | Promise → `Object` | Host-managed image generation. Requires `network` |
+| `window.swiftBiu.ai.videoGenerate(options)` | Promise → `Object` | Host-managed video generation. Requires `network` |
+| `window.swiftBiu.ai.textToSpeech(options)` | Promise → `Object` | Host-managed TTS. Requires `network`; `window.swiftBiu.ai.tts(...)` is an alias |
+| `window.swiftBiu.ai.speechToText(options)` | Promise → `Object` | Host-managed STT. Requires `network` + `localFileRead`; `window.swiftBiu.ai.stt(...)` and `window.swiftBiu.ai.transcribe(...)` are aliases |
+| `window.swiftBiu.downloadRemoteFile(url, options)` | Promise → `Object` | Downloads a remote file into transient local storage. Requires `network` |
+| `window.swiftBiu.materializeSelectedRemoteFiles(options)` | Promise → `Object` | Downloads current remote selections. Requires `network` |
 | `window.swiftBiu.getFileMetadata(path)` | Promise → `Object` | Requires `localFileRead` |
 | `window.swiftBiu.extractFileIcon(path, options)` | Promise → `Object` | Requires `localFileRead`. Returns PNG Base64 icon data from the host App; preferred for App Store sandbox compatibility |
 | `window.swiftBiu.setFileIcon(targetPath, iconPath, options)` | Promise → `Object` | Requires `localFileRead` + `localFileWrite`. Applies an image as the custom Finder icon for an accessible file/folder/app |
@@ -467,6 +523,7 @@ window.swiftBiu_initialize = function(context) {
 | `window.swiftBiu.directoryExists(path)` | Promise → `{exists: Boolean}` | Requires `localFileRead` or `localFileWrite` |
 | `window.swiftBiu.copyText(text)` | Promise | Requires `clipboardWrite` |
 | `window.swiftBiu.copyImage(base64, options)` | Promise → Boolean | Requires `clipboardWrite`. Accepts raw Base64 or `data:image/...;base64,...`; `options` may include `{ mimeType, filename, fileBacked }`. Use this for generated image clipboard writes instead of `navigator.clipboard.write(...)`; browser `ClipboardItem({ "image/png": ... })` writes image pixels, not a Finder-pasteable file. With the default `fileBacked: true`, SwiftBiu writes a temporary file URL for Finder/Desktop paste |
+| `window.swiftBiu.showNotification(titleOrMessage, messageOrOptions, options)` | Promise | Shows a native notification. Requires `notifications` |
 | `window.swiftBiu.pasteText(text)` | Promise | Requires `paste` |
 | `window.swiftBiu.pickLocalFile(options)` | Promise → `{path: String}` | Requires `localFileRead` or `localFileWrite`. Lets the user select and authorize a file/package such as `.app` or an image |
 | `window.swiftBiu.pickLocalDirectory()` | Promise → `{path: String}` | Requires `localFileWrite`. Lets the user choose a writable folder first |
@@ -487,6 +544,7 @@ window.swiftBiu_initialize = function(context) {
 | `window.swiftBiu.closeWindow()` | Promise | Close the plugin window |
 | `window.swiftBiu.storage.get(key)` | Promise → `{result: String}` | Read config (internally calls `getConfig`) |
 | `window.swiftBiu.ui.resizeWindow({height})` | Promise | Resize window height only |
+| `window.swiftBiu.runShellScript(script, context)` | Promise → `{result: String}` | Requires `runShellScript`; avoid for App Store-compatible plugins |
 
 ### Native File Selection (Plugin UI)
 The plugin UI supports native file and folder selection using standard HTML `<input type="file">`.

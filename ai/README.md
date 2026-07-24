@@ -42,6 +42,7 @@ The AI should read `AI_SKILL.md` first, then load only the smallest matching ref
 | Icon formats, SF Symbol, text icons | `references/manifest-icons.md` |
 | Full manifest, settings, shareTargets | `developer-modules/manifest.md` |
 | Clipboard, files, network, notifications | `developer-modules/permissions.md` |
+| SwiftBiu-managed AI providers, models, or `allowedProviders` | `references/native-ai.md` |
 | Batch file workflows | `references/file-workflows.md` |
 | OpenAI, Gemini, DeepL, remove.bg, internal APIs | `references/network-api-checklist.md` |
 | HTML UI, preview, forms, progress | `references/ui-patterns.md` |

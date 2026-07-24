@@ -7,7 +7,8 @@ Use this reference when a plugin needs an icon. Prefer simple, built-in icon for
 1. **SF Symbol** for native-looking utility plugins.
 2. **Text icon** for short labels such as `AI`, `JSON`, `OCR`.
 3. **File icon** for branded or custom visuals bundled with the plugin.
-4. **Iconify or data URI** only when you need a specific external icon shape.
+4. **Lottie icon** when motion adds useful identity in the toolbar.
+5. **Iconify or data URI** only when you need a specific external icon shape.
 
 ## SF Symbol
 
@@ -72,6 +73,24 @@ Recommendations:
 - Prepare at least 64x64 or 128x128 source assets.
 - Keep file size small.
 - Put the icon file inside the plugin folder so it is packaged with the plugin.
+
+## Lottie dynamic icon
+
+Bundle a Lottie JSON file when the icon should animate in SwiftBiu's toolbar:
+
+```json
+{
+  "icon": "spark-motion.json",
+  "iconType": "lottie",
+  "iconLottieStillFrame": "first",
+  "iconScale": 1.1
+}
+```
+
+- `iconLottieStillFrame`: `"first"`, `"last"`, or a numeric frame used while the animation is resting.
+- `iconScale`: optional scale normalized by SwiftBiu to `0.5`–`2.0`.
+- Users decide whether dynamic icons animate on hover or automatically. Do not build this preference into the asset or plugin logic.
+- Keep the animation legible at 18–24px and avoid continuous motion that obscures the icon's meaning.
 
 ## Data URI icon
 

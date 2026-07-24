@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-08T11:08:18.924Z",
+  "generatedAt": "2026-07-24T10:30:46.613Z",
   "categories": [
     {
       "id": "text-processing",
@@ -210,8 +210,8 @@
         "zh": "Codex Image Studio"
       },
       "description": {
-        "en": "Generate images from text prompts using Codex Responses image tools through ChatGPT OAuth.",
-        "zh": "Generate images from text prompts using Codex Responses image tools through ChatGPT OAuth."
+        "en": "Generate images using Codex Login or a compatible custom provider with image tools.",
+        "zh": "Generate images using Codex Login or a compatible custom provider with image tools."
       },
       "icon": "swiftbiu-custom-icon.png",
       "version": "1.0.0",
@@ -229,8 +229,8 @@
         "zh": "Codex Text Studio"
       },
       "description": {
-        "en": "Send selected text or manual prompts to Codex through ChatGPT OAuth and paste the generated text.",
-        "zh": "Send selected text or manual prompts to Codex through ChatGPT OAuth and paste the generated text."
+        "en": "Send selected text or manual prompts through Codex Login or a compatible custom provider.",
+        "zh": "Send selected text or manual prompts through Codex Login or a compatible custom provider."
       },
       "icon": "swiftbiu-custom-icon-lottie.json",
       "version": "1.0.0",
@@ -448,6 +448,25 @@
       "author": "官方",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/MermaidPreviewer.swiftbiux",
       "categoryId": "devtools",
+      "requiredHost": null
+    },
+    {
+      "id": "com.swiftbiu.plugin.movefiles",
+      "name": {
+        "en": "Move Files",
+        "zh": "移动文件"
+      },
+      "description": {
+        "en": "Move selected files and folders to a chosen destination, with conflict details and undo support.",
+        "zh": "将选中的文件或文件夹移动到指定目录，并提供冲突明细与撤销操作。"
+      },
+      "icon": "folder.badge.minus",
+      "version": "1.1.0",
+      "type": "Local",
+      "extensionKind": "fileAction",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/latest/download/MoveFiles-Plugin.swiftbiux",
+      "categoryId": "utilities",
       "requiredHost": null
     },
     {

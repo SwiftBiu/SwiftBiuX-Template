@@ -6,6 +6,20 @@
 > - **本地零网络工具**: 包含基于日期元数据的批量文件重命名、本地 Prettier 格式化等零泄露机制。
 > - **声明式分享**: 通过 `shareTargets` 免去复杂 JS 编写即可调用 AirDrop、微信分享等系统接口。
 
+## 一个快捷键，按内容智能分发
+
+SwiftBiu 1.3.9 可以让同一个物理快捷键进入合适的扩展路径，插件无需识别触发动作本身。分发依据是宿主准备好的内容上下文：
+
+| 已准备的内容 | 应实现 |
+| --- | --- |
+| 选中文字、剪切板文本或 OCR 识别文字 | `textAction` |
+| 图片、视频、本地文件，以及宿主已转换为本地文件的兼容富剪切板内容 | `fileAction` |
+| 自定义预览或编辑器 | 从兼容的后台动作调用 `SwiftBiu.displayUI(...)` |
+
+通过 `isAvailable(context)` 隐藏或降低不支持内容的动作优先级。不要判断用户使用了快捷键、滑动、拖放还是剪切板入口；这些触发规则由宿主管理。
+
+<div class="swiftbiu-native-demo" data-demo-start="routing" data-demo-modes="routing,clipboard"></div>
+
 ## 🗺 插件场景与 API 参考
 
 以下每个场景都是真实用例，附带你需要的 API 文档链接。把 AI prompt 复制过去，填上 API Key，就能得到一个可用的插件。

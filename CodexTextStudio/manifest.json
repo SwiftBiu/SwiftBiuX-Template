@@ -2,11 +2,15 @@
   "actions" : [
     {
       "ai" : {
+        "allowedProviders" : [
+          "codex",
+          "custom-endpoint"
+        ],
         "modelKey" : "chatModel",
         "providerKey" : "chatProvider",
         "useCase" : "chat"
       },
-      "description" : "Generate or rewrite text using Codex via ChatGPT OAuth login.",
+      "description" : "Generate or rewrite text using Codex Login or a compatible custom provider.",
       "extensionKind" : "textAction",
       "id" : "codexText",
       "script" : "script.js",
@@ -15,6 +19,10 @@
     }
   ],
   "ai" : {
+    "allowedProviders" : [
+      "codex",
+      "custom-endpoint"
+    ],
     "modelKey" : "chatModel",
     "providerKey" : "chatProvider",
     "useCase" : "chat"
@@ -24,7 +32,7 @@
   "configuration" : [
     {
       "defaultValue" : "codex",
-      "description" : "Choose the Codex login profile for text actions.",
+      "description" : "Choose Codex Login or a compatible custom provider.",
       "key" : "chatProvider",
       "label" : "Chat Provider",
       "required" : true,
@@ -32,7 +40,7 @@
     },
     {
       "defaultValue" : "gpt-5.2-codex",
-      "description" : "Choose the Codex text model.",
+      "description" : "Choose a text model exposed by the selected Codex-compatible provider.",
       "key" : "chatModel",
       "label" : "Chat Model",
       "required" : true,
@@ -73,7 +81,7 @@
       "type" : "option"
     }
   ],
-  "description" : "Send selected text or manual prompts to Codex through ChatGPT OAuth and paste the generated text.",
+  "description" : "Send selected text or manual prompts through Codex Login or a compatible custom provider.",
   "extensionKind" : "textAction",
   "icon" : "swiftbiu-custom-icon-lottie.json",
   "iconLottieStillFrame" : 0,

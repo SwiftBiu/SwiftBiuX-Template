@@ -2,6 +2,8 @@
 
 欢迎来到 SwiftBiuX 官方插件模板库。这里既包含可直接安装的插件，也包含给 AI 和开发者使用的插件开发规范、示例与模板。
 
+SwiftBiu 1.3.9 可把同一项扩展能力带到选中文字、剪切板、OCR 和文件入口，并按内容类型智能分发；扩展还可以使用 Lottie 工具栏动态图标，通过 `.swiftbiuxs` 可审阅源码或只读 iCloud 链接安全分享。
+
 ## 🤖 推荐：用 AI 快速生成插件
 
 现在开发 SwiftBiu 插件的推荐方式是：**先让 AI 根据 SwiftBiuX Skill 生成可运行插件，再按需查文档微调。**
@@ -50,9 +52,14 @@ https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
 - [`DEVELOPMENT_GUIDE_zh.md`](DEVELOPMENT_GUIDE_zh.md)：传统完整开发手册。
 - [`developer-modules/manifest.zh.md`](developer-modules/manifest.zh.md)：manifest、图标、配置项、shareTargets 与核心 API。
 - [`developer-modules/permissions.zh.md`](developer-modules/permissions.zh.md)：剪贴板、粘贴、文件、网络、通知等权限。
+- [`references/native-ai.md`](references/native-ai.md)：SwiftBiu 托管 AI、提供商/模型选择和 `allowedProviders` 契约。
 - [`developer-modules/examples.zh.md`](developer-modules/examples.zh.md)：真实插件模板和实现模式。
 
 AI 按需加载索引：[`ai/docs-index.json`](ai/docs-index.json)
+
+发布模板前运行 `node scripts/test_public_contract.js --template-only`。当本仓库位于
+`SwiftBiu/SwiftBiuX-Template` 时，运行 `node scripts/test_public_contract.js`
+还会继续对比 Swift 后台接口、Web Bridge 路由与 API 覆盖测试。
 
 ## 📦 查看插件目录
 

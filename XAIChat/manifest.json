@@ -13,6 +13,10 @@
     "ui"
   ],
   "ai": {
+    "allowedProviders": [
+      "xai-oauth",
+      "xai"
+    ],
     "useCase": "chat",
     "providerKey": "textProvider",
     "modelKey": "textModel"
@@ -47,6 +51,10 @@
       "script": "script.js",
       "shortcut": "cmd+shift+g",
       "ai": {
+        "allowedProviders": [
+          "xai-oauth",
+          "xai"
+        ],
         "useCase": "chat",
         "providerKey": "textProvider",
         "modelKey": "textModel"

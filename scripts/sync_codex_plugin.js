@@ -17,6 +17,7 @@ const pluginReferencesDir = path.join(pluginSkillDir, "references");
 const references = [
   "configuration.md",
   "file-workflows.md",
+  "native-ai.md",
   "network-api-checklist.md",
   "scenarios.md",
   "ui-patterns.md"

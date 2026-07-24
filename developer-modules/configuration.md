@@ -25,6 +25,7 @@ Supported `type` values:
 - `secure`: passwords or API keys, stored in Keychain.
 - `boolean`: a switch.
 - `option`: a dropdown.
+- `directory`: a native folder-path picker.
 - `fileExtensionAppRules`: a native suffix-to-app rule editor.
 
 Legacy `radioList` configurations are no longer supported. Migrate them to a normal `string` field or duplicate the extension for each fixed prompt variant.
@@ -55,6 +56,7 @@ All values are returned as strings.
 | `string` / `secure` | Stored string | Use directly |
 | `boolean` | `"true"` or `"false"` | `SwiftBiu.getConfig("key") === "true"` |
 | `option` | Selected option `value` | Use directly |
+| `directory` | Selected folder path | Use directly |
 | `fileExtensionAppRules` | JSON string containing `rules` | Parse with `JSON.parse(...)` |
 
 ## `option`
@@ -107,6 +109,41 @@ const value = SwiftBiu.getConfig("rules") || "{\"rules\":[]}";
 const rules = JSON.parse(value).rules || [];
 ```
 
+## Restricting Native AI Provider Pickers
+
+When a plugin declares native AI metadata, SwiftBiu can restrict the generated provider picker by provider identity:
+
+```json
+{
+  "ai": {
+    "useCase": "chat",
+    "providerKey": "chatProvider",
+    "modelKey": "chatModel",
+    "allowedProviders": ["codex", "custom-endpoint"]
+  },
+  "configuration": [
+    {
+      "key": "chatProvider",
+      "label": "Chat Provider",
+      "type": "string",
+      "defaultValue": "codex"
+    },
+    {
+      "key": "chatModel",
+      "label": "Chat Model",
+      "type": "string",
+      "defaultValue": "gpt-5.2-codex"
+    }
+  ]
+}
+```
+
+- `allowedProviders` accepts SwiftBiu provider identifiers or aliases.
+- Restrictions apply to the native picker and are checked again when the plugin calls a native AI proxy.
+- Include `custom-endpoint` when users should be able to choose their own compatible service. SwiftBiu keeps the account's existing API format behavior unchanged; the service must still support the request shape used by the plugin.
+
+Repeat the restrictions in an action-level `ai` object when that action overrides the root `ai` declaration.
+
 ## Generic Keys and Documented Conventions
 
 Most keys are plugin-defined. SwiftBiu stores and returns them, while your script defines their meaning.
@@ -137,5 +174,6 @@ Recommendations:
 
 - [Manifest and Action Types](manifest.md)
 - [Background SwiftBiu API](background-api.md)
+- [SwiftBiu-Managed AI Provider Contract](../references/native-ai.md)
 - [Native Workflows](native-workflows.md)
 - [Web UI API](web-ui-api.md)

@@ -101,11 +101,41 @@ window.swiftBiu_initialize = async function (context) {
 | `author` | String | Yes | Plugin author. |
 | `description` | String | Yes | Short plugin description. |
 | `version` | String | Yes | Version such as `1.0`. |
-| `actions` | Array | Yes | Actions provided by the plugin. Currently one action is supported. |
-| `icon` | String | No | Root icon. Supports SF Symbols, image files, text, Iconify, and `data:` URIs. |
-| `iconType` | String | No | `sfSymbol`, `file`, `text`, `iconify`, or `data`. |
+| `actions` | Array | Yes | Actions provided by the plugin. Each action can have its own extension kind and AI configuration. |
+| `icon` | String | No | Root icon. Supports SF Symbols, image files, Lottie JSON, text, Iconify, and `data:` URIs. |
+| `iconType` | String | No | `sfSymbol`, `file`, `lottie`, `text`, `iconify`, or `data`. |
+| `iconLottieStillFrame` | String or Number | No | Resting frame for a Lottie icon: `"first"`, `"last"`, or a frame number. |
+| `iconScale` | Number | No | Icon scale. SwiftBiu normalizes it to the supported `0.5`–`2.0` range. |
+| `extensionKind` | String | Yes | `textAction` or `fileAction`. Also declare it on every action. |
 | `configuration` | Array | No | User-editable settings. |
 | `permissions` | Array | No | Required host and system capabilities. |
+| `requiredShortcuts` | Array | No | Apple Shortcuts required by legacy AppleScript/Shortcut bridges. |
+| `ui` | Object | No | Web UI entry point, currently `{ "main": "ui/index.html" }`. |
+| `shareTargets` | Array | No | Declarative native sharing targets. Actions may be empty when the plugin only exposes share targets. |
+| `network` | Object | No | Declared outbound domains and their purpose/data/credential metadata. |
+| `ai` | Object | No | SwiftBiu-managed AI use case, provider/model configuration keys, and optional provider allowlist. |
+
+Each action can declare `title`, `icon`, `description`, `script`, `appleScriptFile`, `shellScriptFile`, `requiredShortcut`, `rules.regex`, `supportedFileExtensions`, `extensionKind`, and `ai`. An action-level `ai` declaration replaces the root `ai` declaration for that action.
+
+### SwiftBiu-Managed AI Metadata
+
+```json
+{
+  "ai": {
+    "useCase": "chat",
+    "providerKey": "chatProvider",
+    "modelKey": "chatModel",
+    "allowedProviders": ["codex", "custom-endpoint"]
+  }
+}
+```
+
+- `useCase`: `chat` / `textGeneration`, `imageGeneration`, `vision`, `videoGeneration`, `tts`, or `stt`. `role` is a compatible alias.
+- `providerKey` and `modelKey`: configuration keys that SwiftBiu renders as native provider/model pickers.
+- `allowedProviders`: optional provider-only allowlist. SwiftBiu filters the picker and validates every native AI proxy request again at runtime.
+- Provider-specific plugins should keep the same allowlist in each action-level `ai` override. Add `custom-endpoint` only when the extension's actual protocol is compatible.
+
+See [Configuration](configuration.md) and the [SwiftBiu-managed AI contract](../references/native-ai.md) for examples and API mapping.
 
 ## Plugin Icon Formats
 
@@ -180,6 +210,23 @@ Or use the explicit prefix:
 
 This is useful for generated icons or packages that should not ship a separate image asset.
 
+### Lottie Dynamic Icon
+
+Package the Lottie JSON in the extension and reference it from the manifest:
+
+```json
+{
+  "icon": "spark-motion.json",
+  "iconType": "lottie",
+  "iconLottieStillFrame": "first",
+  "iconScale": 1.1
+}
+```
+
+`iconLottieStillFrame` accepts `"first"`, `"last"`, or a numeric frame. `iconScale` is normalized to `0.5`–`2.0`. In SwiftBiu, the user can choose whether dynamic toolbar icons animate on hover or play automatically; a static icon remains still, which preserves a clear visual contrast.
+
+<div class="swiftbiu-native-demo" data-demo-start="icons" data-demo-modes="icons"></div>
+
 ### Parsing Rules and Recommendations
 
 - Explicit prefixes take priority over `iconType`.
@@ -187,6 +234,21 @@ This is useful for generated icons or packages that should not ship a separate i
 - Keep file icons inside the plugin package and reference them by filename.
 - Keep text icons short so they remain balanced in toolbars and lists.
 - Prefer vectors, transparent backgrounds, optical padding, and high contrast at 18–24px sizes.
+
+## Reviewable Source Sharing in 1.3.9
+
+SwiftBiu uses two related package formats:
+
+| Format | Purpose |
+| --- | --- |
+| `.swiftbiux` | Installable plugin archive |
+| `.swiftbiuxs` | Reviewable UTF-8 source container for saving, system sharing, and read-only iCloud links |
+
+From **Installed Extensions**, the user can export an extension with **Save to File…**, **Share…**, or **Copy iCloud Link**. SwiftBiu combines the manifest, scripts, UI, and assets into one sealed source document, records per-file and bundle SHA-256 integrity data, and excludes saved configuration and credentials.
+
+The recipient reviews the plugin name, author, version, files, requested permissions, and integrity state before confirming installation. An iCloud link transports the sealed source; it does not bypass validation or execute remote code.
+
+<div class="swiftbiu-native-demo" data-demo-start="sharing" data-demo-modes="sharing"></div>
 
 ## Continue Reading
 

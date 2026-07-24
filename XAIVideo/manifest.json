@@ -12,6 +12,10 @@
     "notifications"
   ],
   "ai": {
+    "allowedProviders": [
+      "xai-oauth",
+      "xai"
+    ],
     "useCase": "videoGeneration",
     "providerKey": "videoProvider",
     "modelKey": "videoModel"
@@ -46,6 +50,10 @@
       "script": "script.js",
       "shortcut": "cmd+shift+v",
       "ai": {
+        "allowedProviders": [
+          "xai-oauth",
+          "xai"
+        ],
         "useCase": "videoGeneration",
         "providerKey": "videoProvider",
         "modelKey": "videoModel"

@@ -36,6 +36,7 @@ function listManifestPaths() {
 function validateManifestKinds() {
   const manifestPaths = listManifestPaths();
   const counts = { textAction: 0, fileAction: 0 };
+  let mixedActionCount = 0;
 
   for (const manifestPath of manifestPaths) {
     const manifest = readJson(manifestPath);
@@ -56,11 +57,11 @@ function validateManifestKinds() {
 
     actions.forEach((action, index) => {
       const actionKind = action && action.extensionKind;
-      if (!ALLOWED_KINDS.has(actionKind)) {
+      if (actionKind != null && !ALLOWED_KINDS.has(actionKind)) {
         fail(`${pluginName}: actions[${index}].extensionKind is invalid '${actionKind}'`);
       }
-      if (actionKind !== rootKind) {
-        fail(`${pluginName}: actions[${index}].extensionKind '${actionKind}' must match root '${rootKind}'`);
+      if (actionKind != null && actionKind !== rootKind) {
+        mixedActionCount += 1;
       }
     });
 
@@ -71,11 +72,16 @@ function validateManifestKinds() {
       if (!ALLOWED_SHARE_TARGET_KINDS.has(target.kind)) {
         fail(`${pluginName}: shareTargets[${index}].kind is invalid '${target && target.kind}'`);
       }
+      if (target.extensionKind != null && !ALLOWED_KINDS.has(target.extensionKind)) {
+        fail(
+          `${pluginName}: shareTargets[${index}].extensionKind is invalid '${target.extensionKind}'`
+        );
+      }
     });
   }
 
   console.log(
-    `[manifest] validated ${manifestPaths.length} manifests (textAction=${counts.textAction}, fileAction=${counts.fileAction})`
+    `[manifest] validated ${manifestPaths.length} manifests (textAction=${counts.textAction}, fileAction=${counts.fileAction}, mixedActions=${mixedActionCount})`
   );
 }
 
