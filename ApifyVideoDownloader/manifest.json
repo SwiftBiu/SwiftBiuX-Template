@@ -1,0 +1,129 @@
+{
+  "identifier": "com.swiftbiux.apify-video-downloader",
+  "name": {
+    "en": "Apify Video Downloader",
+    "zh": "Apify 视频下载器"
+  },
+  "author": "SwiftBiu Community Template",
+  "description": {
+    "en": "Download public videos from supported social platforms through independent Apify Actors. SwiftBiu only provides the extension runtime, network transport, and local file save APIs.",
+    "zh": "通过独立的 Apify Actor 下载支持平台的公开视频。SwiftBiu 仅提供扩展运行环境、网络请求和本地文件保存能力。"
+  },
+  "version": "1.0.4",
+  "icon": "arrow.down.video",
+  "iconType": "sfSymbol",
+  "extensionKind": "textAction",
+  "permissions": [
+    "network",
+    "localFileWrite",
+    "notifications",
+    "ui"
+  ],
+  "network": {
+    "domains": [
+      {
+        "host": "api.apify.com",
+        "purpose": "Start and monitor the selected third-party Apify video downloader Actor and read its result dataset.",
+        "data": [
+          "selected public video URL",
+          "actor input",
+          "run status"
+        ],
+        "usesCredential": "User-provided Apify API token"
+      }
+    ]
+  },
+  "configuration": [
+    {
+      "key": "apify_token",
+      "label": {
+        "en": "Apify API Token",
+        "zh": "Apify API Token"
+      },
+      "type": "secure",
+      "placeholder": {
+        "en": "apify_api_...",
+        "zh": "apify_api_..."
+      },
+      "description": {
+        "en": "Your own Apify token. It is stored by SwiftBiu as a secure configuration value and sent only to api.apify.com.",
+        "zh": "你自己的 Apify Token。由 SwiftBiu 作为安全配置保存，仅发送给 api.apify.com。"
+      }
+    },
+    {
+      "key": "youtube_quality",
+      "label": {
+        "en": "YouTube Quality",
+        "zh": "YouTube 默认画质"
+      },
+      "type": "option",
+      "defaultValue": "720p",
+      "description": {
+        "en": "The YouTube Actor creates one downloadable file in this preferred quality.",
+        "zh": "YouTube Actor 会按该首选画质生成一个可下载文件。"
+      },
+      "options": [
+        { "label": "Best Available", "value": "Best Available" },
+        { "label": "1080p", "value": "1080p" },
+        { "label": "720p", "value": "720p" },
+        { "label": "480p", "value": "480p" },
+        { "label": "360p", "value": "360p" },
+        { "label": "Audio Only", "value": "Audio Only" }
+      ]
+    },
+    {
+      "key": "max_charge_usd",
+      "label": {
+        "en": "Maximum Charge Per Run",
+        "zh": "单次任务最高费用"
+      },
+      "type": "option",
+      "defaultValue": "0.25",
+      "description": {
+        "en": "Passed to Apify as maxTotalChargeUsd. The run is capped to one paid dataset item as an additional safety guard.",
+        "zh": "通过 maxTotalChargeUsd 传给 Apify，并额外把单次付费 Dataset 结果限制为 1 条。"
+      },
+      "options": [
+        { "label": "$0.05", "value": "0.05" },
+        { "label": "$0.10", "value": "0.10" },
+        { "label": "$0.25", "value": "0.25" },
+        { "label": "$0.50", "value": "0.50" },
+        { "label": "$1.00", "value": "1.00" }
+      ]
+    },
+    {
+      "key": "download_directory",
+      "label": {
+        "en": "Download Folder",
+        "zh": "下载目录"
+      },
+      "type": "directory",
+      "description": {
+        "en": "Optional default save folder. If not configured, the plugin asks you to choose a folder before saving.",
+        "zh": "可选默认保存目录。未配置时，插件会在保存前要求选择目录。"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "downloadVideoWithApify",
+      "title": {
+        "en": "Download Video with Apify",
+        "zh": "用 Apify 下载视频"
+      },
+      "description": {
+        "en": "Detect the selected video platform, run a third-party Apify Actor, and save the returned media locally.",
+        "zh": "识别选中链接的平台，运行第三方 Apify Actor，并把返回的媒体保存到本地。"
+      },
+      "icon": "arrow.down.video",
+      "script": "script.js",
+      "extensionKind": "textAction",
+      "rules": {
+        "regex": "https?://\\S+"
+      }
+    }
+  ],
+  "ui": {
+    "main": "ui/index.html"
+  }
+}
