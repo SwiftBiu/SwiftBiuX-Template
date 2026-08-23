@@ -12,6 +12,8 @@
 - 核心 Skill：[`AI_SKILL.md`](AI_SKILL.md)
 - 完整 Skill：[`AI_SKILL_FULL.md`](AI_SKILL_FULL.md)
 - 快速开始：[`developer-modules/quick-start.zh.md`](developer-modules/quick-start.zh.md) / [`developer-modules/quick-start.md`](developer-modules/quick-start.md)
+- 官网开发者中心：[SwiftBiu Developer](https://www.swiftbiu.com/developer.html) / [Quick Start](https://www.swiftbiu.com/developer/quick-start/)
+- 官网版本记录：[SwiftBiu Changelog](https://www.swiftbiu.com/changelog.html)
 - 按需加载索引：[`ai/docs-index.json`](ai/docs-index.json)
 
 复制这个 Prompt 给 ChatGPT、Claude、Cursor、Codex 或其他代码助手即可开始：
