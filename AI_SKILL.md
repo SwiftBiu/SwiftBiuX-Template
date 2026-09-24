@@ -91,10 +91,18 @@ If you are an AI code assistant, you do not need to run npm. Generate complete p
 - `script.js`
 - `ui/index.html` only for Rich Web App plugins
 
-After generating the files, package the plugin when possible:
+After generating the files, or after updating manifest declarations (permissions, network domains, config):
+
+1. Increment the `version` in `manifest.json`.
+2. Package the plugin:
 
 ```bash
 ./scripts/build_plugin.sh <PluginDirectory>
+```
+
+3. If updating official catalog plugins, regenerate catalog metadata:
+```bash
+node scripts/generate_catalog.js
 ```
 
 Only skip packaging when the current environment does not contain the packaging script or cannot run shell commands. In that case, tell the user the exact command to run.
@@ -270,7 +278,7 @@ Many fields in `manifest.json` support the `TranslatableString` type, which allo
 | `network`        | `SwiftBiu.fetch`, `window.swiftBiu.fetch`, and all `SwiftBiu.ai*` / `window.swiftBiu.ai.*` provider requests | Network and native AI requests |
 | `clipboardWrite` | `SwiftBiu.writeToClipboard`, `SwiftBiu.copyImage`, `window.swiftBiu.copyText`, `window.swiftBiu.copyImage` | Write text or images to clipboard |
 | `clipboardRead`  | `SwiftBiu.getClipboard`               | Read clipboard content         |
-| `localFileRead`  | `SwiftBiu.getFileMetadata`, `SwiftBiu.extractFileIcon`, `SwiftBiu.setFileIcon`, `SwiftBiu.pickLocalFile`, `SwiftBiu.readLocalFile`, `SwiftBiu.readLocalTextFile`, `SwiftBiu.listDirectory`, `SwiftBiu.openFileWithApp`, `window.swiftBiu.getFileMetadata`, `window.swiftBiu.extractFileIcon`, `window.swiftBiu.setFileIcon`, `window.swiftBiu.pickLocalFile`, `window.swiftBiu.readLocalFile`, `window.swiftBiu.readLocalTextFile`, `window.swiftBiu.listDirectory`, `window.swiftBiu.openFileWithApp` | Inspect, select, extract icons from, replace icons for, read, list, or open currently selected local files and accessible files/directories |
+| `localFileRead`  | `SwiftBiu.getFileMetadata`, `SwiftBiu.extractFileIcon`, `SwiftBiu.convertImageToSVG`, `SwiftBiu.censorLocalImage`, `SwiftBiu.setFileIcon`, `SwiftBiu.pickLocalFile`, `SwiftBiu.readLocalFile`, `SwiftBiu.readLocalTextFile`, `SwiftBiu.listDirectory`, `SwiftBiu.openFileWithApp`, `window.swiftBiu.getFileMetadata`, `window.swiftBiu.extractFileIcon`, `window.swiftBiu.convertImageToSVG`, `window.swiftBiu.censorLocalImage`, `window.swiftBiu.setFileIcon`, `window.swiftBiu.pickLocalFile`, `window.swiftBiu.readLocalFile`, `window.swiftBiu.readLocalTextFile`, `window.swiftBiu.listDirectory`, `window.swiftBiu.openFileWithApp` | Inspect, select, extract icons from, replace icons for, convert/censor images, read, list, or open currently selected local files and accessible files/directories |
 | `localFileWrite` | `setFileIcon`, `pickLocalFile`, `pickLocalDirectory`, `requestDirectoryAuthorization`, `hasAuthorizedDirectoryAccess`, `createLocalDirectory`, `createLocalFile`, `writeLocalTextFile`, `overwriteLocalFile`, `renameLocalFile`, `copyLocalFile`, `moveLocalFile`, `trashLocalItem`, `saveLocalFile`, `fileExists`, `directoryExists` | Select writable files, replace custom icons, create, update, move, rename, trash, save, or inspect writable destinations in selected or authorized locations |
 | `share`          | `shareTargets`, `SwiftBiu.share`, `window.swiftBiu.share` | Share selected text, links, files, or images through SwiftBiu's native sharing bridge |
 | `paste`          | `SwiftBiu.pasteText` / `swiftBiu.pasteText` | Write + paste to active app. On iOS main app, degrades gracefully to a Toast Notification. Works properly on iOS Keyboard Extension |
@@ -394,6 +402,7 @@ API object: **`SwiftBiu`** (also accessible as `swiftBiu`, both are injected)
 | `SwiftBiu.cancelFetchStream(streamID)` | Sync | Cancels a stream created by `fetchStream(...)` |
 | `SwiftBiu.downloadRemoteFile(url, options, onSuccess, onError)` | Callback-based | Requires `network`. Downloads a remote file-like URL and returns a transient local file result |
 | `SwiftBiu.materializeSelectedRemoteFiles(options, onSuccess, onError)` | Callback-based | Requires `network`. Downloads `context.selectedRemoteFiles` into transient local files for the current action |
+| `SwiftBiu.releaseTemporaryFile(path)` | Sync → Bool | Deletes a transient file returned by `downloadRemoteFile(...)`; refuses non-managed paths |
 | `SwiftBiu.showImage(source, position, context)` | Sync | `source`: URL string or base64. Requires `notifications` |
 | `SwiftBiu.showInteractiveImage(options, onRegenerate)` | Sync create → `sessionID` | Requires `notifications`. Native image card with regenerate/update behavior |
 | `SwiftBiu.updateInteractiveImage(sessionID, options)` | Sync | Updates an existing interactive image session |
@@ -419,6 +428,8 @@ API object: **`SwiftBiu`** (also accessible as `swiftBiu`, both are injected)
 | `SwiftBiu.openImageInPreview(base64)` | Sync | Opens base64 image in Preview.app |
 | `SwiftBiu.getFileMetadata(path)` | Sync → Object | Requires `localFileRead`. Returns size, timestamps, content type, etc. |
 | `SwiftBiu.extractFileIcon(path, options)` | Sync → Object | Requires `localFileRead`. Returns `{success, base64, fileName, width, height, format}` or `{success: false, error}`. Use this for App Store-compatible icon extraction instead of shell/osascript |
+| `SwiftBiu.convertImageToSVG(path, options)` | Sync → Object | Requires `localFileRead`. On-device SVG conversion with alpha, shared boundaries, and fitted linear/radial gradients. Options: `maxColors`, `maxDimension`, `minArea`, `curveMode` (spline/polygon/pixel), `layerMode` (stacked/cutout), `curveTolerance`, `cornerThreshold`, `gradientMode` (auto/off; default auto), `groupMode` (objects/geometric; default geometric), `paintMode` (faithful/editable/minimal; API default faithful). Snake_case aliases are accepted; pixel mode skips gradients. Returns `{success, svg, width, height, colors, shapeCount, groupCount, objectCount, fileName}` |
+| `SwiftBiu.censorLocalImage(path, options)` | Sync → Object | Requires `localFileRead`. Local Vision/Core Image pixelation. `options`: `{mode: "faces"|"full", blockSize}`. Returns `{success, base64, format, facesDetected, mode}` |
 | `SwiftBiu.setFileIcon(targetPath, iconPath, options)` | Sync → Object | Requires `localFileRead` + `localFileWrite`. Uses the host App to apply an image as the custom Finder icon for an accessible file/folder/app. Prefer this over shell tools for App Store compatibility |
 | `SwiftBiu.readLocalFile(path)` | Sync → Base64 String | Requires `localFileRead`. Path must come from `context.selectedFiles` or a user-authorized location; do not pass `context.selectedRemoteFiles` |
 | `SwiftBiu.readLocalTextFile(path)` | Sync → String | Requires `localFileRead`. Convenience UTF-8 text decoder for selected or authorized files |
@@ -513,8 +524,11 @@ window.swiftBiu_initialize = function(context) {
 | `window.swiftBiu.ai.speechToText(options)` | Promise → `Object` | Host-managed STT. Requires `network` + `localFileRead`; `window.swiftBiu.ai.stt(...)` and `window.swiftBiu.ai.transcribe(...)` are aliases |
 | `window.swiftBiu.downloadRemoteFile(url, options)` | Promise → `Object` | Downloads a remote file into transient local storage. Requires `network` |
 | `window.swiftBiu.materializeSelectedRemoteFiles(options)` | Promise → `Object` | Downloads current remote selections. Requires `network` |
+| `window.swiftBiu.releaseTemporaryFile(path)` | Promise → `{success: Boolean}` | Deletes a transient file returned by `downloadRemoteFile(...)`; refuses non-managed paths |
 | `window.swiftBiu.getFileMetadata(path)` | Promise → `Object` | Requires `localFileRead` |
 | `window.swiftBiu.extractFileIcon(path, options)` | Promise → `Object` | Requires `localFileRead`. Returns PNG Base64 icon data from the host App; preferred for App Store sandbox compatibility |
+| `window.swiftBiu.convertImageToSVG(path, options)` | Promise → `Object` | Requires `localFileRead`. On-device SVG conversion with alpha, shared boundaries, and fitted linear/radial gradients. Options: `maxColors`, `maxDimension`, `minArea`, `curveMode` (spline/polygon/pixel), `layerMode` (stacked/cutout), `curveTolerance`, `cornerThreshold`, `gradientMode` (auto/off; default auto), `groupMode` (objects/geometric; default geometric), `paintMode` (faithful/editable/minimal; API default faithful). Snake_case aliases are accepted; pixel mode skips gradients |
+| `window.swiftBiu.censorLocalImage(path, options)` | Promise → `Object` | Requires `localFileRead`. Local face/full-image pixelation |
 | `window.swiftBiu.setFileIcon(targetPath, iconPath, options)` | Promise → `Object` | Requires `localFileRead` + `localFileWrite`. Applies an image as the custom Finder icon for an accessible file/folder/app |
 | `window.swiftBiu.readLocalFile(path)` | Promise → `{base64: String}` | Requires `localFileRead`. Path must come from `context.selectedFiles` or a user-authorized location; do not pass `context.selectedRemoteFiles` |
 | `window.swiftBiu.readLocalTextFile(path)` | Promise → `{result: String}` | Requires `localFileRead`. Convenience UTF-8 text decoder for selected or authorized files |

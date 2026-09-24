@@ -1,5 +1,7 @@
 # File Workflow Reference
 
+<!-- Skill/AI reference only. Official website pages are built from developer-modules/*.md, not this file. See developer-modules/README.md. -->
+
 Use this reference for plugins that read, create, update, rename, copy, move, save, open, or trash files.
 
 ## Input Rules
@@ -30,7 +32,8 @@ For remote file-like inputs:
 
 - Use `context.selectedRemoteFiles` only for URL-aware workflows.
 - Use `downloadRemoteFile(...)` or `materializeSelectedRemoteFiles(...)` only when the plugin has `network` permission and the user expects remote downloads.
-- Treat downloaded transient paths as current-action inputs, not permanent storage.
+- When the user already chose a destination folder, pass `destinationPath` or `directoryPath` so SwiftBiu saves directly. Do not download to the temporary directory and then `moveLocalFile(...)` for that case.
+- Treat downloaded transient paths as current-action inputs, not permanent storage. Call `releaseTemporaryFile(path)` when the temporary file is no longer needed.
 
 ## Create and Save Workflows
 

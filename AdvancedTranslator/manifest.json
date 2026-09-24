@@ -3,7 +3,7 @@
   "name": "Advanced Translator",
   "author": "SwiftBiu Team",
   "description": "A powerful translation plugin that uses custom UI and supports multiple translation services.",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "icon": "translate",
   "iconType": "sfSymbol",
   "actions": [
@@ -19,6 +19,20 @@
     "clipboardWrite",
     "notifications"
   ],
+  "network": {
+    "domains": [
+      {
+        "host": "generativelanguage.googleapis.com",
+        "purpose": "Send translation requests to Google Gemini models.",
+        "data": [
+          "selectedText",
+          "model",
+          "translation_service"
+        ],
+        "usesCredential": "User-provided Gemini API key"
+      }
+    ]
+  },
   "ui": {
     "main": "ui/index.html"
   },

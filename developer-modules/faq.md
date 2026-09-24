@@ -6,6 +6,41 @@
 > - **Direct Open**: Always support direct open for UI Extensions.
 > - **Complex Logs**: Always use `JSON.stringify(obj)` when logging complex nested background objects.
 
+
+```text
+Resources/
+  i18n/
+    en.json
+    zh-Hans.json
+    zh-Hant.json
+ui/
+  locales.js
+script.js
+```
+
+For logic-only plugins, keep the same per-language separation even if you eventually bundle the strings into `script.js` during build time. The important part is the authoring model: one locale, one reviewed translation source.
+
+## Debugging & Logging
+
+SwiftBiu provides two complementary debugging methods tailored for its dual-environment architecture.
+
+### 1. SwiftBiu Built-in Log Viewer
+Whether in the background script (`script.js`) or the Web UI (`index.html`), calls to `console.log()`, `console.warn()`, and `console.error()` are captured and bridged to SwiftBiu's native logging system.
+*   **How to view**: Click the SwiftBiu icon in the menu bar -> select **"Log Viewer"**.
+*   **Cross-Environment Tracking**: Logs originating from the UI layer automatically carry a `[UI]` prefix alongside your plugin identifier, allowing you to clearly trace front-to-back communication in a single console.
+*   *(Tip: When printing complex objects in the background script, it's recommended to use `console.log(JSON.stringify(obj, null, 2))` to ensure full readability in the native log console)*.
+
+### 2. Safari Web Inspector (For Web UI Views)
+When developing a **Web App Action**, encountering CSS layout issues or needing to directly debug the DOM or network requests is common. Pushing logs to the native console alone is insufficient. You can directly leverage macOS's built-in Safari Developer Tools for this.
+
+1.  Open the **Safari browser**.
+2.  Open the **"Develop"** tab in the menu bar (If you don't see it, go to Safari Preferences -> Advanced, and check "Show features for web developers").
+3.  Trigger and keep your SwiftBiu plugin's Web UI open.
+4.  Under Safari's Develop menu, locate your Mac's device name (e.g., `Your-MacBook-Pro`). In the expanded list, find the `SwiftBiu` process, and click the `index.html` below it to open the powerful Web Inspector!
+5.  *Note: This native debugging capability relies on the developer version of SwiftBiu (The App Store sandbox version may block Safari inspector attachment due to system security policies).*
+
+---
+
 ## Best Practices & FAQ
 
 Through the development process, we've identified some common pitfalls and recommended best practices. Following these tips can help you avoid unnecessary debugging and build more robust, user-friendly plugins.
@@ -65,40 +100,14 @@ function isAvailable(context) {
 
 Avoid using bleeding-edge ECMAScript syntax proposals (such as the array `.at()` method or bleeding-edge RegEx features) in background scripts. This may cause runtime errors on older macOS systems. We recommend using standard ES6 syntax to ensure the broadest compatibility across different macOS versions.
 
-### 6. Native Request Modes for Background Scripts
+### 6. Installation Error: `Type mismatch for key 'network.domains'` or App Update Prompts
 
-> [!NOTE]
-> Background `script.js` currently has two native request styles: one-shot `fetch(...)` and incremental `fetchStream(...)`.
+> [!WARNING]
+> Keep version compatibility in mind when writing `network.domains` or using newer features:
 
-Use `SwiftBiu.fetch(url, options, onSuccess, onError)` when the server returns a complete response in one shot:
-1. If your plugin already has its own visual container (`displayUI(...)`, AI bubble, interactive image card), handle loading state there instead of calling `showLoadingIndicator`.
-2. For non-UI quick actions, you may still wrap the request with `SwiftBiu.showLoadingIndicator(...)` and `SwiftBiu.hideLoadingIndicator()`.
-3. Call `SwiftBiu.fetch(url, options, onSuccess, onError)` to initiate the request.
-4. Call `SwiftBiu.showNotification(...)` or update your bubble/UI with the final result.
-
-Use `SwiftBiu.fetchStream(url, options, onEvent, onError)` when the provider supports SSE or chunked responses:
-1. Start the request and store the returned `streamID` if you may need to cancel or replace it later.
-2. Handle `response` to inspect status and headers before data arrives.
-3. Handle each `data` event by parsing the provider-specific chunk format and appending it to your accumulated output.
-4. On `complete`, finalize UI state such as `ready`, enable submit buttons, or persist final metadata.
-5. If the user cancels or regenerates, call `SwiftBiu.cancelFetchStream(streamID)` before launching the next stream.
-
-*(If you prefer modern JS, you can manually wrap `fetch(...)` in a Promise for async/await style. On the Web UI side, the global `window.swiftBiu.fetch` is already a Promise API.)*
-
-### 7. Background Debugging: Log Complex Objects Fully
-
-> [!TIP]
-> Printing complex objects with native logs might result in truncation or simply `[object Object]`.
-
-When using `console.log()` in the background script, it is highly recommended to use `JSON.stringify` to format complex arrays or JSON objects:
-```javascript
-// ✅ Excellent debugging practice, readable at a glance
-console.log("API Response:", JSON.stringify(result, null, 2));
-
-// ❌ Complex hierarchies may fail to expand natively
-console.log("API Response:", result);
-```
-
+*   **`network.domains` Must Be an Array of Objects**: When declaring allowed domains for network requests, each item must be a dictionary object (e.g., `[{"host": "api.example.com", "purpose": "Exchange rate data"}]`), **never** a plain string array like `["api.example.com"]`. Older SwiftBiu clients decode domains strictly as dictionaries, and string arrays will throw a decoding error: `Expected Dictionary<String, Any>`.
+*   **Declare `minAppVersion` for New Features**: If your plugin requires features introduced in newer SwiftBiu releases (such as native SVG conversion via `convertImageToSVG`, image auto-censoring, or shortcut dependencies), specify `"minAppVersion": "1.4.8"` in `manifest.json`. When installed on older versions, SwiftBiu will intercept the installation and show a clear prompt telling the user to update SwiftBiu first, avoiding broken runtime behaviors or unexpected errors.
+*   **Existing Legacy Extensions**: Extensions without `minAppVersion` are fully backward-compatible by default and install smoothly on all client versions.
 
 
 ---

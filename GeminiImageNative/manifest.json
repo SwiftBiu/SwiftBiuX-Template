@@ -3,7 +3,7 @@
   "name": "Nano Banana",
   "author": "SwiftBiu",
   "description": "Generates images from selected text in a native SwiftBiu studio window.",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "actions": [
     {
       "title": "Nano Banana",
@@ -14,6 +14,21 @@
   "permissions": [
     "network"
   ],
+  "network": {
+    "domains": [
+      {
+        "host": "generativelanguage.googleapis.com",
+        "purpose": "Generate images via Google Gemini image models.",
+        "data": [
+          "selectedText",
+          "model",
+          "aspectRatio",
+          "imageSize"
+        ],
+        "usesCredential": "User-provided Gemini API key"
+      }
+    ]
+  },
   "icon": "nano-banana.png",
   "iconType": "file",
   "configuration": [

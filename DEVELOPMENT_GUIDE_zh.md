@@ -144,6 +144,8 @@ function performAction(context) {
 
 ## 📦 模块化开发文档 (developer-modules)
 
+> **官网开发者文档的源文件在这里。** 请改 `developer-modules/` 下的 Markdown。`SwiftBiuWeb/**/developer/` 里的 HTML 是 `SwiftBiuWeb/build.js` 的构建产物，下次构建会被覆盖，不要手改。`references/` 只给 AI / 插件 skill 用，不会渲成官网。详见 `developer-modules/README.md`。
+
 为了提供更细致、更易读的开发参考，SwiftBiu 的核心指南已被拆分为以下模块。当您在 GitHub 上阅读本指南时，可以直接点击链接查看本地的独立 Markdown 文档：
 
 *   **[🚀 快速开始](developer-modules/quick-start.zh.md)** - 2 分钟内创建并运行你的第一个 SwiftBiu 插件。
@@ -472,6 +474,27 @@ window.swiftBiu_initialize = async function (context) {
 | `ai`            | Object | 否       | SwiftBiu 托管 AI 的用途、提供商/模型 Key 和可选 `allowedProviders`。 |
 
 原生 AI 扩展应声明 `ai.useCase`、`providerKey` 和 `modelKey`。提供商专用扩展还应声明 `allowedProviders`；原生选择器与每次运行时代理请求都会使用同一白名单。动作级 `ai` 会整体替代该动作的根级声明，因此需要重复全部必要字段。详见 [SwiftBiu 托管 AI 提供商契约](references/native-ai.md)。
+
+### 网络域名白名单与严格安全模型 (`network`)
+
+如果扩展调用任何外部网络接口（`SwiftBiu.fetch`、`SwiftBiu.fetchStream`、Web UI 网络请求、外链跳转等），必须：
+1. 在 `permissions` 包含 `"network"`；
+2. 在 `network.domains` 中显式声明所有外连目标主机名：
+
+```json
+"network": {
+  "domains": [
+    {
+      "host": "api.frankfurter.app",
+      "purpose": "实时汇率查询"
+    }
+  ]
+}
+```
+
+- **运行时拦截**：SwiftBiu 内核会对每一次请求及重定向（301/302）校验该白名单。未声明的域名会被系统直接拒绝并弹出受限警报，引导用户更新扩展。
+- **版本号递增规则**：任何针对 `permissions`、`network.domains`、`configuration` 的声明补齐或调整，都**必须在 `manifest.json` 中递增 `version` 版本号**（如 `1.0.1` -> `1.0.2`）。
+- **打包与分发**：版本号递增后，使用 `./scripts/build_plugin.sh <插件目录>` 重新打包生成 `.swiftbiux`，并执行 `node scripts/generate_catalog.js` 重新生成官方目录。
 
 ### 插件图标规范 (`icon`)
 

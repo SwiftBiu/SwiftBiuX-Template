@@ -5,6 +5,41 @@
 > - **防误触发规则**: 尽可能按应用过滤插件的显示优先级，保障桌面端体验清洁。
 > - **调试复杂对象**: 在后台沙盒打印大对象时，始终使用 `JSON.stringify(obj, null, 2)` 以防在原生查看器中折叠或丢失。
 
+
+```text
+Resources/
+  i18n/
+    en.json
+    zh-Hans.json
+    zh-Hant.json
+ui/
+  locales.js
+script.js
+```
+
+对于纯逻辑插件，即使最终通过构建步骤把多语言内容收敛进 `script.js`，也建议保持“一个语言一个源文件”的作者心智模型。重点不在最终打包形式，而在翻译维护流程：每个语言必须是独立、可审阅、可迭代的资源源头。
+
+## 调试与日志
+
+SwiftBiu 提供了针对其双环境架构的两种互补的调试方式。
+
+### 1. SwiftBiu 内置日志查看器 
+无论是后台脚本 (`script.js`) 还是 Web UI (`index.html`)，代码中调用的 `console.log()`、`console.warn()` 和 `console.error()` 都会被捕获并桥接到 SwiftBiu 的原生日志系统中。
+*   **如何查看**: 通过菜单栏点击 SwiftBiu 的图标 -> 选择 **"日志查看器" (Log Viewer)**。
+*   **跨环境追踪**: UI 层传来的日志会自动带有 `[UI]` 前缀和您的插件标识符，让您在同一个控制台中清晰追踪前后端的通信过程。
+*   *(提示: 在后台脚本中打印复杂对象时，为了保证在原生日志台的完全可读性，建议使用 `console.log(JSON.stringify(obj, null, 2))`)*。
+
+### 2. Safari Web 检查器 (针对 Web UI 视图)
+当您开发 **Web App 动作** 遇到 CSS 布局问题或想直接调试 DOM、审查网络请求时，原生的控制台显然不够用。此时您可以直接使用 macOS 系统自带的 Safari 开发工具。
+
+1.  打开 **Safari 浏览器**。
+2.  在菜单栏打开 **"开发" (Develop)** 选项卡（如果没看到，请在 Safari 设置 -> 高级中勾选“在菜单栏中显示开发菜单”）。
+3.  唤起并停留在您的 SwiftBiu 插件 Web 界面。
+4.  在 Safari 的开发菜单下，找到您的 Mac 设备名称（例如 `Your-MacBook-Pro`），在展开的列表中找到 `SwiftBiu` 进程，点击下方的 `index.html` 即可打开强大的 Web 检查器！
+5.  *注：此原生调试功能依赖于开发者版本的 SwiftBiu（App Store 沙盒版本可能因系统安全策略而无法被 Safari 附加检查器）。*
+
+---
+
 ## 最佳实践与常见问题 (Best Practices & FAQ)
 
 在插件开发过程中，我们总结了一些常见的“陷阱”和推荐的最佳实践。遵循这些建议可以帮助您避免不必要的调试，并构建出更健壮、体验更好的插件。
@@ -64,40 +99,14 @@ function isAvailable(context) {
 
 避免在后台脚本中使用过于前沿的 ECMAScript 提案语法（例如数组的 `.at()` 方法或未定档的正则扩展特性），这可能会导致低版本系统的运行时报错。建议使用兼容性更好的标准 ES6 语法以确保更广泛的 macOS 兼容性。
 
-### 6. 后台脚本的两种原生请求模式
+### 6. 安装扩展报错：`Type mismatch for key 'network.domains'` 或提示需要更新
 
-> [!NOTE]
-> 后台 `script.js` 当前有两种原生网络请求模式：一次性结果的 `fetch(...)`，以及增量回调的 `fetchStream(...)`。
+> [!WARNING]
+> 在编写 `network.domains` 声明或开发新扩展时请注意版本兼容性：
 
-当服务端是“一次性完整返回”时，使用 `SwiftBiu.fetch(url, options, onSuccess, onError)`：
-1. 若插件已有可承载状态的界面（`displayUI(...)`、AI 响应弹框、可交互图片卡片），请在该界面内管理等待态，不再调用 `showLoadingIndicator`。
-2. 对于没有独立 UI 的轻量动作，仍可在请求前后配对调用 `SwiftBiu.showLoadingIndicator(...)` 与 `SwiftBiu.hideLoadingIndicator()`。
-3. 调用 `SwiftBiu.fetch(url, options, onSuccess, onError)` 发起请求。
-4. 使用 `SwiftBiu.showNotification(...)` 或更新原生弹框 / 自定义 UI 告知最终结果。
-
-当服务端支持 SSE 或 chunked 真流式时，使用 `SwiftBiu.fetchStream(url, options, onEvent, onError)`：
-1. 启动请求后保存返回的 `streamID`，方便后续取消、重试或重新生成。
-2. 在 `response` 事件中先检查状态码和响应头。
-3. 在每次 `data` 事件里解析服务商自己的 chunk 格式，并把内容追加到脚本内部维护的累计文本里。
-4. 在 `complete` 事件里收尾，例如把 UI 切到 `ready`、开放提交按钮，或保存最终元数据。
-5. 如果用户取消或重新生成，请先调用 `SwiftBiu.cancelFetchStream(streamID)` 再启动新的流。
-
-*(注意：如果您习惯现代 JS，依然可以自行把 `fetch(...)` 包装成 Promise 以使用 async/await；而在 Web UI 侧，全局的 `window.swiftBiu.fetch` 本来就是 Promise API。)*
-
-### 7. 后台调试：完整打印复杂对象
-
-> [!TIP]
-> 复杂对象的原生日志打印可能会被截断或简写为 `[object Object]`。
-
-在后台脚本中使用 `console.log()` 时，对于 JSON 或复杂数组，强烈建议使用 `JSON.stringify` 格式化：
-```javascript
-// ✅ 推荐的绝佳调试方式，在控制台中一目了然
-console.log("API 响应数据:", JSON.stringify(result, null, 2));
-
-// ❌ 复杂层级在原生查看器中可能无法直接展开
-console.log("API 响应数据:", result);
-```
-
+*   **`network.domains` 必须是对象数组**：声明网络访问域名白名单时，必须为字典对象数组（如 `[{"host": "api.example.com", "purpose": "获取汇率"}]`），**不能**写为纯字符串数组 `["api.example.com"]`。旧版 SwiftBiu 客户端使用严格的字典解码，纯字符串数组会直接导致安装失败并报错 `Expected Dictionary<String, Any>`。
+*   **新特性请声明 `minAppVersion` 引导用户更新软件**：若扩展使用了较新版本才支持的特性（如 native 图像转 SVG `convertImageToSVG`、图片审核 `censorLocalImage`、快捷指令依赖等），请在 `manifest.json` 中声明 `"minAppVersion": "1.4.8"`。在较低版本的客户端上安装时，SwiftBiu 会自动拦截并弹出友好提示“此扩展需要 SwiftBiu 1.4.8 或更高版本，请先更新 SwiftBiu”，避免用户困惑。
+*   **存量旧扩展无缝兼容**：对于未声明 `minAppVersion` 的旧扩展，客户端默认完全支持安装，无需担心兼容性中断。
 
 
 ---

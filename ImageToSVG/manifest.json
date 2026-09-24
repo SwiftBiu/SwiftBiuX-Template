@@ -1,0 +1,390 @@
+{
+  "identifier": "com.swiftbiux.image-to-svg",
+  "name": {
+    "en": "Image to SVG",
+    "zh": "图片转 SVG"
+  },
+  "author": "SwiftBiu Community Template",
+  "description": {
+    "en": "Convert a selected image to SVG locally. Color count, size, and save folder are managed in SwiftBiu settings.",
+    "zh": "在本地把选中图片转成 SVG。颜色数、尺寸与保存目录在 SwiftBiu 设置中管理。"
+  },
+  "version": "1.7.0",
+  "icon": "square.on.circle",
+  "iconType": "sfSymbol",
+  "extensionKind": "fileAction",
+  "permissions": [
+    "localFileRead",
+    "localFileWrite",
+    "notifications"
+  ],
+  "configuration": [
+    {
+      "key": "max_colors",
+      "label": {
+        "en": "How many colors to keep",
+        "zh": "保留多少种颜色"
+      },
+      "type": "option",
+      "defaultValue": "32",
+      "description": {
+        "en": "Lower = bigger flat color blocks, easier to edit, less like the photo. Higher = closer to the original, but more pieces.",
+        "zh": "调低：色块更大、更好改，但会更“海报化”。调高：更接近原图，但形状会变多、文件也更大。"
+      },
+      "options": [
+        {
+          "label": {
+            "en": "8 — simplest, poster look",
+            "zh": "8｜最少色，最整齐"
+          },
+          "value": "8"
+        },
+        {
+          "label": {
+            "en": "16 — simpler shapes",
+            "zh": "16｜较少色块"
+          },
+          "value": "16"
+        },
+        {
+          "label": {
+            "en": "24 — more color detail",
+            "zh": "24｜多一点层次"
+          },
+          "value": "24"
+        },
+        {
+          "label": {
+            "en": "32 — balanced (default)",
+            "zh": "32｜均衡（推荐）"
+          },
+          "value": "32"
+        },
+        {
+          "label": {
+            "en": "48 — close to original",
+            "zh": "48｜接近原图"
+          },
+          "value": "48"
+        },
+        {
+          "label": {
+            "en": "64 — maximum detail",
+            "zh": "64｜最细，形状最多"
+          },
+          "value": "64"
+        }
+      ],
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    },
+    {
+      "key": "max_dimension",
+      "label": {
+        "en": "Trace resolution",
+        "zh": "描图精细度"
+      },
+      "type": "option",
+      "defaultValue": "768",
+      "description": {
+        "en": "The picture is shrunk to this longest-edge size before tracing. Higher looks sharper and follows edges better, but is slower and makes a larger SVG.",
+        "zh": "转换前先把图缩到这个最长边。数字越大：边缘越准、越细腻，但更慢、SVG 也更大。数字越小：更快更干净，但容易变糊、丢细节。"
+      },
+      "options": [
+        {
+          "label": {
+            "en": "192 — fastest, blockier",
+            "zh": "192｜最快，更块状"
+          },
+          "value": "192"
+        },
+        {
+          "label": {
+            "en": "256 — light and simple",
+            "zh": "256｜轻量够用"
+          },
+          "value": "256"
+        },
+        {
+          "label": {
+            "en": "384 — faster preview",
+            "zh": "384｜快速转换"
+          },
+          "value": "384"
+        },
+        {
+          "label": {
+            "en": "512 — sharper edges",
+            "zh": "512｜边缘更清晰"
+          },
+          "value": "512"
+        },
+        {
+          "label": {
+            "en": "768 — detailed (default)",
+            "zh": "768｜清晰（推荐）"
+          },
+          "value": "768"
+        },
+        {
+          "label": {
+            "en": "1024 — finest, heaviest",
+            "zh": "1024｜最多细节，耗时更长"
+          },
+          "value": "1024"
+        }
+      ],
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    },
+    {
+      "key": "min_area",
+      "label": {
+        "en": "Ignore specks smaller than",
+        "zh": "多小的杂点可以丢掉"
+      },
+      "type": "option",
+      "defaultValue": "4",
+      "description": {
+        "en": "1 disables area-based speckle removal. Color quantization and edge smoothing still apply. Higher values merge small regions into adjacent shapes; isolated specks may be removed. Transparent holes are preserved.",
+        "zh": "1 不按面积清除小色块，仍会进行分色和平滑。调高后小色块会并入相邻图形，孤立杂点可能被移除；真实透明孔洞会保留。"
+      },
+      "options": [
+        {
+          "label": {
+            "en": "1 px — preserve small regions",
+            "zh": "1 像素｜保留小色块"
+          },
+          "value": "1"
+        },
+        {
+          "label": {
+            "en": "4 px — balanced (default)",
+            "zh": "4 像素｜均衡（推荐）"
+          },
+          "value": "4"
+        },
+        {
+          "label": {
+            "en": "8 px — cleaner shapes",
+            "zh": "8 像素｜形状更干净"
+          },
+          "value": "8"
+        },
+        {
+          "label": {
+            "en": "16 px — merge small chips",
+            "zh": "16 像素｜合并小碎块"
+          },
+          "value": "16"
+        },
+        {
+          "label": {
+            "en": "32 px — only large shapes",
+            "zh": "32 像素｜只留大色块"
+          },
+          "value": "32"
+        }
+      ],
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    },
+    {
+      "key": "curve_mode",
+      "label": {
+        "en": "Edge style",
+        "zh": "边缘样式"
+      },
+      "type": "option",
+      "defaultValue": "spline",
+      "description": {
+        "en": "Smooth curves for illustrations, polygons for angular art, or exact pixel boundaries for pixel art.",
+        "zh": "插画使用平滑曲线，几何图形可选折线，像素画可保留像素边界。"
+      },
+      "options": [
+        {
+          "label": {
+            "en": "Smooth curves",
+            "zh": "平滑曲线"
+          },
+          "value": "spline"
+        },
+        {
+          "label": {
+            "en": "Polygons",
+            "zh": "折线"
+          },
+          "value": "polygon"
+        },
+        {
+          "label": {
+            "en": "Pixel boundaries",
+            "zh": "像素边界"
+          },
+          "value": "pixel"
+        }
+      ],
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    },
+    {
+      "key": "layer_mode",
+      "label": {
+        "en": "Layer arrangement",
+        "zh": "图层组织"
+      },
+      "type": "option",
+      "defaultValue": "stacked",
+      "description": {
+        "en": "Stacked completes covered opaque regions for easier editing. Cutout keeps separate adjacent regions. Both preserve transparent holes.",
+        "zh": "叠放模式补全被不透明图形覆盖的底层区域，便于单独编辑；拼合模式保留各区域边界。两种模式均保留透明孔洞。"
+      },
+      "options": [
+        {
+          "label": {
+            "en": "Stacked layers",
+            "zh": "叠放图层"
+          },
+          "value": "stacked"
+        },
+        {
+          "label": {
+            "en": "Adjacent shapes",
+            "zh": "相邻拼合"
+          },
+          "value": "cutout"
+        }
+      ],
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    },
+    {
+      "key": "curve_tolerance",
+      "label": {
+        "en": "Curve detail",
+        "zh": "曲线细节"
+      },
+      "type": "option",
+      "defaultValue": "0.6",
+      "description": {
+        "en": "Finer fitting preserves more contour detail; simpler fitting reduces edit points and file size.",
+        "zh": "精细拟合保留更多轮廓细节，简洁拟合减少编辑节点和文件大小。"
+      },
+      "options": [
+        {
+          "label": {
+            "en": "Fine",
+            "zh": "精细"
+          },
+          "value": "0.35"
+        },
+        {
+          "label": {
+            "en": "Balanced",
+            "zh": "均衡"
+          },
+          "value": "0.6"
+        },
+        {
+          "label": {
+            "en": "Simple",
+            "zh": "简洁"
+          },
+          "value": "1.0"
+        }
+      ],
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    },
+    {
+      "key": "gradient_mode",
+      "label": { "en": "Smooth shading", "zh": "渐变层次" },
+      "type": "option",
+      "defaultValue": "auto",
+      "description": {
+        "en": "Recognize simple linear and radial gradients as editable fills. Complex shading stays as color regions. Pixel boundaries always use solid colors.",
+        "zh": "将简单线性和径向渐变识别为可编辑填充，复杂明暗仍保留为色块；像素边界模式始终使用纯色色块。"
+      },
+      "options": [
+        { "label": { "en": "Detect gradients", "zh": "自动识别渐变" }, "value": "auto" },
+        { "label": { "en": "Solid color regions", "zh": "保留纯色色块" }, "value": "off" }
+      ],
+      "group": { "en": "Conversion Defaults", "zh": "转换默认值" }
+    },
+    {
+      "key": "paint_mode",
+      "label": { "en": "Color region detail", "zh": "色块细节" },
+      "type": "option",
+      "defaultValue": "editable",
+      "description": {
+        "en": "Merge small adjacent regions only when their colors and opacity are close. Editable keeps more shading; Minimal gives fewer shapes but a flatter look. Faithful preserves the previous region detail. Pixel edges always stay exact.",
+        "zh": "只合并颜色与透明度接近的相邻小色块。便于编辑档保留较多明暗；极简档图形更少，但画面更平；精细档保留原来的色块细节。像素边界模式始终保留原样。"
+      },
+      "options": [
+        { "label": { "en": "Editable (recommended)", "zh": "便于编辑（推荐）" }, "value": "editable" },
+        { "label": { "en": "Minimal shapes", "zh": "极简色块" }, "value": "minimal" },
+        { "label": { "en": "Faithful color detail", "zh": "精细色块" }, "value": "faithful" }
+      ],
+      "group": { "en": "Conversion Defaults", "zh": "转换默认值" }
+    },
+    {
+      "key": "group_mode",
+      "label": { "en": "Editable groups", "zh": "编辑分组" },
+      "type": "option",
+      "defaultValue": "objects",
+      "description": {
+        "en": "Group connected colors and nearby small parts into object candidates; repeated silhouettes remain separate objects within a collection. Touching or overlapping objects may still need manual adjustment.",
+        "zh": "将相连色块和归属明显的小部件组成对象候选，相似图形保留为集合中的独立对象。相接或重叠的图形仍可能需要手动调整。"
+      },
+      "options": [
+        { "label": { "en": "Object groups (experimental)", "zh": "对象分组（实验）" }, "value": "objects" },
+        { "label": { "en": "Geometric containment", "zh": "几何包含层级" }, "value": "geometric" }
+      ],
+      "group": { "en": "Conversion Defaults", "zh": "转换默认值" }
+    },
+    {
+      "key": "output_directory",
+      "label": {
+        "en": "Output Folder",
+        "zh": "保存目录"
+      },
+      "type": "directory",
+      "description": {
+        "en": "Where the .svg file is saved. Leave empty and the first run will ask you once, then remember that folder.",
+        "zh": "转好的 SVG 存到哪里。留空的话，第一次运行会让你选一次文件夹，之后都用它。"
+      },
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "convertImageToSVG",
+      "title": {
+        "en": "Convert to SVG",
+        "zh": "转为 SVG"
+      },
+      "description": {
+        "en": "Convert the selected image to SVG on-device using the defaults in extension settings.",
+        "zh": "按扩展设置中的默认参数，在本地把选中图片转成 SVG。"
+      },
+      "icon": "square.on.circle",
+      "script": "script.js",
+      "extensionKind": "fileAction"
+    }
+  ]
+}

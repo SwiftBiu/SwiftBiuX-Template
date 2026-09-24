@@ -1,5 +1,7 @@
 # Web UI `window.swiftBiu` API
 
+<!-- 官网源文件。改本文件和 web-ui-api.md。不要手改 SwiftBiuWeb/**/developer/web-ui-api/index.html。 -->
+
 Web App 动作运行在独立的前台沙盒中。后台 `script.js` 负责调用 `SwiftBiu.displayUI(...)`，页面中的业务逻辑通过 `window.swiftBiu` 与宿主通信。
 
 > [!IMPORTANT]
@@ -51,8 +53,9 @@ window.swiftBiu_initialize = async function (context) {
 - `window.swiftBiu.fetch(url, options)`：返回 `{ status, data }`。需要 `network`。
 - `window.swiftBiu.storage.get(key)`：返回 `{ result }`。
 - `window.swiftBiu.storage.set(key, value)`：保存 Manifest 中已声明的配置值。
-- `window.swiftBiu.downloadRemoteFile(url, options)`：返回临时本地文件结果。需要 `network`。
+- `window.swiftBiu.downloadRemoteFile(url, options)`：下载远程文件。默认落到临时目录；传入 `destinationPath` 或 `directoryPath` 可直接保存。需要 `network`；直接保存还需要 `localFileWrite`。
 - `window.swiftBiu.materializeSelectedRemoteFiles(options)`：下载当前动作中的远程文件选择。需要 `network`。
+- `window.swiftBiu.releaseTemporaryFile(path)`：删除 `downloadRemoteFile` 创建的临时文件。
 - `window.swiftBiu.getFileMetadata(path)`：返回文件元数据。需要 `localFileRead`。
 - `window.swiftBiu.extractFileIcon(path, options)`：返回 PNG 图标信息或错误。需要 `localFileRead`。
 - `window.swiftBiu.setFileIcon(targetPath, iconPath, options)`：写入 Finder 自定义图标。需要 `localFileRead` 与 `localFileWrite`。

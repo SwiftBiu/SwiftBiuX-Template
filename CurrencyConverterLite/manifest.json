@@ -3,7 +3,7 @@
   "name": "Currency Converter (Lite)",
   "author": "SwiftBiu",
   "description": "Convert currency instantly and copy the result. (Pure JS)",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "icon": "banknote.fill",
   "iconType": "sfSymbol",
   "actions": [
@@ -19,6 +19,19 @@
     "notifications",
     "paste"
   ],
+  "network": {
+    "domains": [
+      {
+        "host": "api.frankfurter.app",
+        "purpose": "Query real-time foreign exchange reference rates from the Frankfurter open API.",
+        "data": [
+          "amount",
+          "fromCurrency",
+          "toCurrency"
+        ]
+      }
+    ]
+  },
   "configuration": [
     {
       "key": "fromCurrency",

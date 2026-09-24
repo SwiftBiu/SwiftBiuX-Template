@@ -9,7 +9,7 @@
     "en": "Select text and search with a custom keyword (e.g., 'Apple' + 'Official').",
     "zh": "选择文字并附带自定义关键字进行搜索（如：'苹果' + '官网'）。"
   },
-  "version": "1.2.0",
+  "version": "1.2.2",
   "icon": "plus.magnifyingglass",
   "iconType": "sfSymbol",
   "actions": [
@@ -22,7 +22,28 @@
       "extensionKind": "textAction"
     }
   ],
-  "permissions": [],
+  "permissions": [
+    "network",
+    "notifications"
+  ],
+  "network": {
+    "domains": [
+      { "host": "www.bing.com", "purpose": "Bing search queries" },
+      { "host": "www.google.com", "purpose": "Google search queries" },
+      { "host": "duckduckgo.com", "purpose": "DuckDuckGo search queries" },
+      { "host": "www.baidu.com", "purpose": "Baidu search queries" },
+      { "host": "github.com", "purpose": "GitHub code and repository search" },
+      { "host": "stackoverflow.com", "purpose": "Stack Overflow technical search" },
+      { "host": "www.youtube.com", "purpose": "YouTube video search" },
+      { "host": "www.zhihu.com", "purpose": "Zhihu QA search" },
+      { "host": "search.bilibili.com", "purpose": "Bilibili search" },
+      { "host": "en.wikipedia.org", "purpose": "Wikipedia article lookup" },
+      { "host": "www.reddit.com", "purpose": "Reddit community search" },
+      { "host": "www.xiaohongshu.com", "purpose": "Xiaohongshu search" },
+      { "host": "www.douyin.com", "purpose": "Douyin video search" },
+      { "host": "www.tiktok.com", "purpose": "TikTok search" }
+    ]
+  },
   "configuration": [
     {
       "key": "search_engine",

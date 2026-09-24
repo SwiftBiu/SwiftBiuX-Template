@@ -1,0 +1,100 @@
+{
+  "identifier": "com.swiftbiux.image-auto-censor",
+  "name": {
+    "en": "Image Auto Censor",
+    "zh": "图片自动打码"
+  },
+  "author": "SwiftBiu Community Template",
+  "description": {
+    "en": "Pixelate faces or the whole selected image locally. Strength and save folder are managed in SwiftBiu settings.",
+    "zh": "在本地打码人脸或整张选中图片。强度与保存目录在 SwiftBiu 设置中管理。"
+  },
+  "version": "1.1.0",
+  "icon": "eye.slash",
+  "iconType": "sfSymbol",
+  "extensionKind": "fileAction",
+  "permissions": [
+    "localFileRead",
+    "localFileWrite",
+    "notifications"
+  ],
+  "configuration": [
+    {
+      "key": "censor_mode",
+      "label": {
+        "en": "Censor Mode",
+        "zh": "打码模式"
+      },
+      "type": "option",
+      "defaultValue": "faces",
+      "description": {
+        "en": "Use on-device face detection, or pixelate the entire image.",
+        "zh": "使用系统本地人脸检测，或对整张图片打码。"
+      },
+      "options": [
+        { "label": { "en": "Faces", "zh": "人脸" }, "value": "faces" },
+        { "label": { "en": "Entire Image", "zh": "整张图片" }, "value": "full" }
+      ],
+      "group": {
+        "en": "Censor Defaults",
+        "zh": "打码默认值"
+      }
+    },
+    {
+      "key": "pixelate_strength",
+      "label": {
+        "en": "Pixelate Strength",
+        "zh": "马赛克强度"
+      },
+      "type": "option",
+      "defaultValue": "20",
+      "description": {
+        "en": "Core Image pixellate block size. Larger values are coarser.",
+        "zh": "Core Image 马赛克块大小。数值越大越粗。"
+      },
+      "options": [
+        { "label": "10", "value": "10" },
+        { "label": "20", "value": "20" },
+        { "label": "30", "value": "30" },
+        { "label": "40", "value": "40" },
+        { "label": "50", "value": "50" }
+      ],
+      "group": {
+        "en": "Censor Defaults",
+        "zh": "打码默认值"
+      }
+    },
+    {
+      "key": "output_directory",
+      "label": {
+        "en": "Output Folder",
+        "zh": "保存目录"
+      },
+      "type": "directory",
+      "description": {
+        "en": "Default save folder. If empty, the first run asks once and remembers it here.",
+        "zh": "默认保存目录。留空时首次运行会询问一次，并把所选目录记到这里。"
+      },
+      "group": {
+        "en": "Censor Defaults",
+        "zh": "打码默认值"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "autoCensorImage",
+      "title": {
+        "en": "Auto Censor Image",
+        "zh": "自动打码"
+      },
+      "description": {
+        "en": "Pixelate the selected image on-device using the defaults in extension settings.",
+        "zh": "按扩展设置中的默认参数，在本地对选中图片自动打码。"
+      },
+      "icon": "eye.slash",
+      "script": "script.js",
+      "extensionKind": "fileAction"
+    }
+  ]
+}

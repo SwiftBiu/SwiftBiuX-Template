@@ -50,6 +50,8 @@ AI 应先读取 `AI_SKILL.md`，然后根据任务类型按需加载文档：
 
 完整索引见：`ai/docs-index.json`。
 
+官网页面由 `developer-modules/*.md` 构建，不是 `references/`，也不是 `SwiftBiuWeb/**/developer/**/index.html`。对照见 `developer-modules/README.md`。
+
 ## 推荐工作流
 
 1. **先描述需求**：用自然语言说清输入、处理逻辑和输出方式。

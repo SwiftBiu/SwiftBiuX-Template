@@ -157,3 +157,29 @@ Defaults:
 
 - Omit `systemPrompt` if the native layer should resolve `responseSystemPrompt` from configuration.
 - Omit custom button labels unless the plugin truly needs custom wording.
+
+## Manifest Network Policy & Release Checklist
+
+Every network-enabled plugin must declare both permissions and specific domain whitelists:
+
+```json
+{
+  "permissions": ["network"],
+  "network": {
+    "domains": [
+      {
+        "host": "api.example.com",
+        "purpose": "Direct API endpoint"
+      }
+    ]
+  }
+}
+```
+
+Checklist before shipping or updating:
+- [ ] `"permissions": ["network"]` is declared in `manifest.json`.
+- [ ] All request endpoints (and any 301/302 redirect destinations) are declared in `network.domains`.
+- [ ] Undeclared hosts will be blocked by SwiftBiu's runtime security policy.
+- [ ] Increment the `version` in `manifest.json` whenever permissions or domains change.
+- [ ] Run `./scripts/build_plugin.sh <PluginDirectory>` to repackage the `.swiftbiux` bundle.
+- [ ] Run `node scripts/generate_catalog.js` to refresh catalog distribution.

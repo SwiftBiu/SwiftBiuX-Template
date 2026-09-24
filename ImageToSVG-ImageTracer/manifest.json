@@ -1,0 +1,123 @@
+{
+  "identifier": "com.swiftbiux.image-to-svg-imagetracer",
+  "name": {
+    "en": "Image to SVG (ImageTracer)",
+    "zh": "图片转 SVG（ImageTracer）"
+  },
+  "author": "SwiftBiu Community Template",
+  "description": {
+    "en": "Convert a selected PNG to SVG locally with ImageTracer.js. Options live in SwiftBiu settings.",
+    "zh": "用 ImageTracer.js 在本地把选中 PNG 转成 SVG。参数在 SwiftBiu 设置中管理。"
+  },
+  "version": "1.0.0",
+  "icon": "scribble.variable",
+  "iconType": "sfSymbol",
+  "extensionKind": "fileAction",
+  "permissions": [
+    "localFileRead",
+    "localFileWrite",
+    "notifications"
+  ],
+  "configuration": [
+    {
+      "key": "preset",
+      "label": {
+        "en": "Trace Preset",
+        "zh": "描摹预设"
+      },
+      "type": "option",
+      "defaultValue": "default",
+      "description": {
+        "en": "ImageTracer.js option preset.",
+        "zh": "ImageTracer.js 预设。"
+      },
+      "options": [
+        { "label": { "en": "Default", "zh": "默认" }, "value": "default" },
+        { "label": { "en": "Posterized", "zh": "海报化" }, "value": "posterized2" },
+        { "label": { "en": "Detailed", "zh": "精细" }, "value": "detailed" },
+        { "label": { "en": "Curvy", "zh": "圆润" }, "value": "curvy" },
+        { "label": { "en": "Sharp", "zh": "锐利" }, "value": "sharp" },
+        { "label": { "en": "Grayscale", "zh": "灰度" }, "value": "grayscale" }
+      ],
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    },
+    {
+      "key": "numberofcolors",
+      "label": {
+        "en": "Maximum Colors",
+        "zh": "最多颜色数"
+      },
+      "type": "option",
+      "defaultValue": "16",
+      "description": {
+        "en": "Overrides the preset color count when not left at Auto.",
+        "zh": "非自动时覆盖预设颜色数。"
+      },
+      "options": [
+        { "label": { "en": "Preset Default", "zh": "跟随预设" }, "value": "auto" },
+        { "label": "8", "value": "8" },
+        { "label": "16", "value": "16" },
+        { "label": "32", "value": "32" },
+        { "label": "64", "value": "64" }
+      ],
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    },
+    {
+      "key": "max_dimension",
+      "label": {
+        "en": "Max Edge Length",
+        "zh": "最长边像素"
+      },
+      "type": "option",
+      "defaultValue": "384",
+      "description": {
+        "en": "PNG is scaled so the longest edge does not exceed this size.",
+        "zh": "转换前把 PNG 最长边缩放到不超过该像素。"
+      },
+      "options": [
+        { "label": "192", "value": "192" },
+        { "label": "256", "value": "256" },
+        { "label": "384", "value": "384" },
+        { "label": "512", "value": "512" },
+        { "label": "768", "value": "768" }
+      ],
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    },
+    {
+      "key": "output_directory",
+      "label": {
+        "en": "Output Folder",
+        "zh": "保存目录"
+      },
+      "type": "directory",
+      "description": {
+        "en": "Default save folder. If empty, the first run asks once and remembers it here.",
+        "zh": "默认保存目录。留空时首次运行会询问一次，并把所选目录记到这里。"
+      },
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "convertImageToSVGImageTracer",
+      "title": {
+        "en": "Convert with ImageTracer",
+        "zh": "用 ImageTracer 转 SVG"
+      },
+      "script": "script.js",
+      "extensionKind": "fileAction"
+    }
+  ]
+}

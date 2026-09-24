@@ -1,5 +1,7 @@
 # Web UI `window.swiftBiu` API
 
+<!-- Canonical website source. Edit this file (and web-ui-api.zh.md). Do not edit generated SwiftBiuWeb/**/developer/web-ui-api/index.html. -->
+
 Web App Actions run in an isolated frontend sandbox. Background `script.js` calls `SwiftBiu.displayUI(...)`; page logic communicates with the host through `window.swiftBiu`.
 
 > [!IMPORTANT]
@@ -51,8 +53,9 @@ When the context contains only textual paths, parse `context.selectedText` yours
 - `window.swiftBiu.fetch(url, options)`: returns `{ status, data }`. Requires `network`.
 - `window.swiftBiu.storage.get(key)`: returns `{ result }`.
 - `window.swiftBiu.storage.set(key, value)`: persists a known manifest configuration value.
-- `window.swiftBiu.downloadRemoteFile(url, options)`: returns a transient local file result. Requires `network`.
+- `window.swiftBiu.downloadRemoteFile(url, options)`: downloads a remote file. Default is a transient local file; pass `destinationPath` or `directoryPath` to save permanently. Requires `network`; direct save also requires `localFileWrite`.
 - `window.swiftBiu.materializeSelectedRemoteFiles(options)`: downloads the current remote selections. Requires `network`.
+- `window.swiftBiu.releaseTemporaryFile(path)`: deletes a transient file created by `downloadRemoteFile`.
 - `window.swiftBiu.getFileMetadata(path)`: returns file metadata. Requires `localFileRead`.
 - `window.swiftBiu.extractFileIcon(path, options)`: returns PNG icon data or an error. Requires `localFileRead`.
 - `window.swiftBiu.setFileIcon(targetPath, iconPath, options)`: applies a Finder custom icon. Requires `localFileRead` and `localFileWrite`.

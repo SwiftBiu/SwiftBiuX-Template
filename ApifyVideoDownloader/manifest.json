@@ -6,18 +6,17 @@
   },
   "author": "SwiftBiu Community Template",
   "description": {
-    "en": "Download public videos from supported social platforms through independent Apify Actors. SwiftBiu only provides the extension runtime, network transport, and local file save APIs.",
-    "zh": "通过独立的 Apify Actor 下载支持平台的公开视频。SwiftBiu 仅提供扩展运行环境、网络请求和本地文件保存能力。"
+    "en": "Download a selected public video in one click through independent Apify Actors, using defaults managed in SwiftBiu settings.",
+    "zh": "通过独立的 Apify Actor 一键下载选中的公开视频，画质、费用与保存行为统一在 SwiftBiu 设置中管理。"
   },
-  "version": "1.0.4",
-  "icon": "arrow.down.video",
+  "version": "1.3.2",
+  "icon": "square.and.arrow.down",
   "iconType": "sfSymbol",
   "extensionKind": "textAction",
   "permissions": [
     "network",
     "localFileWrite",
-    "notifications",
-    "ui"
+    "notifications"
   ],
   "network": {
     "domains": [
@@ -48,6 +47,10 @@
       "description": {
         "en": "Your own Apify token. It is stored by SwiftBiu as a secure configuration value and sent only to api.apify.com.",
         "zh": "你自己的 Apify Token。由 SwiftBiu 作为安全配置保存，仅发送给 api.apify.com。"
+      },
+      "group": {
+        "en": "Authentication",
+        "zh": "身份验证"
       }
     },
     {
@@ -63,13 +66,39 @@
         "zh": "YouTube Actor 会按该首选画质生成一个可下载文件。"
       },
       "options": [
-        { "label": "Best Available", "value": "Best Available" },
+        { "label": { "en": "Best Available", "zh": "最佳可用画质" }, "value": "best" },
         { "label": "1080p", "value": "1080p" },
         { "label": "720p", "value": "720p" },
         { "label": "480p", "value": "480p" },
         { "label": "360p", "value": "360p" },
-        { "label": "Audio Only", "value": "Audio Only" }
-      ]
+        { "label": { "en": "Audio Only", "zh": "仅音频" }, "value": "audio_only" }
+      ],
+      "group": {
+        "en": "Download Defaults",
+        "zh": "下载默认值"
+      }
+    },
+    {
+      "key": "media_preference",
+      "label": {
+        "en": "Media Selection",
+        "zh": "媒体选择策略"
+      },
+      "type": "option",
+      "defaultValue": "automatic",
+      "description": {
+        "en": "When an Actor returns multiple files, automatically choose the best match or prefer video/audio.",
+        "zh": "当 Actor 返回多个文件时，自动选择最佳结果，或优先选择视频/音频。"
+      },
+      "options": [
+        { "label": { "en": "Automatic Best Match", "zh": "自动选择最佳结果" }, "value": "automatic" },
+        { "label": { "en": "Prefer Video", "zh": "优先视频" }, "value": "video" },
+        { "label": { "en": "Prefer Audio", "zh": "优先音频" }, "value": "audio" }
+      ],
+      "group": {
+        "en": "Download Defaults",
+        "zh": "下载默认值"
+      }
     },
     {
       "key": "max_charge_usd",
@@ -89,7 +118,11 @@
         { "label": "$0.25", "value": "0.25" },
         { "label": "$0.50", "value": "0.50" },
         { "label": "$1.00", "value": "1.00" }
-      ]
+      ],
+      "group": {
+        "en": "Cost & Safety",
+        "zh": "费用与安全"
+      }
     },
     {
       "key": "download_directory",
@@ -99,8 +132,12 @@
       },
       "type": "directory",
       "description": {
-        "en": "Optional default save folder. If not configured, the plugin asks you to choose a folder before saving.",
-        "zh": "可选默认保存目录。未配置时，插件会在保存前要求选择目录。"
+        "en": "Default save folder. If it is empty, the first download asks once and remembers the selected folder here.",
+        "zh": "默认保存目录。留空时首次下载会询问一次，并把所选目录记到这里。"
+      },
+      "group": {
+        "en": "Download Defaults",
+        "zh": "下载默认值"
       }
     }
   ],
@@ -108,22 +145,19 @@
     {
       "id": "downloadVideoWithApify",
       "title": {
-        "en": "Download Video with Apify",
-        "zh": "用 Apify 下载视频"
+        "en": "Download Video",
+        "zh": "下载视频"
       },
       "description": {
-        "en": "Detect the selected video platform, run a third-party Apify Actor, and save the returned media locally.",
-        "zh": "识别选中链接的平台，运行第三方 Apify Actor，并把返回的媒体保存到本地。"
+        "en": "Immediately detect the selected platform and download using the defaults in extension settings.",
+        "zh": "立即识别选中链接的平台，并按扩展设置中的默认参数下载。"
       },
-      "icon": "arrow.down.video",
+      "icon": "square.and.arrow.down",
       "script": "script.js",
       "extensionKind": "textAction",
       "rules": {
         "regex": "https?://\\S+"
       }
     }
-  ],
-  "ui": {
-    "main": "ui/index.html"
-  }
+  ]
 }

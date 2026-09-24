@@ -1,5 +1,7 @@
 # 后台 `SwiftBiu` API
 
+<!-- 官网源文件。改本文件和 background-api.md。不要手改 SwiftBiuWeb/**/developer/background-api/index.html。 -->
+
 标准动作和 Web App 的后台启动脚本都运行在 `script.js` 沙盒中。该环境注入全局对象 `SwiftBiu`，并提供等价的小写别名 `swiftBiu`。
 
 > [!IMPORTANT]
@@ -50,10 +52,16 @@
 - `SwiftBiu.saveLocalFile(base64: String, filename: String)`：打开原生“另存为”面板。
 - `SwiftBiu.exportFile(base64: String, filename: String)`：`saveLocalFile(...)` 的兼容别名。
 
-## 文件图标
+## 文件图标与本地图片处理
 
 - `SwiftBiu.extractFileIcon(path: String, options?: Object)`：通过宿主原生进程提取文件或 App 图标，成功时返回 `{ success, base64, fileName, width, height, format }`，失败时返回 `{ success: false, error }`。需要 `localFileRead`。
 - `SwiftBiu.setFileIcon(targetPath: String, iconPath: String, options?: Object)`：为文件、目录或 `.app` 写入 Finder 自定义图标。需要 `localFileRead` 和 `localFileWrite`。
+- `SwiftBiu.convertImageToSVG(path: String, options?: Object)`：在设备本地把图片矢量化为 SVG，返回 `{ success, svg, format, width, height, colors, shapeCount, groupCount, objectCount, path, fileName }` 或 `{ success: false, error }`。需要 `localFileRead`。可选参数包括 `maxColors`（2–64，限制纯色调色板）、`maxDimension`（64–1024）、`minArea`（1–256）、`curveMode`（`spline`、`polygon`、`pixel`）、`layerMode`（`stacked`、`cutout`）、`curveTolerance`（0.05–2 px）、`cornerThreshold`（20–150 度）和 `gradientMode`（`auto`、`off`，默认 `auto`）；同时支持 snake_case 别名。引擎保留透明度和透明孔洞，共享相邻区域的三次边界，将拟合准确的线性或径向明暗合并为 SVG 渐变填充。渐变使用两个色标和恒定透明度；复杂明暗仍输出为色块。像素模式不识别渐变。返回的 `svg` 需另行调用文件写入 API 保存。
+- `SwiftBiu.censorLocalImage(path: String, options?: Object)`：对本地图片进行智能隐私打码遮挡，返回 `{ success, outputPath?, error? }`。需要 `localFileRead`。
+
+SVG 还支持 `groupMode: "objects" | "geometric"`（别名 `group_mode`，API 默认 `geometric`）。实验性的对象模式分离可能的画布背景，将相连色块和归属明显的邻近小部件组成对象候选，相似实例保留为集合内的独立对象，内部包含关系形成部件层级。该模式不识别语义类别，也不恢复被遮挡的几何。存在遮挡顺序冲突时，会输出共享 `data-object` 且带有 `data-split="true"` 的多个分片。`objectCount` 按逻辑候选计数，分片不重复计入；`groupCount` 统计所有 `data-kind` 分组，包括部件、集合、背景和分片。几何模式下两项计数均为 0。
+
+`paintMode`（别名 `paint_mode`）可设为 `faithful`（API 默认）、`editable` 或 `minimal`。便于编辑与极简两档依次扩大可合并的相邻小色块范围，但要求 OKLab 色差和透明度接近；透明孔洞及高对比细节保留。像素边界模式跳过该简化。ImageToSVG 插件默认使用便于编辑档。`minArea: 1` 只关闭原有的纯面积杂点过滤；若要保留此前的色块细节，请选 `faithful`。减少图形数量可能增加回渲染误差。
 
 需要兼容 App Store 沙盒时，应使用以上宿主 API，不要依赖 shell、AppleScript、`sips`、`qlmanage` 或 `osascript`。
 
@@ -72,6 +80,9 @@
 - `SwiftBiu.showInteractiveImage(options, onRegenerate)`：创建可交互图片会话并返回 `sessionID`。需要 `notifications`。
 - `SwiftBiu.updateInteractiveImage(sessionID, options)`：更新图片会话。
 - `SwiftBiu.failInteractiveImage(sessionID, message)`：将图片会话切换到失败状态。
+
+本地图片预览可直接传文件引用：`showImage` 接受正确编码的 `file://` URL，`showInteractiveImage` 和 `updateInteractiveImage` 接受 `{ filePath: "/path/to/image.png" }`，无需先调用 `readLocalFile` 转 Base64。本地路径额外需要 `localFileRead`，且必须属于当前运行实例选中的文件、登记的临时文件或用户已授权目录。插件 ID 和图片会话 ID 本身不授予文件权限。`filePath` 优先于 `imageSource`，待生成占位状态仍优先；原有 Base64 和 HTTP 图片输入继续支持。此处接口属于后台 JavaScriptCore API。
+
 - `SwiftBiu.showVideo(source, position, context)`：展示本地或远程视频卡片。需要 `notifications`。
 - `SwiftBiu.showInteractiveVideo(options, onRegenerate)`、`updateInteractiveVideo(...)`、`failInteractiveVideo(...)`：管理可原位更新的视频生成会话。需要 `notifications`。
 - `SwiftBiu.showAudio(source, position, context)`：展示 Base64、本地或远程音频。需要 `notifications`。
@@ -86,8 +97,9 @@ Loading 只适合没有独立界面的轻量动作。Web UI、AI 响应弹框和
 - `SwiftBiu.fetch(url, options, onSuccess, onError)`：Callback 异步请求。需要 `network`。
 - `SwiftBiu.fetchStream(url, options, onEvent, onError)`：创建流式网络请求并返回 `streamID`。需要 `network`。
 - `SwiftBiu.cancelFetchStream(streamID: String)`：取消进行中的流式请求。
-- `SwiftBiu.downloadRemoteFile(url, options, onSuccess, onError)`：把远程文件下载到临时本地存储。需要 `network`。
+- `SwiftBiu.downloadRemoteFile(url, options, onSuccess, onError)`：下载远程文件。默认落到临时存储；传入 `destinationPath` 或 `directoryPath` 可直接保存。需要 `network`；直接保存还需要 `localFileWrite`。
 - `SwiftBiu.materializeSelectedRemoteFiles(options, onSuccess, onError)`：下载本次动作的 `context.selectedRemoteFiles`。需要 `network`。
+- `SwiftBiu.releaseTemporaryFile(path)`：删除 `downloadRemoteFile` 创建的临时文件。
 
 ## SwiftBiu 托管 AI 提供商
 

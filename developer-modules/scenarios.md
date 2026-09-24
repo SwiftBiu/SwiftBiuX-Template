@@ -6,19 +6,7 @@
 > - **Local Automation**: Batch renaming and prettier formatting are local-first, zero-network.
 > - **Declarative Triggers**: `shareTargets` enables AirDrop and local URL Schemes without writing JS.
 
-## One Shortcut, Content-Aware Dispatch
-
-In SwiftBiu 1.3.9, a physical shortcut can open the appropriate extension path without requiring the plugin to inspect the trigger itself. Dispatch depends on the prepared content context:
-
-| Prepared content | Implement |
-| --- | --- |
-| Selected text, Clipboard text, or recognized OCR text | `textAction` |
-| Images, videos, and local files—including compatible rich Clipboard items materialized by the host | `fileAction` |
-| A custom preview or editor | Call `SwiftBiu.displayUI(...)` from either compatible background action |
-
-Use `isAvailable(context)` to hide or deprioritize an action when the content is unsupported. Do not infer whether the user pressed a shortcut, swiped, dragged, or opened Clipboard history; that trigger policy belongs to the host.
-
-<div class="swiftbiu-native-demo" data-demo-start="routing" data-demo-modes="routing,clipboard"></div>
+---
 
 ## 🗺 Plugin Scenarios with API References
 
@@ -222,8 +210,6 @@ Build a SwiftBiu Web App plugin named "Code Formatter":
   ]
 }
 ```
-
----
 
 
 

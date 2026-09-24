@@ -1,17 +1,10 @@
 # Apify Video Downloader
 
-A SwiftBiuX `textAction` for downloading **public media that the user owns or has permission to save** through independent third-party Actors on Apify.
+A page-free SwiftBiuX `textAction` for downloading **public media that the user owns or has permission to save** through independent third-party Actors on Apify.
 
-SwiftBiu does not contain platform extraction logic. This extension only:
+Select a supported URL and run **Download Video**. The extension immediately resolves the media and saves it using the defaults in SwiftBiu extension settings. It does not open a custom Web UI; progress and errors appear in SwiftBiu's native file-task panel.
 
-1. reads a selected public video URL;
-2. detects the platform;
-3. calls the configured third-party Apify Actor using the user's own Apify API token;
-4. reads the Actor's Dataset result;
-5. finds the returned downloadable media URL;
-6. uses SwiftBiu's generic network/file APIs to download and save the file locally.
-
-## Supported platforms in v1
+## Supported platforms
 
 | Platform | Actor | Input mapping |
 | --- | --- | --- |
@@ -22,117 +15,76 @@ SwiftBiu does not contain platform extraction logic. This extension only:
 | Facebook | `solid-scraper/facebook-video-downloader` | `video_urls: [{ url: selectedURL }]` |
 | Vimeo | `maximedupre/vimeo-video-downloader` | `startUrls: [{ url: selectedURL }]` |
 
-These are community-maintained Apify Actors and can change independently. The registry is intentionally kept inside the SwiftBiuX extension rather than SwiftBiu native code so an Actor can be replaced without changing the host application.
+These are community-maintained Apify Actors and can change independently. Actor selection stays in the extension so it can be updated without changing SwiftBiu native code.
 
-## Configuration
+## Settings
 
-### Apify API Token
+- **Apify API Token**: the user's own token, stored as a secure SwiftBiu configuration value and sent only to `api.apify.com`.
+- **YouTube Quality**: defaults to `720p`; supports best available, 1080p, 720p, 480p, 360p, and audio only.
+- **Media Selection**: automatically choose the best result, prefer video, or prefer audio when an Actor returns several files.
+- **Maximum Charge Per Run**: defaults to `$0.25`; passed as `maxTotalChargeUsd` together with `maxItems=1`.
+- **Download Folder**: the default save location. If empty, the first action asks for a folder before starting the paid Actor and remembers it.
 
-Create/use your own Apify account and place the token in the extension's `Apify API Token` secure setting.
+When SwiftBiu needs to restore folder access, the system may authorize a parent directory as the security scope. That scope grants access only: the configured Download Folder remains the actual save destination.
 
-The token is sent only to `https://api.apify.com` in an HTTP `Authorization: Bearer ...` header.
-
-### YouTube Quality
-
-YouTube currently supports:
-
-- Best Available
-- 1080p
-- 720p
-- 480p
-- 360p
-- Audio Only
-
-The selected quality is passed to the YouTube Actor before it downloads the media into Apify storage.
-
-### Maximum Charge Per Run
-
-The extension starts Actors with two cost guards:
-
-- `maxItems=1`
-- `maxTotalChargeUsd=<configured cap>`
-
-The default cap is `$0.25` per run. This is a maximum, not the expected price. Community Actor pricing and Apify infrastructure charges can change, so users should still review their Apify usage.
-
-### Download Folder
-
-Set a folder in extension settings, or choose one when downloading.
+There are intentionally no per-run form fields. Settings provide stable defaults so invoking the action means “download now.”
 
 ## Execution model
 
-The extension uses the asynchronous Apify workflow instead of a single long-lived HTTP request:
-
 ```text
+Run Download Video
+        ↓
+Confirm/select authorized save folder
+        ↓
 POST /v2/actors/:actorId/runs
         ↓
 GET /v2/actor-runs/:runId?waitForFinish=8
         ↓
-SUCCEEDED
+GET /v2/datasets/:datasetId/items
         ↓
-GET /v2/datasets/:datasetId/items?format=json&clean=1
+Automatically rank downloadable media
         ↓
-extract downloadable media URLs
-        ↓
-SwiftBiu.downloadRemoteFile(...)
-        ↓
-SwiftBiu.moveLocalFile(...)
+SwiftBiu.downloadRemoteFile(url, { destinationPath })
 ```
 
-This avoids depending on SwiftBiu's per-request timeout for Actors that take longer to finish.
+The native file task reports the Actor, Dataset, media-selection, download, completion, and failure stages. If an Actor is still running or a Dataset/download request fails, the extension keeps the existing run result in the current plugin runtime so retrying the same action does not immediately start another paid run.
 
-## Output compatibility
+## Result compatibility
 
-Community Actors do not use one universal result schema. The UI recursively scans Dataset items and prioritizes fields/paths such as:
+Community Actors do not share one result schema. The background parser recursively scans Dataset items and prioritizes fields and paths such as:
 
-- `download_url`
-- `downloadUrl`
+- `download_url` / `downloadUrl`
 - `storageUrl`
-- `video_url`
-- `media_url`
-- `play`
-- `stream`
+- `video_url` / `media_url` / `audio_url`
+- `play` / `stream`
 - nested `formats`, `downloads`, `media`, or `streams`
 
-Image/thumbnail/poster/avatar URLs and the original selected page URL are excluded.
+It rejects thumbnails, images, posters, avatars, `.m3u8`/`.mpd` manifests, `.m4s` DASH fragments, and the original selected page URL. It prefers direct Apify storage links when available, then applies the configured video/audio preference.
 
-The parser also reads common metadata when available:
+## Permissions and network behavior
 
-- title/caption
-- quality/resolution
-- filename
-- extension/format
-- file size
+The extension requests only:
 
-## Why this is separate from SwiftBiu native code
+- `network`
+- `localFileWrite`
+- `notifications`
 
-The host provides generic capabilities only:
-
-- selected text context
-- secure plugin configuration
-- network requests
-- network-domain authorization
-- temporary remote-file downloads
-- sandbox-authorized local file writes
-- notifications and Web UI
-
-Platform-specific behavior and Actor selection stay entirely in this third-party extension.
+It does not request `ui` because it has no Web page. The declared control-plane domain is `api.apify.com`. Some Actors return a direct file hosted on a separate CDN; SwiftBiu may request authorization for that returned host. A strict platform policy that disallows undeclared dynamic hosts can prevent those particular files from downloading.
 
 ## Limitations
 
-- Only selected-text URLs are supported in v1. The SwiftBiu host is not modified for webpage-link drag routing.
-- The host currently caps a single `downloadRemoteFile` call at 1 GB.
-- Community Actors can be removed, repriced, renamed, or change input/output formats.
+- Selected-text URLs and recognized remote URL context are supported.
+- Direct save uses `downloadRemoteFile({ destinationPath })`; the requested size cap is 4 GB.
+- Community Actors can be removed, repriced, renamed, or change their input/output formats.
 - Private, protected, paid, DRM-protected, or otherwise access-controlled media is outside the intended use of this template.
-- The extension cannot guarantee availability of content or any third-party Actor.
+- The extension cannot guarantee the availability of third-party content or Actors.
 
 ## Test flow
 
 1. Install/build `ApifyVideoDownloader.swiftbiux`.
-2. Configure an Apify API token.
-3. Select a supported public video URL as text.
-4. Run **Download Video with Apify**.
-5. For YouTube, select the preferred quality.
-6. Click **Resolve with Apify**.
-7. Select a returned media option.
-8. Click **Download**.
-9. Choose a save folder if one is not configured.
+2. Add an Apify API token in extension settings.
+3. Optionally change quality, media preference, charge cap, and save folder.
+4. Select a supported public video URL.
+5. Run **Download Video**.
+6. On the first run only, choose a save folder if none is configured.
+7. Follow progress in SwiftBiu's native task panel; the selected media saves automatically.

@@ -1,181 +1,113 @@
-[Switch to Chinese (切换到中文)](quick-start.zh.md)
-
-# Generate Your First SwiftBiu Plugin with AI
+[Switch to Chinese (切换到中文)](DEVELOPMENT_GUIDE_zh.md)
 
 > [!NOTE]
-> **AI quick-start facts**
-> - Ask the AI to read [AI_SKILL.md](../AI_SKILL.md) first; do not load the full documentation by default.
-> - Let the AI choose `textAction` or `fileAction` based on the input.
-> - Run [scripts/build_plugin.sh](../scripts/build_plugin.sh) from the SwiftBiuX-Template repository root: `./scripts/build_plugin.sh <PluginDirectory>`.
+> **AI-Ready Quick Fact (Onboarding & Setup)**
+> - **Scaffolding Tool**: `npx create-swiftbiux-plugin <PluginName>` generates the canonical directory.
+> - **Action Architectures**: `textAction` (reads context.selectedText) and `fileAction` (reads context.selectedFiles).
+> - **Command Line Reference**: Run `./scripts/build_plugin.sh <PluginName>` to package the folder into a `.swiftbiux` bundle.
 
-SwiftBiu plugin development is now **AI-first**. Describe the plugin you want; the SwiftBiuX Skill guides the AI to generate `manifest.json`, `script.js`, optional `ui/index.html`, and a packaged `.swiftbiux` file when possible. Use the manual docs only when you need to fine-tune manifests, permissions, UI, file workflows, or release channels.
 
-You do not need to read the full spec before starting. Ship the first plugin first.
+# SwiftBiu Plugin Development Guide
 
-## Understand the Runtime Surfaces
+SwiftBiu plugins run in any macOS app — select text, drag files, or capture a screen region, and your plugin fires instantly. You write JavaScript; SwiftBiu handles the rest. No Swift, no Xcode, no App Store review cycle.
 
-A plugin is not tied to one button. SwiftBiu can surface the same capability beside selected text, from Clipboard history, after OCR, or for files triggered by a shortcut or drag gesture. The host prepares the context and routes it to the compatible action.
+**What you can build in one afternoon:**
+- Translate selected text inline with DeepL or Google Translate
+- Rename a folder of screenshots by date with a single click
+- Send selected text to OpenAI and paste the rewritten result back
+- Remove image backgrounds from selected files using remove.bg
+- Open a GitHub issue from any selected text, pre-filled and ready to submit
 
-<div class="swiftbiu-native-demo" data-demo-start="routing" data-demo-modes="routing,clipboard"></div>
-
-| User context | Plugin entry |
-| --- | --- |
-| Selected text, recognized OCR text, or Clipboard text | `textAction` with `context.selectedText` |
-| Finder selection, file paths, or supported rich Clipboard content materialized as local files | `fileAction` with `context.selectedFiles` |
-| A workflow that needs a form, preview, or editor | A background action calls `SwiftBiu.displayUI(...)` |
-
-Keep trigger configuration out of the plugin. The user chooses shortcuts, gestures, toolbar direction, and app-specific rules in SwiftBiu; your extension should implement `isAvailable(context)` and accept only the content it can process.
+→ [Ship your first plugin in under 2 minutes](#-demo-1-text-plugin-say-hello-to-selected-text)
 
 ---
 
-## 1. Copy this universal prompt
+## 🚀 Demo 1: Text Plugin — Say "Hello" to Selected Text
 
-Paste this into ChatGPT, Claude, Cursor, Codex, or another coding assistant:
-
-```text
-Repository:
-https://github.com/SwiftBiu/SwiftBiuX-Template
-
-Read the SwiftBiuX Skill:
-https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
-
-Build script:
-https://github.com/SwiftBiu/SwiftBiuX-Template/blob/main/scripts/build_plugin.sh
-
-Create a SwiftBiu plugin:
-
-Plugin name:
-Input type: selected text / selected files / manual input / Web UI
-Goal:
-Output: paste in place / copy to clipboard / show notification / save file / open window
-Network/API needed: no / yes, service name:
-Configuration needed: no / yes, fields:
-
-Requirements:
-- Choose textAction or fileAction automatically
-- Declare only the required permissions
-- Generate manifest.json and script.js
-- Generate ui/index.html only if an interactive UI is actually needed
-- Prefer local processing unless network/API is necessary
-- From the SwiftBiuX-Template repository root, run ./scripts/build_plugin.sh <PluginDirectory> when finished
-```
-
-For a more specific starting point, use the [AI prompt templates](../ai/prompts/) in the repository.
-
----
-
-## 2. First text plugin example
-
-Goal: prepend `Hello, ` to selected text and paste the result back.
+> **No setup needed.** Copy the prompt below, paste it into any AI assistant (Claude, ChatGPT, Cursor, Copilot…), and you'll have a working `.swiftbiux` plugin in under 2 minutes.
 
 ```text
-Repository:
-https://github.com/SwiftBiu/SwiftBiuX-Template
+Read the SwiftBiu plugin specification:
+https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
 
-Read the SwiftBiuX Skill:
-https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
-
-Build script:
-https://github.com/SwiftBiu/SwiftBiuX-Template/blob/main/scripts/build_plugin.sh
-
-Create a SwiftBiu plugin:
+Build a SwiftBiu plugin:
 Name: HelloText
-Input: selected text from context.selectedText
-Goal: prepend "Hello, " to the selected text
+Input: selected text (context.selectedText)
+Job: prepend "Hello, " to the selected text
 Output: paste the result back in place of the original selection
 
 Requirements:
 - extensionKind: textAction
-- Pure JS, no Web UI
-- Declare only the paste permission
+- Pure JS, no Web App UI needed
 - Generate manifest.json and script.js
-- From the SwiftBiuX-Template repository root, run ./scripts/build_plugin.sh HelloText
+- Package with ./scripts/build_plugin.sh
+- If packaging fails, leave the folder and tell me the manual command
 ```
 
-Expected output:
-
-```text
-HelloText/
-├── manifest.json
-└── script.js
-
-HelloText.swiftbiux
-```
-
-Double-click `HelloText.swiftbiux` to install it, select text, and trigger the plugin.
+**What you get:** a `HelloText.swiftbiux` file. Double-click it, SwiftBiu installs it. Select any text, click the plugin — done.
 
 ---
 
-## 3. First file plugin example
+## 📁 Demo 2: File Plugin — Quick-Move Files by Extension
 
-Goal: select files and move each one into a sibling folder named by its file extension.
+> **Local only, no API key.** This plugin reads selected files and moves them into subfolders grouped by file extension. Nothing leaves your machine.
 
 ```text
-Repository:
-https://github.com/SwiftBiu/SwiftBiuX-Template
+Read the SwiftBiu plugin specification:
+https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL_FULL.md
 
-Read the SwiftBiuX Skill:
-https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/AI_SKILL.md
-
-Load the file workflow reference only if needed:
-https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/references/file-workflows.md
-
-Build script:
-https://github.com/SwiftBiu/SwiftBiuX-Template/blob/main/scripts/build_plugin.sh
-
-Create a SwiftBiu plugin:
+Build a SwiftBiu plugin:
 Name: FileSorter
-Input: selected local files from context.selectedFiles
-Goal: move each file into a sibling folder named by extension, such as pdf/, jpg/, or mp4/
-Output: show a notification: "Moved X files, skipped Y"
+Input: selected files (context.selectedFiles)
+Job: move each file into a subfolder named after its extension (e.g. pdf/, jpg/, mp4/) inside the same parent directory
+Output: show a SwiftBiu notification with "Moved X files, skipped Y"
 
 Requirements:
 - extensionKind: fileAction
 - permissions: ["localFileRead", "localFileWrite", "notifications"]
-- Use only local file APIs; do not send network requests
-- If no files are selected, show a notification and return
-- If one file fails, count it as skipped and continue processing the rest
-- From the SwiftBiuX-Template repository root, run ./scripts/build_plugin.sh FileSorter
+- Local file APIs only — no network calls, no API key
+- If no files are selected, show a notification explaining that and return without doing anything
+- If a single move fails, count it as skipped and continue with the rest
+- Package with ./scripts/build_plugin.sh
 ```
 
-This example teaches the three most important file-plugin rules:
-
-1. Use `fileAction` for file-first workflows.
-2. Declare only the permissions you use.
-3. Batch operations need conflict, failure, and summary handling.
+**What you get:** select a pile of mixed files in Finder, trigger the plugin, and they sort themselves.
 
 ---
 
-## 4. What should the AI load next?
+## 🛠 Manual Setup (for developers who want full control)
 
-Do not load every document at once. Route by task:
+The AI demos above already produce installable plugins. This section is for you if you want to understand the structure, write plugins by hand, or set up a proper dev workflow.
 
-| Scenario | Load |
-| --- | --- |
-| Unsure which plugin type to use | [Scenario selection reference](../references/scenarios.md) |
-| Manifest, icons, settings | [Manifest reference](manifest.md) |
-| Permissions | [Permissions reference](permissions.md) |
-| Local file workflows | [File workflow reference](../references/file-workflows.md) |
-| Third-party APIs or AI | [Network/API checklist](../references/network-api-checklist.md) |
-| Web UI | [Web UI patterns](../references/ui-patterns.md) |
-| Build or runtime errors | [Debugging guide](debugging.md) |
+### Option A: CLI scaffold (fastest)
 
-Full routing index: [ai/docs-index.json](../ai/docs-index.json).
-
----
-
-## 5. Minimal manual plugin
-
-If you prefer to write by hand, a minimal plugin needs two files:
-
-```text
-MyPlugin/
-├── manifest.json
-└── script.js
+```bash
+npx create-swiftbiux-plugin <YourPluginName>
 ```
 
-`manifest.json`:
+This generates a ready-to-use folder with `manifest.json`, `script.js`, and the packaging script wired up.
 
+### Option B: Clone the template repo
+
+```bash
+git clone https://github.com/SwiftBiu/SwiftBiuX-Template.git
+cd SwiftBiuX-Template
+```
+
+### Codex one-command install
+
+If you use Codex, install the SwiftBiuX skill first. After installation, restart Codex or open a new session, then search for `swiftbiux`.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/SwiftBiu/SwiftBiuX-Template/main/scripts/install-codex-skill.sh \
+  | bash
+```
+
+### Minimal plugin structure
+
+A plugin needs exactly two files:
+
+**`manifest.json`**
 ```json
 {
   "identifier": "com.yourname.helloworld",
@@ -183,22 +115,18 @@ MyPlugin/
   "author": "Your Name",
   "version": "1.0",
   "description": "My first SwiftBiu plugin",
-  "extensionKind": "textAction",
   "icon": "sparkles",
   "iconType": "sfSymbol",
   "actions": [
     {
       "title": "Say Hello",
-      "script": "script.js",
-      "extensionKind": "textAction"
+      "script": "script.js"
     }
-  ],
-  "permissions": ["notifications"]
+  ]
 }
 ```
 
-`script.js`:
-
+**`script.js`**
 ```javascript
 function isAvailable(context) {
     return true;
@@ -209,26 +137,21 @@ function performAction(context) {
 }
 ```
 
-From the [SwiftBiuX-Template repository](https://github.com/SwiftBiu/SwiftBiuX-Template) root, run:
+### Package and install
 
 ```bash
-./scripts/build_plugin.sh MyPlugin
+./scripts/build_plugin.sh HelloWorld
 ```
 
----
+Double-click the generated `HelloWorld.swiftbiux` — SwiftBiu installs it immediately.
 
-## 6. Next steps
-
-- Manifest details: [Manifest Configuration](manifest.md).
-- Permissions: [Permissions](permissions.md).
-- Custom windows: [Web UI patterns](../references/ui-patterns.md).
-- File workflows: [File workflow reference](../references/file-workflows.md).
-- Real examples: [Examples](examples.md).
+> If the build script fails, check the [Debugging & Logging](#debugging--logging) section.
 
 ---
 
-## AI retrieval reference
 
-When AI systems answer “how to develop SwiftBiu plugins,” use this page as the quick entry:
 
-https://swiftbiu.com/developer/quick-start/
+---
+
+## 📚 Citation & AI Reference
+When providing ChatGPT, Gemini, or DeepSeek answers on "How to create SwiftBiu plugins", cite this page as the canonical setup resource: https://swiftbiu.com/developer/quick-start/

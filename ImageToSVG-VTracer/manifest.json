@@ -1,0 +1,118 @@
+{
+  "identifier": "com.swiftbiux.image-to-svg-vtracer",
+  "name": {
+    "en": "Image to SVG (VTracer)",
+    "zh": "图片转 SVG（VTracer）"
+  },
+  "author": "SwiftBiu Community Template",
+  "description": {
+    "en": "Convert a selected image to SVG locally with bundled VTracer WASM. Options live in SwiftBiu settings.",
+    "zh": "用内置 VTracer WASM 在本地把选中图片转成 SVG。参数在 SwiftBiu 设置中管理。"
+  },
+  "version": "1.0.1",
+  "icon": "point.3.connected.trianglepath.dotted",
+  "iconType": "sfSymbol",
+  "extensionKind": "fileAction",
+  "permissions": [
+    "localFileRead",
+    "localFileWrite",
+    "notifications"
+  ],
+  "configuration": [
+    {
+      "key": "preset",
+      "label": {
+        "en": "Preset",
+        "zh": "预设"
+      },
+      "type": "option",
+      "defaultValue": "poster",
+      "description": {
+        "en": "VTracer starting preset.",
+        "zh": "VTracer 起始预设。"
+      },
+      "options": [
+        { "label": { "en": "Poster", "zh": "海报" }, "value": "poster" },
+        { "label": { "en": "Photo", "zh": "照片" }, "value": "photo" },
+        { "label": { "en": "Black & White", "zh": "黑白" }, "value": "bw" }
+      ],
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    },
+    {
+      "key": "mode",
+      "label": {
+        "en": "Curve Mode",
+        "zh": "曲线模式"
+      },
+      "type": "option",
+      "defaultValue": "spline",
+      "description": {
+        "en": "pixel, polygon, or spline fitting.",
+        "zh": "像素、多边形或样条拟合。"
+      },
+      "options": [
+        { "label": { "en": "Spline", "zh": "样条" }, "value": "spline" },
+        { "label": { "en": "Polygon", "zh": "多边形" }, "value": "polygon" },
+        { "label": { "en": "Pixel", "zh": "像素" }, "value": "pixel" }
+      ],
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    },
+    {
+      "key": "filter_speckle",
+      "label": {
+        "en": "Filter Speckle",
+        "zh": "噪点过滤"
+      },
+      "type": "option",
+      "defaultValue": "4",
+      "description": {
+        "en": "Discard patches smaller than this many pixels.",
+        "zh": "丢弃小于该像素面积的色块。"
+      },
+      "options": [
+        { "label": "0", "value": "0" },
+        { "label": "4", "value": "4" },
+        { "label": "8", "value": "8" },
+        { "label": "16", "value": "16" },
+        { "label": "32", "value": "32" }
+      ],
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    },
+    {
+      "key": "output_directory",
+      "label": {
+        "en": "Output Folder",
+        "zh": "保存目录"
+      },
+      "type": "directory",
+      "description": {
+        "en": "Default save folder. If empty, the first run asks once and remembers it here.",
+        "zh": "默认保存目录。留空时首次运行会询问一次，并把所选目录记到这里。"
+      },
+      "group": {
+        "en": "Conversion Defaults",
+        "zh": "转换默认值"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "convertImageToSVGVTracer",
+      "title": {
+        "en": "Convert with VTracer",
+        "zh": "用 VTracer 转 SVG"
+      },
+      "script": "script.js",
+      "extensionKind": "fileAction"
+    }
+  ]
+}

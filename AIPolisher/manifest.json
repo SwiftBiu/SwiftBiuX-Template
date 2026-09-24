@@ -9,7 +9,7 @@
     "en": "Polish, rewrite, and refine your text using AI.",
     "zh": "使用 AI 润色、重写并优化您的文本。"
   },
-  "version": "1.1.1",
+  "version": "1.1.2",
   "icon": "vibrant.text.highlighter",
   "iconType": "sfSymbol",
   "actions": [
@@ -33,6 +33,20 @@
     "clipboardWrite",
     "ui"
   ],
+  "network": {
+    "domains": [
+      {
+        "host": "generativelanguage.googleapis.com",
+        "purpose": "Send text to Gemini API for polishing, rewriting, and refinement.",
+        "data": [
+          "selectedText",
+          "model",
+          "mode"
+        ],
+        "usesCredential": "User-provided Gemini API key"
+      }
+    ]
+  },
   "configuration": [
     {
       "key": "apikey",

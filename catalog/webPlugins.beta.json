@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-24T10:30:46.668Z",
+  "generatedAt": "2026-09-23T08:09:02.739Z",
   "categories": [
     {
       "id": "text-processing",
@@ -63,12 +63,111 @@
       },
       "icon": "extension",
       "version": "1.0.0",
+      "minAppVersion": null,
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/AIImageVerifier.swiftbiux",
       "categoryId": "utilities",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "clipboardWrite",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "id": "verifyImage",
+          "title": "Verify AI Image",
+          "description": "Verify the text-to-image path using configured AI model.",
+          "extensionKind": "textAction",
+          "script": "script.js",
+          "shortcut": "cmd+shift+y",
+          "ai": {
+            "useCase": "imageGeneration",
+            "providerKey": "imageProvider",
+            "modelKey": "imageModel"
+          }
+        }
+      ],
+      "configuration": [
+        {
+          "key": "imageProvider",
+          "label": "Image Provider",
+          "description": "Choose an AI provider profile that has image models.",
+          "type": "string",
+          "required": true,
+          "defaultValue": "gemini"
+        },
+        {
+          "key": "imageModel",
+          "label": "Image Model",
+          "description": "Choose the image model for this action.",
+          "type": "string",
+          "required": true,
+          "defaultValue": "gemini-2.5-flash"
+        },
+        {
+          "key": "aspectRatio",
+          "label": "Aspect Ratio",
+          "description": "Aspect ratio passed to image generation.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "1:1",
+          "options": [
+            {
+              "value": "1:1",
+              "label": "Square"
+            },
+            {
+              "value": "16:9",
+              "label": "Landscape"
+            },
+            {
+              "value": "9:16",
+              "label": "Portrait"
+            }
+          ]
+        },
+        {
+          "key": "resolution",
+          "label": "Resolution",
+          "description": "Resolution hint passed to image generation.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "1k",
+          "options": [
+            {
+              "value": "1k",
+              "label": "1K"
+            },
+            {
+              "value": "2k",
+              "label": "2K"
+            }
+          ]
+        },
+        {
+          "key": "autoCopy",
+          "label": "Copy Result",
+          "description": "Copy the generated image to the clipboard after generation.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "true",
+          "options": [
+            {
+              "value": "true",
+              "label": "On"
+            },
+            {
+              "value": "false",
+              "label": "Off"
+            }
+          ]
+        }
+      ],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.swiftbiu.aipolisher",
@@ -81,13 +180,203 @@
         "zh": "使用 AI 润色、重写并优化您的文本。"
       },
       "icon": "vibrant.text.highlighter",
-      "version": "1.1.1",
+      "version": "1.1.2",
+      "minAppVersion": null,
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/AIPolisher.swiftbiux",
       "categoryId": "online-services",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "notifications",
+        "paste",
+        "clipboardWrite",
+        "ui"
+      ],
+      "actions": [
+        {
+          "title": {
+            "en": "AI Polisher",
+            "zh": "AI 润色"
+          },
+          "description": {
+            "en": "Open the AI Polisher rich UI",
+            "zh": "打开 AI 润色增强面板"
+          },
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "apikey",
+          "label": {
+            "en": "Gemini API Key",
+            "zh": "Gemini API 密钥"
+          },
+          "type": "secure",
+          "placeholder": {
+            "en": "Enter your Gemini API key",
+            "zh": "输入您的 Gemini API 密钥"
+          },
+          "description": {
+            "en": "Obtain an API key from Google AI Studio.",
+            "zh": "从 Google AI Studio 获取 API 密钥。"
+          }
+        },
+        {
+          "key": "model",
+          "label": {
+            "en": "AI Model",
+            "zh": "AI 模型"
+          },
+          "type": "option",
+          "defaultValue": "gemini-3-flash-preview",
+          "options": [
+            {
+              "label": "Gemini 3.0 Pro",
+              "value": "gemini-3-pro-preview"
+            },
+            {
+              "label": "Gemini 3.0 Flash",
+              "value": "gemini-3-flash-preview"
+            },
+            {
+              "label": "Gemini 2.5 Pro",
+              "value": "gemini-2.5-pro"
+            },
+            {
+              "label": "Gemini 2.5 Flash",
+              "value": "gemini-2.5-flash"
+            },
+            {
+              "label": "Gemini 2.0 Flash Lite",
+              "value": "gemini-2.0-flash-lite"
+            },
+            {
+              "label": "Gemini 2.0 Flash",
+              "value": "gemini-2.0-flash"
+            },
+            {
+              "label": "Gemini 2.0 Pro",
+              "value": "gemini-2.0-pro"
+            },
+            {
+              "label": "Gemma 3n-e4b-it",
+              "value": "gemma-3n-e4b-it"
+            }
+          ]
+        },
+        {
+          "key": "defaultMode",
+          "label": {
+            "en": "Default Action",
+            "zh": "默认启动模式"
+          },
+          "type": "option",
+          "defaultValue": "grammar",
+          "options": [
+            {
+              "label": {
+                "en": "Select Manually",
+                "zh": "手动选择"
+              },
+              "value": "none"
+            },
+            {
+              "label": {
+                "en": "Fix Grammar",
+                "zh": "语法纠错"
+              },
+              "value": "grammar"
+            },
+            {
+              "label": {
+                "en": "Professional",
+                "zh": "专业职场"
+              },
+              "value": "professional"
+            },
+            {
+              "label": {
+                "en": "Casual",
+                "zh": "轻松休闲"
+              },
+              "value": "casual"
+            },
+            {
+              "label": {
+                "en": "Concise",
+                "zh": "精炼表达"
+              },
+              "value": "shorten"
+            },
+            {
+              "label": {
+                "en": "Expand",
+                "zh": "润色丰富"
+              },
+              "value": "expand"
+            },
+            {
+              "label": {
+                "en": "Add Emojis",
+                "zh": "添加表情"
+              },
+              "value": "emoji"
+            }
+          ],
+          "description": {
+            "en": "Choose which polishing mode runs automatically when the plugin starts.",
+            "zh": "选择插件启动时自动运行的润色模式。"
+          }
+        },
+        {
+          "key": "apiurl",
+          "label": {
+            "en": "Custom API URL",
+            "zh": "自定义 API 地址"
+          },
+          "type": "string",
+          "placeholder": "https://api.example.com/...",
+          "description": {
+            "en": "Optional. Custom endpoint for Gemini API.",
+            "zh": "可选。自定义 Gemini API 端点地址。"
+          }
+        },
+        {
+          "key": "autoTrigger",
+          "label": {
+            "en": "Auto-Polish on Start & Switch",
+            "zh": "自动润色"
+          },
+          "type": "boolean",
+          "defaultValue": true,
+          "description": {
+            "en": "If enabled, polishing starts immediately when the window opens or mode changes.",
+            "zh": "启用后，打开窗口或切换模式时将立即开始润色。"
+          }
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "generativelanguage.googleapis.com",
+            "purpose": "Send text to Gemini API for polishing, rewriting, and refinement.",
+            "data": [
+              "selectedText",
+              "model",
+              "mode"
+            ],
+            "usesCredential": "User-provided Gemini API key"
+          }
+        ]
+      },
+      "ui": {
+        "main": "ui/index.html"
+      }
     },
     {
       "id": "app.ikw.swiftbiu.airewriter",
@@ -100,13 +389,72 @@
         "zh": "Use preset prompt to rewrite the selected text by AI Compatible API"
       },
       "icon": "extension",
-      "version": "1.0.1",
+      "version": "1.0.2",
+      "minAppVersion": null,
       "type": "Network",
       "extensionKind": "textAction",
       "author": "kweizh",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/AIRewriter.swiftbiux",
       "categoryId": "online-services",
-      "requiredHost": "google.com"
+      "requiredHost": "google.com",
+      "permissions": [
+        "network",
+        "paste",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "title": "OAIRewrite",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "apikey",
+          "label": "API Key",
+          "placeholder": "Enter your API key",
+          "description": "Your AI compatible API key.",
+          "type": "secure"
+        },
+        {
+          "key": "apiurl",
+          "label": "API URL",
+          "type": "string",
+          "placeholder": "e.g., https://api.example.com/v1",
+          "description": "AI compatible API endpoint for chat completions.",
+          "isSecure": false
+        },
+        {
+          "key": "model",
+          "label": "Model",
+          "type": "string",
+          "placeholder": "e.g., gpt-4o, gpt-4o-mini",
+          "description": "The model to use for rewriting."
+        },
+        {
+          "key": "promptTemplate",
+          "label": "Prompt Template",
+          "type": "string",
+          "placeholder": "e.g., Rewrite the following text to make it more professional",
+          "description": "The prompt template for rewriting"
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "api.openai.com",
+            "purpose": "Send chat completion requests to the configured OpenAI compatible API.",
+            "data": [
+              "selectedText",
+              "model",
+              "promptTemplate"
+            ],
+            "usesCredential": "User-provided API key"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.swiftbiu.plugin.advancedtranslator",
@@ -119,13 +467,337 @@
         "zh": "A powerful translation plugin that uses custom UI and supports multiple translation services."
       },
       "icon": "translate",
-      "version": "1.0.5",
+      "version": "1.0.6",
+      "minAppVersion": null,
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "SwiftBiu Team",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/AdvancedTranslator.swiftbiux",
       "categoryId": "online-services",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "ui",
+        "network",
+        "clipboardWrite",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "title": "Translate with Advanced Translator",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "translation_service",
+          "label": "Translation Service",
+          "type": "option",
+          "description": "Choose your preferred translation service.",
+          "options": [
+            {
+              "label": "Smart AI",
+              "value": "AI"
+            }
+          ]
+        },
+        {
+          "key": "api_key",
+          "label": "API Key",
+          "type": "secure",
+          "placeholder": "Enter your API key for the selected service",
+          "description": "Your API key is stored securely."
+        },
+        {
+          "key": "apiurl",
+          "label": "API URL",
+          "type": "string",
+          "placeholder": "e.g., https://generativelanguage.googleapis.com/v1beta/models/AI-1.5-flash:generateContent",
+          "description": "Custom Smart AI API endpoint. Leave blank for default.",
+          "isSecure": false
+        },
+        {
+          "key": "model",
+          "label": "Model",
+          "type": "option",
+          "description": "The model to use.",
+          "options": [
+            {
+              "label": "Smart 2.5 Flash Lite",
+              "value": "AI-flash-lite-latest"
+            },
+            {
+              "label": "Gemma 3n-e4b-it",
+              "value": "gemma-3n-e4b-it"
+            },
+            {
+              "label": "Smart 2.0 Flash Lite",
+              "value": "AI-2.0-flash-lite"
+            },
+            {
+              "label": "Smart 2.0 Flash",
+              "value": "AI-2.0-flash"
+            },
+            {
+              "label": "Smart 2.5 Flash",
+              "value": "AI-flash-latest"
+            },
+            {
+              "label": "Smart 2.5 Pro",
+              "value": "AI-2.5-pro"
+            }
+          ]
+        },
+        {
+          "key": "prompt_template",
+          "label": "Prompt Template",
+          "type": "string",
+          "description": "Customize one analysis prompt for this extension. If you want multiple prompt variants, duplicate the extension and edit each copy separately.",
+          "defaultValue": "Analyze the content.\nIf it is a single word or a short compound word, respond in this JSON format:\n{\n  \"type\": \"word\",\n  \"word\": \"original word\",\n  \"ipa\": \"IPA pronunciation\",\n  \"etymology\": \"origin\",\n  \"rootAnalysis\": \"roots\",\n  \"collocations\": \"list of collocations formatted as a markdown list\",\n  \"memoryAids\": \"memory aid\",\n  \"commonConfusions\": \"confusing words formatted as a markdown list\"\n}\nIf it is a sentence or a phrase, respond in this JSON format:\n{\n  \"type\": \"sentence\",\n  \"original\": \"original text\",\n  \"translation\": \"translated text\",\n  \"grammarNotes\": \"brief grammar analysis or key points\",\n  \"alternatives\": [\"alternative translation 1\", \"alternative translation 2\"]\n}\nIMPORTANT: You MUST wrap your response in a markdown code block like this:\n```json\n{ ... }\n```"
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "generativelanguage.googleapis.com",
+            "purpose": "Send translation requests to Google Gemini models.",
+            "data": [
+              "selectedText",
+              "model",
+              "translation_service"
+            ],
+            "usesCredential": "User-provided Gemini API key"
+          }
+        ]
+      },
+      "ui": {
+        "main": "ui/index.html"
+      }
+    },
+    {
+      "id": "com.swiftbiux.apify-video-downloader",
+      "name": {
+        "en": "Apify Video Downloader",
+        "zh": "Apify 视频下载器"
+      },
+      "description": {
+        "en": "Download a selected public video in one click through independent Apify Actors, using defaults managed in SwiftBiu settings.",
+        "zh": "通过独立的 Apify Actor 一键下载选中的公开视频，画质、费用与保存行为统一在 SwiftBiu 设置中管理。"
+      },
+      "icon": "square.and.arrow.down",
+      "version": "1.3.2",
+      "minAppVersion": null,
+      "type": "Network",
+      "extensionKind": "textAction",
+      "author": "SwiftBiu Community Template",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/ApifyVideoDownloader.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "localFileWrite",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "id": "downloadVideoWithApify",
+          "title": {
+            "en": "Download Video",
+            "zh": "下载视频"
+          },
+          "description": {
+            "en": "Immediately detect the selected platform and download using the defaults in extension settings.",
+            "zh": "立即识别选中链接的平台，并按扩展设置中的默认参数下载。"
+          },
+          "icon": "square.and.arrow.down",
+          "script": "script.js",
+          "extensionKind": "textAction",
+          "rules": {
+            "regex": "https?://\\S+"
+          }
+        }
+      ],
+      "configuration": [
+        {
+          "key": "apify_token",
+          "label": {
+            "en": "Apify API Token",
+            "zh": "Apify API Token"
+          },
+          "type": "secure",
+          "placeholder": {
+            "en": "apify_api_...",
+            "zh": "apify_api_..."
+          },
+          "description": {
+            "en": "Your own Apify token. It is stored by SwiftBiu as a secure configuration value and sent only to api.apify.com.",
+            "zh": "你自己的 Apify Token。由 SwiftBiu 作为安全配置保存，仅发送给 api.apify.com。"
+          },
+          "group": {
+            "en": "Authentication",
+            "zh": "身份验证"
+          }
+        },
+        {
+          "key": "youtube_quality",
+          "label": {
+            "en": "YouTube Quality",
+            "zh": "YouTube 默认画质"
+          },
+          "type": "option",
+          "defaultValue": "720p",
+          "description": {
+            "en": "The YouTube Actor creates one downloadable file in this preferred quality.",
+            "zh": "YouTube Actor 会按该首选画质生成一个可下载文件。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "Best Available",
+                "zh": "最佳可用画质"
+              },
+              "value": "best"
+            },
+            {
+              "label": "1080p",
+              "value": "1080p"
+            },
+            {
+              "label": "720p",
+              "value": "720p"
+            },
+            {
+              "label": "480p",
+              "value": "480p"
+            },
+            {
+              "label": "360p",
+              "value": "360p"
+            },
+            {
+              "label": {
+                "en": "Audio Only",
+                "zh": "仅音频"
+              },
+              "value": "audio_only"
+            }
+          ],
+          "group": {
+            "en": "Download Defaults",
+            "zh": "下载默认值"
+          }
+        },
+        {
+          "key": "media_preference",
+          "label": {
+            "en": "Media Selection",
+            "zh": "媒体选择策略"
+          },
+          "type": "option",
+          "defaultValue": "automatic",
+          "description": {
+            "en": "When an Actor returns multiple files, automatically choose the best match or prefer video/audio.",
+            "zh": "当 Actor 返回多个文件时，自动选择最佳结果，或优先选择视频/音频。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "Automatic Best Match",
+                "zh": "自动选择最佳结果"
+              },
+              "value": "automatic"
+            },
+            {
+              "label": {
+                "en": "Prefer Video",
+                "zh": "优先视频"
+              },
+              "value": "video"
+            },
+            {
+              "label": {
+                "en": "Prefer Audio",
+                "zh": "优先音频"
+              },
+              "value": "audio"
+            }
+          ],
+          "group": {
+            "en": "Download Defaults",
+            "zh": "下载默认值"
+          }
+        },
+        {
+          "key": "max_charge_usd",
+          "label": {
+            "en": "Maximum Charge Per Run",
+            "zh": "单次任务最高费用"
+          },
+          "type": "option",
+          "defaultValue": "0.25",
+          "description": {
+            "en": "Passed to Apify as maxTotalChargeUsd. The run is capped to one paid dataset item as an additional safety guard.",
+            "zh": "通过 maxTotalChargeUsd 传给 Apify，并额外把单次付费 Dataset 结果限制为 1 条。"
+          },
+          "options": [
+            {
+              "label": "$0.05",
+              "value": "0.05"
+            },
+            {
+              "label": "$0.10",
+              "value": "0.10"
+            },
+            {
+              "label": "$0.25",
+              "value": "0.25"
+            },
+            {
+              "label": "$0.50",
+              "value": "0.50"
+            },
+            {
+              "label": "$1.00",
+              "value": "1.00"
+            }
+          ],
+          "group": {
+            "en": "Cost & Safety",
+            "zh": "费用与安全"
+          }
+        },
+        {
+          "key": "download_directory",
+          "label": {
+            "en": "Download Folder",
+            "zh": "下载目录"
+          },
+          "type": "directory",
+          "description": {
+            "en": "Default save folder. If it is empty, the first download asks once and remembers the selected folder here.",
+            "zh": "默认保存目录。留空时首次下载会询问一次，并把所选目录记到这里。"
+          },
+          "group": {
+            "en": "Download Defaults",
+            "zh": "下载默认值"
+          }
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "api.apify.com",
+            "purpose": "Start and monitor the selected third-party Apify video downloader Actor and read its result dataset.",
+            "data": [
+              "selected public video URL",
+              "actor input",
+              "run status"
+            ],
+            "usesCredential": "User-provided Apify API token"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.developer.appiconextractor",
@@ -139,12 +811,46 @@
       },
       "icon": "photo.artframe",
       "version": "1.2.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "fileAction",
       "author": "Developer",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/AppIconExtractor.swiftbiux",
       "categoryId": "utilities",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "notifications",
+        "localFileRead",
+        "localFileWrite",
+        "clipboardRead"
+      ],
+      "actions": [
+        {
+          "title": {
+            "en": "Extract App Icon",
+            "zh": "提取应用图标"
+          },
+          "script": "script.js",
+          "extensionKind": "fileAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "outputDirectory",
+          "label": {
+            "en": "Output Folder",
+            "zh": "保存目录"
+          },
+          "type": "string",
+          "description": {
+            "en": "The authorized folder used to save extracted app icons. Leave empty and choose one when the extension runs.",
+            "zh": "用于保存提取图标的已授权目录。留空时会在首次运行时选择。"
+          },
+          "defaultValue": ""
+        }
+      ],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.swiftbiu.local-background-remover",
@@ -157,13 +863,85 @@
         "zh": "在插件窗口中本地移除图片背景。"
       },
       "icon": "person.crop.square",
-      "version": "0.1.1",
+      "version": "0.1.2",
+      "minAppVersion": null,
       "type": "Web App",
       "extensionKind": "fileAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/BackgroundRemover.swiftbiux",
       "categoryId": "utilities",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "ui",
+        "localFileRead",
+        "localFileWrite"
+      ],
+      "actions": [
+        {
+          "title": {
+            "en": "Remove Background",
+            "zh": "本地抠图"
+          },
+          "description": {
+            "en": "Open the local background remover.",
+            "zh": "打开本地抠图工具。"
+          },
+          "script": "script.js",
+          "extensionKind": "fileAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "assetPath",
+          "label": {
+            "en": "IMG.LY Asset Path",
+            "zh": "IMG.LY 资源路径"
+          },
+          "type": "string",
+          "placeholder": "../assets/imgly/",
+          "description": {
+            "en": "Optional. Leave blank to use the default remote model assets. Set this when bundling WASM/ONNX assets locally.",
+            "zh": "可选。留空使用默认远程模型资源；打包本地 WASM/ONNX 资源时填写。"
+          },
+          "defaultValue": ""
+        },
+        {
+          "key": "defaultModel",
+          "label": {
+            "en": "Default Model",
+            "zh": "默认模型"
+          },
+          "type": "option",
+          "defaultValue": "isnet_fp16",
+          "options": [
+            {
+              "label": {
+                "en": "Balanced",
+                "zh": "均衡"
+              },
+              "value": "isnet_fp16"
+            },
+            {
+              "label": {
+                "en": "Quality",
+                "zh": "高质量"
+              },
+              "value": "isnet"
+            },
+            {
+              "label": {
+                "en": "Fast",
+                "zh": "快速"
+              },
+              "value": "isnet_quint8"
+            }
+          ]
+        }
+      ],
+      "network": null,
+      "ui": {
+        "main": "ui/index.html"
+      }
     },
     {
       "id": "com.SwiftBiu.base64converter",
@@ -177,12 +955,28 @@
       },
       "icon": "arrow.triangle.2.circlepath",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/Base64Converter.swiftbiux",
       "categoryId": "text-processing",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "clipboardWrite",
+        "notifications",
+        "paste"
+      ],
+      "actions": [
+        {
+          "title": "Base64 转换",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.SwiftBiu.caseconverter",
@@ -196,12 +990,164 @@
       },
       "icon": "textformat",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/CaseConverter.swiftbiux",
       "categoryId": "text-processing",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "clipboardWrite",
+        "notifications",
+        "paste"
+      ],
+      "actions": [
+        {
+          "title": "转换大小写",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [],
+      "network": null,
+      "ui": null
+    },
+    {
+      "id": "com.swiftbiux.channels-video-downloader",
+      "name": {
+        "en": "Channels Video Downloader",
+        "zh": "微信视频号下载器"
+      },
+      "description": {
+        "en": "Download WeChat Channels videos in one click via Apify without QR scan or browser popups.",
+        "zh": "基于 Apify 一键下载微信视频号视频，无需扫码，无弹窗打扰，全自动解析并保存至本地。"
+      },
+      "icon": "play.rectangle.on.rectangle",
+      "version": "2.0.1",
+      "minAppVersion": null,
+      "type": "Network",
+      "extensionKind": "textAction",
+      "author": "SwiftBiu",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/ChannelsVideoDownloader.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "localFileWrite",
+        "notifications",
+        "clipboardRead"
+      ],
+      "actions": [
+        {
+          "id": "downloadChannelsVideo",
+          "title": {
+            "en": "Download Channels Video",
+            "zh": "下载视频号视频"
+          },
+          "description": {
+            "en": "Download WeChat Channels video to local folder via Apify without QR scan.",
+            "zh": "通过 Apify 云端解析下载微信视频号视频，无需扫码，自动保存至本地。"
+          },
+          "icon": "arrow.down.circle",
+          "script": "script.js",
+          "extensionKind": "textAction",
+          "rules": {
+            "regex": "(?:https?:\\/\\/)?(?:weixin\\.qq\\.com\\/sph\\/|channels\\.weixin\\.qq\\.com\\/|finder\\.video\\.qq\\.com\\/|video\\.mp\\.weixin\\.qq\\.com\\/)\\S*"
+          }
+        }
+      ],
+      "configuration": [
+        {
+          "key": "apify_token",
+          "label": {
+            "en": "Apify API Token",
+            "zh": "Apify API Token"
+          },
+          "type": "secure",
+          "placeholder": {
+            "en": "apify_api_...",
+            "zh": "apify_api_..."
+          },
+          "description": {
+            "en": "Your Apify token. Stored securely by SwiftBiu and sent only to api.apify.com.",
+            "zh": "你的 Apify Token。由 SwiftBiu 安全保存，仅发送给 api.apify.com。"
+          },
+          "group": {
+            "en": "Authentication",
+            "zh": "身份验证"
+          }
+        },
+        {
+          "key": "channels_actor",
+          "label": {
+            "en": "WeChat Channels Actor",
+            "zh": "视频号解析 Actor"
+          },
+          "type": "string",
+          "defaultValue": "agentflow/wechat-channels-video-downloader",
+          "placeholder": {
+            "en": "agentflow/wechat-channels-video-downloader",
+            "zh": "agentflow/wechat-channels-video-downloader"
+          },
+          "description": {
+            "en": "The Apify Actor used to resolve WeChat Channels videos. Supports custom Actor IDs.",
+            "zh": "用于解析视频号的 Apify Actor。支持填入你使用的任意视频号或通用下载 Actor。"
+          },
+          "group": {
+            "en": "Downloader Settings",
+            "zh": "下载器配置"
+          }
+        },
+        {
+          "key": "download_directory",
+          "label": {
+            "en": "Download Folder",
+            "zh": "保存目录"
+          },
+          "type": "directory",
+          "description": {
+            "en": "Default save folder. If left empty, the first run will prompt to choose a folder and remember it.",
+            "zh": "默认保存目录。留空时首次下载会弹出目录选择框，并记住选择。"
+          },
+          "group": {
+            "en": "Downloader Settings",
+            "zh": "下载器配置"
+          }
+        },
+        {
+          "key": "auto_clipboard",
+          "label": {
+            "en": "Check Clipboard Fallback",
+            "zh": "剪贴板回退检测"
+          },
+          "type": "boolean",
+          "defaultValue": true,
+          "description": {
+            "en": "If no text is selected when triggering, automatically check the clipboard for a Channels link.",
+            "zh": "当触发时未选中文本，自动检查剪贴板中是否存在视频号链接。"
+          },
+          "group": {
+            "en": "General",
+            "zh": "通用设置"
+          }
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "api.apify.com",
+            "purpose": "Start and monitor the WeChat Channels video downloader Actor on Apify and read its dataset.",
+            "data": [
+              "selected video URL",
+              "actor input",
+              "run status"
+            ],
+            "usesCredential": "User-provided Apify API token"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.swiftbiu.plugins.codex-image-studio",
@@ -215,12 +1161,136 @@
       },
       "icon": "swiftbiu-custom-icon.png",
       "version": "1.0.0",
+      "minAppVersion": null,
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/CodexImageStudio.swiftbiux",
       "categoryId": "utilities",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "clipboardWrite",
+        "notifications",
+        "ui"
+      ],
+      "actions": [
+        {
+          "ai": {
+            "allowedProviders": [
+              "codex",
+              "custom-endpoint"
+            ],
+            "modelKey": "imageModel",
+            "providerKey": "imageProvider",
+            "useCase": "imageGeneration"
+          },
+          "description": "Generate an image using Codex Login or a compatible custom provider.",
+          "extensionKind": "textAction",
+          "id": "codexImage",
+          "script": "script.js",
+          "shortcut": "cmd+shift+u",
+          "title": "Codex Image Studio"
+        }
+      ],
+      "configuration": [
+        {
+          "defaultValue": "codex",
+          "description": "Choose Codex Login or a compatible custom provider.",
+          "key": "imageProvider",
+          "label": "Image Provider",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "defaultValue": "gpt-image-2-medium",
+          "description": "Choose an image model exposed by the selected Codex-compatible provider.",
+          "key": "imageModel",
+          "label": "Image Model",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "defaultValue": "1:1",
+          "description": "Aspect ratio for image generation.",
+          "key": "aspectRatio",
+          "label": "Aspect Ratio",
+          "options": [
+            {
+              "label": "Square (1:1)",
+              "value": "1:1"
+            },
+            {
+              "label": "Landscape (16:9)",
+              "value": "16:9"
+            },
+            {
+              "label": "Portrait (9:16)",
+              "value": "9:16"
+            }
+          ],
+          "required": false,
+          "type": "option"
+        },
+        {
+          "defaultValue": "1k",
+          "description": "Resolution for image generation.",
+          "key": "resolution",
+          "label": "Resolution",
+          "options": [
+            {
+              "label": "1K",
+              "value": "1k"
+            },
+            {
+              "label": "2K",
+              "value": "2k"
+            }
+          ],
+          "required": false,
+          "type": "option"
+        },
+        {
+          "defaultValue": "true",
+          "description": "Copy the generated image to clipboard automatically.",
+          "key": "autoCopy",
+          "label": "Copy Result Image",
+          "options": [
+            {
+              "label": "On",
+              "value": "true"
+            },
+            {
+              "label": "Off",
+              "value": "false"
+            }
+          ],
+          "required": false,
+          "type": "option"
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "data": [
+              "selectedText",
+              "options"
+            ],
+            "host": "chatgpt.com",
+            "purpose": "Send image generation requests through the configured OpenAI Codex provider.",
+            "usesCredential": "Codex OAuth login token"
+          },
+          {
+            "data": [
+              "authorizationCode"
+            ],
+            "host": "auth.openai.com",
+            "purpose": "Allow SwiftBiu to authorize OpenAI Codex OAuth provider profiles.",
+            "usesCredential": "Codex OAuth client credentials"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.swiftbiu.plugins.codex-text-studio",
@@ -234,12 +1304,112 @@
       },
       "icon": "swiftbiu-custom-icon-lottie.json",
       "version": "1.0.0",
+      "minAppVersion": null,
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/CodexTextStudio.swiftbiux",
       "categoryId": "utilities",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "paste",
+        "notifications",
+        "ui"
+      ],
+      "actions": [
+        {
+          "ai": {
+            "allowedProviders": [
+              "codex",
+              "custom-endpoint"
+            ],
+            "modelKey": "chatModel",
+            "providerKey": "chatProvider",
+            "useCase": "chat"
+          },
+          "description": "Generate or rewrite text using Codex Login or a compatible custom provider.",
+          "extensionKind": "textAction",
+          "id": "codexText",
+          "script": "script.js",
+          "shortcut": "cmd+shift+y",
+          "title": "Codex Text Studio"
+        }
+      ],
+      "configuration": [
+        {
+          "defaultValue": "codex",
+          "description": "Choose Codex Login or a compatible custom provider.",
+          "key": "chatProvider",
+          "label": "Chat Provider",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "defaultValue": "gpt-5.2-codex",
+          "description": "Choose a text model exposed by the selected Codex-compatible provider.",
+          "key": "chatModel",
+          "label": "Chat Model",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "defaultValue": "You are a concise assistant. Answer in the user's language.",
+          "description": "Instruction sent before user content.",
+          "key": "systemPrompt",
+          "label": "System Prompt",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "defaultValue": "0.3",
+          "description": "Sampling temperature for non-Codex-compatible text models.",
+          "key": "temperature",
+          "label": "Temperature",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "defaultValue": "true",
+          "description": "Show chat responses in a native floating bubble UI instead of pasting directly.",
+          "key": "enableAIResponseUI",
+          "label": "Use Floating Bubble",
+          "options": [
+            {
+              "label": "On",
+              "value": "true"
+            },
+            {
+              "label": "Off",
+              "value": "false"
+            }
+          ],
+          "required": false,
+          "type": "option"
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "data": [
+              "selectedText",
+              "options"
+            ],
+            "host": "chatgpt.com",
+            "purpose": "Send chat requests through the configured OpenAI Codex provider.",
+            "usesCredential": "Codex OAuth login token"
+          },
+          {
+            "data": [
+              "authorizationCode"
+            ],
+            "host": "auth.openai.com",
+            "purpose": "Allow SwiftBiu to authorize OpenAI Codex OAuth provider profiles.",
+            "usesCredential": "Codex OAuth client credentials"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.swiftbiu.plugin.currencyconverter",
@@ -252,13 +1422,44 @@
         "zh": "Real-time currency conversion with support for multiple currencies."
       },
       "icon": "banknote",
-      "version": "1.2.1",
+      "version": "1.2.2",
+      "minAppVersion": null,
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/CurrencyConverter.swiftbiux",
       "categoryId": "online-services",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "clipboardWrite",
+        "notifications",
+        "paste"
+      ],
+      "actions": [
+        {
+          "title": "Convert Currency",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [],
+      "network": {
+        "domains": [
+          {
+            "host": "api.frankfurter.app",
+            "purpose": "Query real-time foreign exchange reference rates from the Frankfurter API.",
+            "data": [
+              "amount",
+              "fromCurrency",
+              "toCurrency"
+            ]
+          }
+        ]
+      },
+      "ui": {
+        "main": "ui/index.html"
+      }
     },
     {
       "id": "com.swiftbiu.plugin.currencyconverterlite",
@@ -271,13 +1472,319 @@
         "zh": "Convert currency instantly and copy the result. (Pure JS)"
       },
       "icon": "banknote.fill",
-      "version": "1.0.1",
+      "version": "1.0.2",
+      "minAppVersion": null,
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/CurrencyConverterLite.swiftbiux",
       "categoryId": "online-services",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "clipboardWrite",
+        "notifications",
+        "paste"
+      ],
+      "actions": [
+        {
+          "title": "Convert Currency (Lite)",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "fromCurrency",
+          "label": "默认源货币",
+          "type": "option",
+          "defaultValue": "USD",
+          "options": [
+            {
+              "label": "USD (United States Dollar)",
+              "value": "USD"
+            },
+            {
+              "label": "CNY (Chinese Renminbi Yuan)",
+              "value": "CNY"
+            },
+            {
+              "label": "AUD (Australian Dollar)",
+              "value": "AUD"
+            },
+            {
+              "label": "BGN (Bulgarian Lev)",
+              "value": "BGN"
+            },
+            {
+              "label": "BRL (Brazilian Real)",
+              "value": "BRL"
+            },
+            {
+              "label": "CAD (Canadian Dollar)",
+              "value": "CAD"
+            },
+            {
+              "label": "CHF (Swiss Franc)",
+              "value": "CHF"
+            },
+            {
+              "label": "CZK (Czech Koruna)",
+              "value": "CZK"
+            },
+            {
+              "label": "DKK (Danish Krone)",
+              "value": "DKK"
+            },
+            {
+              "label": "EUR (Euro)",
+              "value": "EUR"
+            },
+            {
+              "label": "GBP (British Pound)",
+              "value": "GBP"
+            },
+            {
+              "label": "HKD (Hong Kong Dollar)",
+              "value": "HKD"
+            },
+            {
+              "label": "HUF (Hungarian Forint)",
+              "value": "HUF"
+            },
+            {
+              "label": "IDR (Indonesian Rupiah)",
+              "value": "IDR"
+            },
+            {
+              "label": "ILS (Israeli New Sheqel)",
+              "value": "ILS"
+            },
+            {
+              "label": "INR (Indian Rupee)",
+              "value": "INR"
+            },
+            {
+              "label": "ISK (Icelandic Króna)",
+              "value": "ISK"
+            },
+            {
+              "label": "JPY (Japanese Yen)",
+              "value": "JPY"
+            },
+            {
+              "label": "KRW (South Korean Won)",
+              "value": "KRW"
+            },
+            {
+              "label": "MXN (Mexican Peso)",
+              "value": "MXN"
+            },
+            {
+              "label": "MYR (Malaysian Ringgit)",
+              "value": "MYR"
+            },
+            {
+              "label": "NOK (Norwegian Krone)",
+              "value": "NOK"
+            },
+            {
+              "label": "NZD (New Zealand Dollar)",
+              "value": "NZD"
+            },
+            {
+              "label": "PHP (Philippine Peso)",
+              "value": "PHP"
+            },
+            {
+              "label": "PLN (Polish Złoty)",
+              "value": "PLN"
+            },
+            {
+              "label": "RON (Romanian Leu)",
+              "value": "RON"
+            },
+            {
+              "label": "SEK (Swedish Krona)",
+              "value": "SEK"
+            },
+            {
+              "label": "SGD (Singapore Dollar)",
+              "value": "SGD"
+            },
+            {
+              "label": "THB (Thai Baht)",
+              "value": "THB"
+            },
+            {
+              "label": "TRY (Turkish Lira)",
+              "value": "TRY"
+            },
+            {
+              "label": "ZAR (South African Rand)",
+              "value": "ZAR"
+            }
+          ]
+        },
+        {
+          "key": "targetCurrency",
+          "label": "默认目标货币",
+          "type": "option",
+          "defaultValue": "CNY",
+          "options": [
+            {
+              "label": "CNY (Chinese Renminbi Yuan)",
+              "value": "CNY"
+            },
+            {
+              "label": "USD (United States Dollar)",
+              "value": "USD"
+            },
+            {
+              "label": "AUD (Australian Dollar)",
+              "value": "AUD"
+            },
+            {
+              "label": "BGN (Bulgarian Lev)",
+              "value": "BGN"
+            },
+            {
+              "label": "BRL (Brazilian Real)",
+              "value": "BRL"
+            },
+            {
+              "label": "CAD (Canadian Dollar)",
+              "value": "CAD"
+            },
+            {
+              "label": "CHF (Swiss Franc)",
+              "value": "CHF"
+            },
+            {
+              "label": "CZK (Czech Koruna)",
+              "value": "CZK"
+            },
+            {
+              "label": "DKK (Danish Krone)",
+              "value": "DKK"
+            },
+            {
+              "label": "EUR (Euro)",
+              "value": "EUR"
+            },
+            {
+              "label": "GBP (British Pound)",
+              "value": "GBP"
+            },
+            {
+              "label": "HKD (Hong Kong Dollar)",
+              "value": "HKD"
+            },
+            {
+              "label": "HUF (Hungarian Forint)",
+              "value": "HUF"
+            },
+            {
+              "label": "IDR (Indonesian Rupiah)",
+              "value": "IDR"
+            },
+            {
+              "label": "ILS (Israeli New Sheqel)",
+              "value": "ILS"
+            },
+            {
+              "label": "INR (Indian Rupee)",
+              "value": "INR"
+            },
+            {
+              "label": "ISK (Icelandic Króna)",
+              "value": "ISK"
+            },
+            {
+              "label": "JPY (Japanese Yen)",
+              "value": "JPY"
+            },
+            {
+              "label": "KRW (South Korean Won)",
+              "value": "KRW"
+            },
+            {
+              "label": "MXN (Mexican Peso)",
+              "value": "MXN"
+            },
+            {
+              "label": "MYR (Malaysian Ringgit)",
+              "value": "MYR"
+            },
+            {
+              "label": "NOK (Norwegian Krone)",
+              "value": "NOK"
+            },
+            {
+              "label": "NZD (New Zealand Dollar)",
+              "value": "NZD"
+            },
+            {
+              "label": "PHP (Philippine Peso)",
+              "value": "PHP"
+            },
+            {
+              "label": "PLN (Polish Złoty)",
+              "value": "PLN"
+            },
+            {
+              "label": "RON (Romanian Leu)",
+              "value": "RON"
+            },
+            {
+              "label": "SEK (Swedish Krona)",
+              "value": "SEK"
+            },
+            {
+              "label": "SGD (Singapore Dollar)",
+              "value": "SGD"
+            },
+            {
+              "label": "THB (Thai Baht)",
+              "value": "THB"
+            },
+            {
+              "label": "TRY (Turkish Lira)",
+              "value": "TRY"
+            },
+            {
+              "label": "ZAR (South African Rand)",
+              "value": "ZAR"
+            }
+          ]
+        },
+        {
+          "key": "includeCurrencySymbol",
+          "label": "结果中包含货币符号",
+          "type": "boolean",
+          "defaultValue": false
+        },
+        {
+          "key": "showExchangeRate",
+          "label": "通知中显示汇率",
+          "type": "boolean",
+          "defaultValue": false
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "api.frankfurter.app",
+            "purpose": "Query real-time foreign exchange reference rates from the Frankfurter open API.",
+            "data": [
+              "amount",
+              "fromCurrency",
+              "toCurrency"
+            ]
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.swiftbiu.plugin.desktop-gravity",
@@ -291,12 +1798,33 @@
       },
       "icon": "square.grid.3x3.topright.filled",
       "version": "1.3.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "fileAction",
       "author": "SwiftBiu Team",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/DesktopGravity.swiftbiux",
       "categoryId": "utilities",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "localFileRead",
+        "localFileWrite",
+        "notifications",
+        "paste",
+        "clipboardRead"
+      ],
+      "actions": [
+        {
+          "title": {
+            "en": "Organize Files",
+            "zh": "整理文件"
+          },
+          "script": "script.js",
+          "extensionKind": "fileAction"
+        }
+      ],
+      "configuration": [],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.swiftbiu.plugin.doubaoimage",
@@ -309,13 +1837,155 @@
         "zh": "使用豆包文生图模型生成图像，并直接预览。"
       },
       "icon": "photo.on.rectangle.angled",
-      "version": "1.3.1",
+      "version": "1.3.2",
+      "minAppVersion": null,
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu Team",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/DoubaoImage-Plugin.swiftbiux",
       "categoryId": "online-services",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "ui",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "title": "豆包图像生成",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "apiUrl",
+          "label": "API URL",
+          "description": "豆包文生图 API 的请求地址。",
+          "type": "string",
+          "defaultValue": "https://ark.cn-beijing.volces.com/api/v3/images/generations"
+        },
+        {
+          "key": "apiKey",
+          "label": "API Key",
+          "description": "请输入您从火山方舟获取的 Secret Access Key。",
+          "type": "secure",
+          "placeholder": "在此输入您的 Secret Access Key"
+        },
+        {
+          "key": "imageModel",
+          "label": "图像模型",
+          "description": "请选择用于生成图像的模型。",
+          "type": "option",
+          "defaultValue": "doubao-seedream-5-0-260128",
+          "options": [
+            {
+              "label": "Doubao Seedream 5.0 (推荐/联网检索)",
+              "value": "doubao-seedream-5-0-260128"
+            },
+            {
+              "label": "Doubao Seedream 4.5",
+              "value": "doubao-seedream-4-5-251128"
+            },
+            {
+              "label": "Doubao Seedream 4.0",
+              "value": "doubao-seedream-4-0-250828"
+            },
+            {
+              "label": "(Legacy) Doubao Seedream 3.0",
+              "value": "doubao-seedream-3-0-t2i-250415"
+            }
+          ]
+        },
+        {
+          "key": "imageSize",
+          "label": "图像尺寸",
+          "description": "请根据您选择的模型，选择合适的尺寸。v4.x模型和v3.0模型支持的尺寸不同。",
+          "type": "option",
+          "defaultValue": "1024x1024",
+          "options": [
+            {
+              "label": "v3.0 - 1:1 (1024x1024)",
+              "value": "1024x1024"
+            },
+            {
+              "label": "v3.0 - 4:3 (1152x864)",
+              "value": "1152x864"
+            },
+            {
+              "label": "v3.0 - 3:4 (864x1152)",
+              "value": "864x1152"
+            },
+            {
+              "label": "v3.0 - 16:9 (1280x720)",
+              "value": "1280x720"
+            },
+            {
+              "label": "v3.0 - 9:16 (720x1280)",
+              "value": "720x1280"
+            },
+            {
+              "label": "v3.0 - 3:2 (1248x832)",
+              "value": "1248x832"
+            },
+            {
+              "label": "v3.0 - 2:3 (832x1248)",
+              "value": "832x1248"
+            },
+            {
+              "label": "v3.0 - 21:9 (1512x648)",
+              "value": "1512x648"
+            },
+            {
+              "label": "v4.x - 1:1 (2048x2048)",
+              "value": "2048x2048"
+            },
+            {
+              "label": "v4.x - 4:3 (2304x1728)",
+              "value": "2304x1728"
+            },
+            {
+              "label": "v4.x - 3:4 (1728x2304)",
+              "value": "1728x2304"
+            },
+            {
+              "label": "v4.x - 16:9 (2560x1440)",
+              "value": "2560x1440"
+            },
+            {
+              "label": "v4.x - 9:16 (1440x2560)",
+              "value": "1440x2560"
+            },
+            {
+              "label": "v4.x - 3:2 (2496x1664)",
+              "value": "2496x1664"
+            },
+            {
+              "label": "v4.x - 2:3 (1664x2496)",
+              "value": "1664x2496"
+            },
+            {
+              "label": "v4.x - 21:9 (3024x1296)",
+              "value": "3024x1296"
+            }
+          ]
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "ark.cn-beijing.volces.com",
+            "purpose": "发送请求到火山方舟豆包文生图 API 生成图像。",
+            "data": [
+              "selectedText",
+              "imageModel",
+              "imageSize"
+            ],
+            "usesCredential": "用户配置的火山方舟 API Key"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.swiftbiu.plugin.doubaotext",
@@ -328,13 +1998,148 @@
         "zh": "使用豆包大语言模型生成文本，并将结果直接粘贴。"
       },
       "icon": "text.bubble",
-      "version": "1.6.1",
+      "version": "1.6.2",
+      "minAppVersion": null,
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu Team",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/DoubaoText-Plugin.swiftbiux",
       "categoryId": "online-services",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "notifications",
+        "paste",
+        "ui"
+      ],
+      "actions": [
+        {
+          "title": "豆包问答AI",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "apiUrl",
+          "label": "API URL",
+          "description": "豆包文生文 API 的请求地址。",
+          "type": "string",
+          "defaultValue": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+          "group": "API 配置"
+        },
+        {
+          "key": "apiKey",
+          "label": "API Key",
+          "description": "请输入您从火山方舟获取的 Secret Access Key。",
+          "type": "secure",
+          "placeholder": "在此输入您的 Secret Access Key",
+          "group": "API 配置"
+        },
+        {
+          "key": "textModel",
+          "label": "文本模型",
+          "description": "请选择用于生成文本的模型。",
+          "type": "option",
+          "defaultValue": "doubao-seed-2-0-pro-260215",
+          "group": "API 配置",
+          "options": [
+            {
+              "label": "Doubao 2.0 Pro (旗舰/256K)",
+              "value": "doubao-seed-2-0-pro-260215"
+            },
+            {
+              "label": "Doubao 2.0 Lite (平衡)",
+              "value": "doubao-seed-2-0-lite-260215"
+            },
+            {
+              "label": "Doubao 2.0 Mini (极速)",
+              "value": "doubao-seed-2-0-mini-260215"
+            },
+            {
+              "label": "Doubao 2.0 Code (代码专家)",
+              "value": "doubao-seed-2-0-code-260215"
+            },
+            {
+              "label": "Doubao 1.8 Pro (Agent/256K)",
+              "value": "doubao-seed-1-8-251228"
+            },
+            {
+              "label": "Deepseek V3.2 (通用推理)",
+              "value": "deepseek-v3-2-251201"
+            },
+            {
+              "label": "Kimi K2 (长文本/MoE)",
+              "value": "kimi-k2-thinking-251104"
+            },
+            {
+              "label": "Doubao Seed Translation (翻译)",
+              "value": "doubao-seed-translation-250915"
+            },
+            {
+              "label": "(Legacy) Doubao Seed 1.6",
+              "value": "doubao-seed-1-6-251015"
+            },
+            {
+              "label": "(Legacy) Doubao Seed 1.6 Lite",
+              "value": "doubao-seed-1-6-lite-251015"
+            },
+            {
+              "label": "(Legacy) Deepseek V3.1",
+              "value": "deepseek-v3-1-terminus"
+            }
+          ]
+        },
+        {
+          "key": "pasteBehavior",
+          "label": "默认应用方式",
+          "description": "作为默认值使用。开启后默认追加到原文后；关闭则默认替换原文。在 AI 响应 UI 中也可以临时切换，并会同步回这里。",
+          "type": "boolean",
+          "defaultValue": true,
+          "group": "响应结果"
+        },
+        {
+          "key": "contextMessageCount",
+          "label": "上下文消息数量",
+          "type": "string",
+          "defaultValue": "0",
+          "placeholder": "0-10",
+          "description": "设置发送给 AI 的历史消息数量。0 表示不带上下文；建议 4-8 条，最高 10 条。选择文本为“重置聊天”或“reset chat”可清空当前运行期上下文。",
+          "group": "上下文设置"
+        },
+        {
+          "key": "enableAIResponseUI",
+          "label": "启用原生 AI 响应弹框（推荐）",
+          "type": "boolean",
+          "defaultValue": true,
+          "description": "开启后，生成结果不会立刻粘贴，而是先显示 SwiftBiu 原生 AI 响应弹框。你可以在弹框中预览结果、修改系统提示词、切换替换/追加，再手动点击“应用”。关闭后则保持旧行为，接口返回后直接按默认应用方式写回文本。",
+          "group": "响应结果"
+        },
+        {
+          "key": "responseSystemPrompt",
+          "label": "弹框默认系统提示词",
+          "type": "string",
+          "defaultValue": "",
+          "placeholder": "留空则使用插件内置默认提示词",
+          "description": "仅在启用原生 AI 响应弹框时使用。这里填写后会优先作为弹框中的默认系统提示词。若需要多套固定提示词，建议复制扩展并分别保存不同版本。你在弹框里修改后的内容也会同步写回这里。",
+          "group": "提示词设置"
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "ark.cn-beijing.volces.com",
+            "purpose": "发送请求到火山方舟豆包大语言模型以生成回答。",
+            "data": [
+              "selectedText",
+              "textModel",
+              "contextMessages"
+            ],
+            "usesCredential": "用户配置的火山方舟 API Key"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.SwiftBiu.gemini",
@@ -347,13 +2152,137 @@
         "zh": "Send the selected text to Google Gemini and get the response."
       },
       "icon": "gemini.png",
-      "version": "1.7.1",
+      "version": "1.7.2",
+      "minAppVersion": null,
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/Gemini.swiftbiux",
       "categoryId": "online-services",
-      "requiredHost": "google.com"
+      "requiredHost": "google.com",
+      "permissions": [
+        "network",
+        "paste",
+        "notifications",
+        "ui"
+      ],
+      "actions": [
+        {
+          "title": "Gemini",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "apikey",
+          "label": "Gemini API Key",
+          "placeholder": "Enter your Gemini API key",
+          "description": "Obtain an API key from Google AI Studio.",
+          "type": "secure"
+        },
+        {
+          "key": "apiurl",
+          "label": "API URL",
+          "type": "string",
+          "placeholder": "e.g., https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash-preview:generateContent",
+          "description": "Custom Gemini API endpoint. Leave blank for default.",
+          "isSecure": false
+        },
+        {
+          "key": "model",
+          "label": "Model",
+          "type": "option",
+          "description": "The model to use.",
+          "options": [
+            {
+              "label": "Gemini 3.1 Pro",
+              "value": "gemini-3.1-pro-preview"
+            },
+            {
+              "label": "Gemini 3.1 Flash Lite",
+              "value": "gemini-3.1-flash-lite-preview"
+            },
+            {
+              "label": "Gemini 3.0 Pro",
+              "value": "gemini-3-pro-preview"
+            },
+            {
+              "label": "Gemini 3.0 Flash",
+              "value": "gemini-3-flash-preview"
+            },
+            {
+              "label": "Gemini 2.5 Pro",
+              "value": "gemini-2.5-pro"
+            },
+            {
+              "label": "Gemini 2.5 Flash",
+              "value": "gemini-2.5-flash"
+            },
+            {
+              "label": "Gemini 2.0 Flash Lite",
+              "value": "gemini-2.0-flash-lite"
+            },
+            {
+              "label": "Gemini 2.0 Flash",
+              "value": "gemini-2.0-flash"
+            },
+            {
+              "label": "Gemini 2.0 Pro",
+              "value": "gemini-2.0-pro"
+            },
+            {
+              "label": "Gemma 3n-e4b-it",
+              "value": "gemma-3n-e4b-it"
+            }
+          ]
+        },
+        {
+          "key": "contextMessageCount",
+          "label": "上下文消息数量",
+          "type": "string",
+          "defaultValue": "0",
+          "placeholder": "0-10",
+          "description": "设置发送给 AI 的历史消息数量。0 表示不带上下文，最高可设置 10 条。"
+        },
+        {
+          "key": "pasteBehavior",
+          "label": "追加模式",
+          "type": "boolean",
+          "defaultValue": true,
+          "description": "开启后，结果会追加到原文后；关闭则直接替换原文。"
+        },
+        {
+          "key": "enableAIResponseUI",
+          "label": "启用 AI 响应 UI",
+          "type": "boolean",
+          "defaultValue": false,
+          "description": "开启后，Gemini 会使用 SwiftBiu 原生 AI 响应弹框展示结果，并支持在弹框中同步修改替换/追加和系统提示词。"
+        },
+        {
+          "key": "responseSystemPrompt",
+          "label": "响应 UI 系统提示词",
+          "type": "string",
+          "defaultValue": "",
+          "placeholder": "留空则使用脚本内置默认提示词",
+          "description": "AI 响应 UI 中显示和编辑的系统提示词。若需要多套固定提示词，建议复制扩展并分别保存不同版本。"
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "generativelanguage.googleapis.com",
+            "purpose": "Send text to Google Gemini for content generation.",
+            "data": [
+              "selectedText",
+              "model",
+              "contextMessages"
+            ],
+            "usesCredential": "User-provided Gemini API key"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.swiftbiu.gemini-imageToast",
@@ -366,13 +2295,120 @@
         "zh": "Generates images from selected text in a native SwiftBiu studio window."
       },
       "icon": "nano-banana.png",
-      "version": "1.2.1",
+      "version": "1.2.2",
+      "minAppVersion": null,
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/GeminiImageNative.swiftbiux",
       "categoryId": "online-services",
-      "requiredHost": "google.com"
+      "requiredHost": "google.com",
+      "permissions": [
+        "network"
+      ],
+      "actions": [
+        {
+          "title": "Nano Banana",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "apiKey",
+          "label": "Gemini API Key",
+          "placeholder": "Enter your Google AI Studio API Key",
+          "description": "Required for generating images.",
+          "type": "secure"
+        },
+        {
+          "key": "model",
+          "label": "Model",
+          "type": "option",
+          "description": "Choose the image generation model. Pro version is more capable.",
+          "defaultValue": "gemini-2.5-flash-image",
+          "options": [
+            {
+              "label": "Gemini 3.1 Flash Image",
+              "value": "gemini-3.1-flash-image-preview"
+            },
+            {
+              "label": "Gemini 3 Pro Image",
+              "value": "gemini-3-pro-image-preview"
+            },
+            {
+              "label": "Nano Banana (2.5 Flash)",
+              "value": "gemini-2.5-flash-image"
+            }
+          ]
+        },
+        {
+          "key": "aspectRatio",
+          "label": "Aspect Ratio",
+          "type": "option",
+          "description": "Change the aspect ratio of the generated image. Note: Only applicable to the Gemini 3 Pro model.",
+          "defaultValue": "1:1",
+          "options": [
+            {
+              "label": "1:1 (Square)",
+              "value": "1:1"
+            },
+            {
+              "label": "16:9 (Widescreen)",
+              "value": "16:9"
+            },
+            {
+              "label": "4:3 (Standard)",
+              "value": "4:3"
+            },
+            {
+              "label": "3:4 (Portrait)",
+              "value": "3:4"
+            },
+            {
+              "label": "9:16 (Story)",
+              "value": "9:16"
+            }
+          ]
+        },
+        {
+          "key": "imageSize",
+          "label": "Image Size",
+          "type": "option",
+          "description": "Select high-resolution output. Note: Only applicable to the Gemini 3 Pro model (2K/4K).",
+          "defaultValue": "1K",
+          "options": [
+            {
+              "label": "1K",
+              "value": "1K"
+            },
+            {
+              "label": "2K",
+              "value": "2K"
+            },
+            {
+              "label": "4K",
+              "value": "4K"
+            }
+          ]
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "generativelanguage.googleapis.com",
+            "purpose": "Generate images via Google Gemini image models.",
+            "data": [
+              "selectedText",
+              "model",
+              "aspectRatio",
+              "imageSize"
+            ],
+            "usesCredential": "User-provided Gemini API key"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.SwiftBiu.hashcalculator",
@@ -386,12 +2422,991 @@
       },
       "icon": "number.circle",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/HashCalculator.swiftbiux",
       "categoryId": "text-processing",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "clipboardWrite",
+        "notifications",
+        "paste",
+        "runShellScript"
+      ],
+      "actions": [
+        {
+          "title": "计算哈希",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [],
+      "network": null,
+      "ui": null
+    },
+    {
+      "id": "com.swiftbiux.image-auto-censor",
+      "name": {
+        "en": "Image Auto Censor",
+        "zh": "图片自动打码"
+      },
+      "description": {
+        "en": "Pixelate faces or the whole selected image locally. Strength and save folder are managed in SwiftBiu settings.",
+        "zh": "在本地打码人脸或整张选中图片。强度与保存目录在 SwiftBiu 设置中管理。"
+      },
+      "icon": "eye.slash",
+      "version": "1.1.0",
+      "minAppVersion": null,
+      "type": "Local",
+      "extensionKind": "fileAction",
+      "author": "SwiftBiu Community Template",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/ImageAutoCensor.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null,
+      "permissions": [
+        "localFileRead",
+        "localFileWrite",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "id": "autoCensorImage",
+          "title": {
+            "en": "Auto Censor Image",
+            "zh": "自动打码"
+          },
+          "description": {
+            "en": "Pixelate the selected image on-device using the defaults in extension settings.",
+            "zh": "按扩展设置中的默认参数，在本地对选中图片自动打码。"
+          },
+          "icon": "eye.slash",
+          "script": "script.js",
+          "extensionKind": "fileAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "censor_mode",
+          "label": {
+            "en": "Censor Mode",
+            "zh": "打码模式"
+          },
+          "type": "option",
+          "defaultValue": "faces",
+          "description": {
+            "en": "Use on-device face detection, or pixelate the entire image.",
+            "zh": "使用系统本地人脸检测，或对整张图片打码。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "Faces",
+                "zh": "人脸"
+              },
+              "value": "faces"
+            },
+            {
+              "label": {
+                "en": "Entire Image",
+                "zh": "整张图片"
+              },
+              "value": "full"
+            }
+          ],
+          "group": {
+            "en": "Censor Defaults",
+            "zh": "打码默认值"
+          }
+        },
+        {
+          "key": "pixelate_strength",
+          "label": {
+            "en": "Pixelate Strength",
+            "zh": "马赛克强度"
+          },
+          "type": "option",
+          "defaultValue": "20",
+          "description": {
+            "en": "Core Image pixellate block size. Larger values are coarser.",
+            "zh": "Core Image 马赛克块大小。数值越大越粗。"
+          },
+          "options": [
+            {
+              "label": "10",
+              "value": "10"
+            },
+            {
+              "label": "20",
+              "value": "20"
+            },
+            {
+              "label": "30",
+              "value": "30"
+            },
+            {
+              "label": "40",
+              "value": "40"
+            },
+            {
+              "label": "50",
+              "value": "50"
+            }
+          ],
+          "group": {
+            "en": "Censor Defaults",
+            "zh": "打码默认值"
+          }
+        },
+        {
+          "key": "output_directory",
+          "label": {
+            "en": "Output Folder",
+            "zh": "保存目录"
+          },
+          "type": "directory",
+          "description": {
+            "en": "Default save folder. If empty, the first run asks once and remembers it here.",
+            "zh": "默认保存目录。留空时首次运行会询问一次，并把所选目录记到这里。"
+          },
+          "group": {
+            "en": "Censor Defaults",
+            "zh": "打码默认值"
+          }
+        }
+      ],
+      "network": null,
+      "ui": null
+    },
+    {
+      "id": "com.swiftbiux.image-to-svg",
+      "name": {
+        "en": "Image to SVG",
+        "zh": "图片转 SVG"
+      },
+      "description": {
+        "en": "Convert a selected image to SVG locally. Color count, size, and save folder are managed in SwiftBiu settings.",
+        "zh": "在本地把选中图片转成 SVG。颜色数、尺寸与保存目录在 SwiftBiu 设置中管理。"
+      },
+      "icon": "square.on.circle",
+      "version": "1.7.0",
+      "minAppVersion": null,
+      "type": "Local",
+      "extensionKind": "fileAction",
+      "author": "SwiftBiu Community Template",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/ImageToSVG.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null,
+      "permissions": [
+        "localFileRead",
+        "localFileWrite",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "id": "convertImageToSVG",
+          "title": {
+            "en": "Convert to SVG",
+            "zh": "转为 SVG"
+          },
+          "description": {
+            "en": "Convert the selected image to SVG on-device using the defaults in extension settings.",
+            "zh": "按扩展设置中的默认参数，在本地把选中图片转成 SVG。"
+          },
+          "icon": "square.on.circle",
+          "script": "script.js",
+          "extensionKind": "fileAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "max_colors",
+          "label": {
+            "en": "How many colors to keep",
+            "zh": "保留多少种颜色"
+          },
+          "type": "option",
+          "defaultValue": "32",
+          "description": {
+            "en": "Lower = bigger flat color blocks, easier to edit, less like the photo. Higher = closer to the original, but more pieces.",
+            "zh": "调低：色块更大、更好改，但会更“海报化”。调高：更接近原图，但形状会变多、文件也更大。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "8 — simplest, poster look",
+                "zh": "8｜最少色，最整齐"
+              },
+              "value": "8"
+            },
+            {
+              "label": {
+                "en": "16 — simpler shapes",
+                "zh": "16｜较少色块"
+              },
+              "value": "16"
+            },
+            {
+              "label": {
+                "en": "24 — more color detail",
+                "zh": "24｜多一点层次"
+              },
+              "value": "24"
+            },
+            {
+              "label": {
+                "en": "32 — balanced (default)",
+                "zh": "32｜均衡（推荐）"
+              },
+              "value": "32"
+            },
+            {
+              "label": {
+                "en": "48 — close to original",
+                "zh": "48｜接近原图"
+              },
+              "value": "48"
+            },
+            {
+              "label": {
+                "en": "64 — maximum detail",
+                "zh": "64｜最细，形状最多"
+              },
+              "value": "64"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "max_dimension",
+          "label": {
+            "en": "Trace resolution",
+            "zh": "描图精细度"
+          },
+          "type": "option",
+          "defaultValue": "768",
+          "description": {
+            "en": "The picture is shrunk to this longest-edge size before tracing. Higher looks sharper and follows edges better, but is slower and makes a larger SVG.",
+            "zh": "转换前先把图缩到这个最长边。数字越大：边缘越准、越细腻，但更慢、SVG 也更大。数字越小：更快更干净，但容易变糊、丢细节。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "192 — fastest, blockier",
+                "zh": "192｜最快，更块状"
+              },
+              "value": "192"
+            },
+            {
+              "label": {
+                "en": "256 — light and simple",
+                "zh": "256｜轻量够用"
+              },
+              "value": "256"
+            },
+            {
+              "label": {
+                "en": "384 — faster preview",
+                "zh": "384｜快速转换"
+              },
+              "value": "384"
+            },
+            {
+              "label": {
+                "en": "512 — sharper edges",
+                "zh": "512｜边缘更清晰"
+              },
+              "value": "512"
+            },
+            {
+              "label": {
+                "en": "768 — detailed (default)",
+                "zh": "768｜清晰（推荐）"
+              },
+              "value": "768"
+            },
+            {
+              "label": {
+                "en": "1024 — finest, heaviest",
+                "zh": "1024｜最多细节，耗时更长"
+              },
+              "value": "1024"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "min_area",
+          "label": {
+            "en": "Ignore specks smaller than",
+            "zh": "多小的杂点可以丢掉"
+          },
+          "type": "option",
+          "defaultValue": "4",
+          "description": {
+            "en": "1 disables area-based speckle removal. Color quantization and edge smoothing still apply. Higher values merge small regions into adjacent shapes; isolated specks may be removed. Transparent holes are preserved.",
+            "zh": "1 不按面积清除小色块，仍会进行分色和平滑。调高后小色块会并入相邻图形，孤立杂点可能被移除；真实透明孔洞会保留。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "1 px — preserve small regions",
+                "zh": "1 像素｜保留小色块"
+              },
+              "value": "1"
+            },
+            {
+              "label": {
+                "en": "4 px — balanced (default)",
+                "zh": "4 像素｜均衡（推荐）"
+              },
+              "value": "4"
+            },
+            {
+              "label": {
+                "en": "8 px — cleaner shapes",
+                "zh": "8 像素｜形状更干净"
+              },
+              "value": "8"
+            },
+            {
+              "label": {
+                "en": "16 px — merge small chips",
+                "zh": "16 像素｜合并小碎块"
+              },
+              "value": "16"
+            },
+            {
+              "label": {
+                "en": "32 px — only large shapes",
+                "zh": "32 像素｜只留大色块"
+              },
+              "value": "32"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "curve_mode",
+          "label": {
+            "en": "Edge style",
+            "zh": "边缘样式"
+          },
+          "type": "option",
+          "defaultValue": "spline",
+          "description": {
+            "en": "Smooth curves for illustrations, polygons for angular art, or exact pixel boundaries for pixel art.",
+            "zh": "插画使用平滑曲线，几何图形可选折线，像素画可保留像素边界。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "Smooth curves",
+                "zh": "平滑曲线"
+              },
+              "value": "spline"
+            },
+            {
+              "label": {
+                "en": "Polygons",
+                "zh": "折线"
+              },
+              "value": "polygon"
+            },
+            {
+              "label": {
+                "en": "Pixel boundaries",
+                "zh": "像素边界"
+              },
+              "value": "pixel"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "layer_mode",
+          "label": {
+            "en": "Layer arrangement",
+            "zh": "图层组织"
+          },
+          "type": "option",
+          "defaultValue": "stacked",
+          "description": {
+            "en": "Stacked completes covered opaque regions for easier editing. Cutout keeps separate adjacent regions. Both preserve transparent holes.",
+            "zh": "叠放模式补全被不透明图形覆盖的底层区域，便于单独编辑；拼合模式保留各区域边界。两种模式均保留透明孔洞。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "Stacked layers",
+                "zh": "叠放图层"
+              },
+              "value": "stacked"
+            },
+            {
+              "label": {
+                "en": "Adjacent shapes",
+                "zh": "相邻拼合"
+              },
+              "value": "cutout"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "curve_tolerance",
+          "label": {
+            "en": "Curve detail",
+            "zh": "曲线细节"
+          },
+          "type": "option",
+          "defaultValue": "0.6",
+          "description": {
+            "en": "Finer fitting preserves more contour detail; simpler fitting reduces edit points and file size.",
+            "zh": "精细拟合保留更多轮廓细节，简洁拟合减少编辑节点和文件大小。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "Fine",
+                "zh": "精细"
+              },
+              "value": "0.35"
+            },
+            {
+              "label": {
+                "en": "Balanced",
+                "zh": "均衡"
+              },
+              "value": "0.6"
+            },
+            {
+              "label": {
+                "en": "Simple",
+                "zh": "简洁"
+              },
+              "value": "1.0"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "gradient_mode",
+          "label": {
+            "en": "Smooth shading",
+            "zh": "渐变层次"
+          },
+          "type": "option",
+          "defaultValue": "auto",
+          "description": {
+            "en": "Recognize simple linear and radial gradients as editable fills. Complex shading stays as color regions. Pixel boundaries always use solid colors.",
+            "zh": "将简单线性和径向渐变识别为可编辑填充，复杂明暗仍保留为色块；像素边界模式始终使用纯色色块。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "Detect gradients",
+                "zh": "自动识别渐变"
+              },
+              "value": "auto"
+            },
+            {
+              "label": {
+                "en": "Solid color regions",
+                "zh": "保留纯色色块"
+              },
+              "value": "off"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "paint_mode",
+          "label": {
+            "en": "Color region detail",
+            "zh": "色块细节"
+          },
+          "type": "option",
+          "defaultValue": "editable",
+          "description": {
+            "en": "Merge small adjacent regions only when their colors and opacity are close. Editable keeps more shading; Minimal gives fewer shapes but a flatter look. Faithful preserves the previous region detail. Pixel edges always stay exact.",
+            "zh": "只合并颜色与透明度接近的相邻小色块。便于编辑档保留较多明暗；极简档图形更少，但画面更平；精细档保留原来的色块细节。像素边界模式始终保留原样。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "Editable (recommended)",
+                "zh": "便于编辑（推荐）"
+              },
+              "value": "editable"
+            },
+            {
+              "label": {
+                "en": "Minimal shapes",
+                "zh": "极简色块"
+              },
+              "value": "minimal"
+            },
+            {
+              "label": {
+                "en": "Faithful color detail",
+                "zh": "精细色块"
+              },
+              "value": "faithful"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "group_mode",
+          "label": {
+            "en": "Editable groups",
+            "zh": "编辑分组"
+          },
+          "type": "option",
+          "defaultValue": "objects",
+          "description": {
+            "en": "Group connected colors and nearby small parts into object candidates; repeated silhouettes remain separate objects within a collection. Touching or overlapping objects may still need manual adjustment.",
+            "zh": "将相连色块和归属明显的小部件组成对象候选，相似图形保留为集合中的独立对象。相接或重叠的图形仍可能需要手动调整。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "Object groups (experimental)",
+                "zh": "对象分组（实验）"
+              },
+              "value": "objects"
+            },
+            {
+              "label": {
+                "en": "Geometric containment",
+                "zh": "几何包含层级"
+              },
+              "value": "geometric"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "output_directory",
+          "label": {
+            "en": "Output Folder",
+            "zh": "保存目录"
+          },
+          "type": "directory",
+          "description": {
+            "en": "Where the .svg file is saved. Leave empty and the first run will ask you once, then remember that folder.",
+            "zh": "转好的 SVG 存到哪里。留空的话，第一次运行会让你选一次文件夹，之后都用它。"
+          },
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        }
+      ],
+      "network": null,
+      "ui": null
+    },
+    {
+      "id": "com.swiftbiux.image-to-svg-imagetracer",
+      "name": {
+        "en": "Image to SVG (ImageTracer)",
+        "zh": "图片转 SVG（ImageTracer）"
+      },
+      "description": {
+        "en": "Convert a selected PNG to SVG locally with ImageTracer.js. Options live in SwiftBiu settings.",
+        "zh": "用 ImageTracer.js 在本地把选中 PNG 转成 SVG。参数在 SwiftBiu 设置中管理。"
+      },
+      "icon": "scribble.variable",
+      "version": "1.0.0",
+      "minAppVersion": null,
+      "type": "Local",
+      "extensionKind": "fileAction",
+      "author": "SwiftBiu Community Template",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/ImageToSVG-ImageTracer.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null,
+      "permissions": [
+        "localFileRead",
+        "localFileWrite",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "id": "convertImageToSVGImageTracer",
+          "title": {
+            "en": "Convert with ImageTracer",
+            "zh": "用 ImageTracer 转 SVG"
+          },
+          "script": "script.js",
+          "extensionKind": "fileAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "preset",
+          "label": {
+            "en": "Trace Preset",
+            "zh": "描摹预设"
+          },
+          "type": "option",
+          "defaultValue": "default",
+          "description": {
+            "en": "ImageTracer.js option preset.",
+            "zh": "ImageTracer.js 预设。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "Default",
+                "zh": "默认"
+              },
+              "value": "default"
+            },
+            {
+              "label": {
+                "en": "Posterized",
+                "zh": "海报化"
+              },
+              "value": "posterized2"
+            },
+            {
+              "label": {
+                "en": "Detailed",
+                "zh": "精细"
+              },
+              "value": "detailed"
+            },
+            {
+              "label": {
+                "en": "Curvy",
+                "zh": "圆润"
+              },
+              "value": "curvy"
+            },
+            {
+              "label": {
+                "en": "Sharp",
+                "zh": "锐利"
+              },
+              "value": "sharp"
+            },
+            {
+              "label": {
+                "en": "Grayscale",
+                "zh": "灰度"
+              },
+              "value": "grayscale"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "numberofcolors",
+          "label": {
+            "en": "Maximum Colors",
+            "zh": "最多颜色数"
+          },
+          "type": "option",
+          "defaultValue": "16",
+          "description": {
+            "en": "Overrides the preset color count when not left at Auto.",
+            "zh": "非自动时覆盖预设颜色数。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "Preset Default",
+                "zh": "跟随预设"
+              },
+              "value": "auto"
+            },
+            {
+              "label": "8",
+              "value": "8"
+            },
+            {
+              "label": "16",
+              "value": "16"
+            },
+            {
+              "label": "32",
+              "value": "32"
+            },
+            {
+              "label": "64",
+              "value": "64"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "max_dimension",
+          "label": {
+            "en": "Max Edge Length",
+            "zh": "最长边像素"
+          },
+          "type": "option",
+          "defaultValue": "384",
+          "description": {
+            "en": "PNG is scaled so the longest edge does not exceed this size.",
+            "zh": "转换前把 PNG 最长边缩放到不超过该像素。"
+          },
+          "options": [
+            {
+              "label": "192",
+              "value": "192"
+            },
+            {
+              "label": "256",
+              "value": "256"
+            },
+            {
+              "label": "384",
+              "value": "384"
+            },
+            {
+              "label": "512",
+              "value": "512"
+            },
+            {
+              "label": "768",
+              "value": "768"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "output_directory",
+          "label": {
+            "en": "Output Folder",
+            "zh": "保存目录"
+          },
+          "type": "directory",
+          "description": {
+            "en": "Default save folder. If empty, the first run asks once and remembers it here.",
+            "zh": "默认保存目录。留空时首次运行会询问一次，并把所选目录记到这里。"
+          },
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        }
+      ],
+      "network": null,
+      "ui": null
+    },
+    {
+      "id": "com.swiftbiux.image-to-svg-vtracer",
+      "name": {
+        "en": "Image to SVG (VTracer)",
+        "zh": "图片转 SVG（VTracer）"
+      },
+      "description": {
+        "en": "Convert a selected image to SVG locally with bundled VTracer WASM. Options live in SwiftBiu settings.",
+        "zh": "用内置 VTracer WASM 在本地把选中图片转成 SVG。参数在 SwiftBiu 设置中管理。"
+      },
+      "icon": "point.3.connected.trianglepath.dotted",
+      "version": "1.0.1",
+      "minAppVersion": null,
+      "type": "Local",
+      "extensionKind": "fileAction",
+      "author": "SwiftBiu Community Template",
+      "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/ImageToSVG-VTracer.swiftbiux",
+      "categoryId": "utilities",
+      "requiredHost": null,
+      "permissions": [
+        "localFileRead",
+        "localFileWrite",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "id": "convertImageToSVGVTracer",
+          "title": {
+            "en": "Convert with VTracer",
+            "zh": "用 VTracer 转 SVG"
+          },
+          "script": "script.js",
+          "extensionKind": "fileAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "preset",
+          "label": {
+            "en": "Preset",
+            "zh": "预设"
+          },
+          "type": "option",
+          "defaultValue": "poster",
+          "description": {
+            "en": "VTracer starting preset.",
+            "zh": "VTracer 起始预设。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "Poster",
+                "zh": "海报"
+              },
+              "value": "poster"
+            },
+            {
+              "label": {
+                "en": "Photo",
+                "zh": "照片"
+              },
+              "value": "photo"
+            },
+            {
+              "label": {
+                "en": "Black & White",
+                "zh": "黑白"
+              },
+              "value": "bw"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "mode",
+          "label": {
+            "en": "Curve Mode",
+            "zh": "曲线模式"
+          },
+          "type": "option",
+          "defaultValue": "spline",
+          "description": {
+            "en": "pixel, polygon, or spline fitting.",
+            "zh": "像素、多边形或样条拟合。"
+          },
+          "options": [
+            {
+              "label": {
+                "en": "Spline",
+                "zh": "样条"
+              },
+              "value": "spline"
+            },
+            {
+              "label": {
+                "en": "Polygon",
+                "zh": "多边形"
+              },
+              "value": "polygon"
+            },
+            {
+              "label": {
+                "en": "Pixel",
+                "zh": "像素"
+              },
+              "value": "pixel"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "filter_speckle",
+          "label": {
+            "en": "Filter Speckle",
+            "zh": "噪点过滤"
+          },
+          "type": "option",
+          "defaultValue": "4",
+          "description": {
+            "en": "Discard patches smaller than this many pixels.",
+            "zh": "丢弃小于该像素面积的色块。"
+          },
+          "options": [
+            {
+              "label": "0",
+              "value": "0"
+            },
+            {
+              "label": "4",
+              "value": "4"
+            },
+            {
+              "label": "8",
+              "value": "8"
+            },
+            {
+              "label": "16",
+              "value": "16"
+            },
+            {
+              "label": "32",
+              "value": "32"
+            }
+          ],
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        },
+        {
+          "key": "output_directory",
+          "label": {
+            "en": "Output Folder",
+            "zh": "保存目录"
+          },
+          "type": "directory",
+          "description": {
+            "en": "Default save folder. If empty, the first run asks once and remembers it here.",
+            "zh": "默认保存目录。留空时首次运行会询问一次，并把所选目录记到这里。"
+          },
+          "group": {
+            "en": "Conversion Defaults",
+            "zh": "转换默认值"
+          }
+        }
+      ],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.SwiftBiu.jsonformatter",
@@ -405,12 +3420,28 @@
       },
       "icon": "curlybraces",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/JSONFormatter.swiftbiux",
       "categoryId": "text-processing",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "clipboardWrite",
+        "notifications",
+        "paste"
+      ],
+      "actions": [
+        {
+          "title": "格式化 JSON",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.SwiftBiu.markdowntableformatter",
@@ -424,12 +3455,28 @@
       },
       "icon": "tablecells",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/MarkdownTableFormatter.swiftbiux",
       "categoryId": "text-processing",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "clipboardWrite",
+        "notifications",
+        "paste"
+      ],
+      "actions": [
+        {
+          "title": "格式化表格",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.official.mermaidpreviewer",
@@ -442,13 +3489,29 @@
         "zh": "实时预览选中的 Mermaid 图表文本 (流程图、时序图等)。"
       },
       "icon": "diagram.2",
-      "version": "1.0.1",
+      "version": "1.0.2",
+      "minAppVersion": null,
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "官方",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/MermaidPreviewer.swiftbiux",
       "categoryId": "devtools",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "clipboardWrite"
+      ],
+      "actions": [
+        {
+          "title": "Mermaid 预览",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [],
+      "network": null,
+      "ui": {
+        "main": "ui/index.html"
+      }
     },
     {
       "id": "com.swiftbiu.plugin.movefiles",
@@ -462,12 +3525,47 @@
       },
       "icon": "folder.badge.minus",
       "version": "1.1.0",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "fileAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/MoveFiles-Plugin.swiftbiux",
       "categoryId": "utilities",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "localFileWrite",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "title": {
+            "en": "Move to Folder…",
+            "zh": "移动到文件夹…"
+          },
+          "description": {
+            "en": "Choose a destination and review progress, conflicts, failures, and undo actions.",
+            "zh": "选择目标目录，并查看移动进度、冲突、失败原因与撤销操作。"
+          },
+          "script": "script.js",
+          "extensionKind": "fileAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "default_dir",
+          "label": {
+            "en": "Quick Move Destination",
+            "zh": "快捷移动目录"
+          },
+          "type": "directory",
+          "description": {
+            "en": "Optional. When set, the action moves items here without asking for a destination. Existing names are skipped, and successful moves can be undone from the task panel.",
+            "zh": "可选。设置后将不再询问目标目录，而是直接移动到这里；同名项目会跳过，成功移动后可在任务面板中撤销。"
+          }
+        }
+      ],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.swiftbiu.openfilewithapp",
@@ -481,12 +3579,49 @@
       },
       "icon": "arrow.up.forward.square",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "fileAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/OpenFileWithApp.swiftbiux",
       "categoryId": "system",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "localFileRead",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "title": {
+            "en": "Open File With App",
+            "zh": "指定 App 打开文件"
+          },
+          "icon": "arrow.up.forward.square",
+          "description": {
+            "en": "Open matching selected files with the configured app.",
+            "zh": "使用配置的 App 打开匹配的选中文件。"
+          },
+          "script": "script.js",
+          "extensionKind": "fileAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "rules",
+          "label": {
+            "en": "File Suffix Rules",
+            "zh": "文件后缀规则"
+          },
+          "type": "fileExtensionAppRules",
+          "description": {
+            "en": "Add suffixes on the left and choose one app for each suffix on the right. Duplicate this extension when you need an alternate app for the same suffix.",
+            "zh": "左侧添加文件后缀，右侧为每个后缀选择一个 App。若同一后缀需要备用 App，可复制此扩展后单独配置。"
+          },
+          "defaultValue": "{\"rules\":[{\"fileExtension\":\"pdf\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"png\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"jpg\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"jpeg\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"heic\",\"appBundleID\":\"com.apple.Preview\"},{\"fileExtension\":\"webp\",\"appBundleID\":\"com.apple.Preview\"}]}"
+        }
+      ],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.swiftbiu.qrcode",
@@ -499,13 +3634,29 @@
         "zh": "Generate custom QR codes instantly."
       },
       "icon": "qrcode",
-      "version": "1.0.1",
+      "version": "1.0.2",
+      "minAppVersion": null,
       "type": "Web App",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/QRCodeGenerator.swiftbiux",
       "categoryId": "data-creative",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "clipboardWrite"
+      ],
+      "actions": [
+        {
+          "title": "Generate QR Code",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [],
+      "network": null,
+      "ui": {
+        "main": "ui/index.html"
+      }
     },
     {
       "id": "com.SwiftBiu.regexextractor",
@@ -519,12 +3670,76 @@
       },
       "icon": "magnifyingglass.circle",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/RegexExtractor.swiftbiux",
       "categoryId": "text-processing",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "clipboardWrite",
+        "notifications",
+        "paste"
+      ],
+      "actions": [
+        {
+          "title": "提取信息",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "patternType",
+          "label": "提取类型",
+          "description": "选择要提取的信息类型。",
+          "type": "option",
+          "options": [
+            {
+              "label": "Email",
+              "value": "Email"
+            },
+            {
+              "label": "URL",
+              "value": "URL"
+            },
+            {
+              "label": "IPv4",
+              "value": "IPv4"
+            },
+            {
+              "label": "Phone (CN)",
+              "value": "Phone (CN)"
+            },
+            {
+              "label": "Date (YYYY-MM-DD)",
+              "value": "Date (YYYY-MM-DD)"
+            },
+            {
+              "label": "Custom",
+              "value": "Custom"
+            }
+          ],
+          "defaultValue": "Email"
+        },
+        {
+          "key": "customRegex",
+          "label": "自定义正则",
+          "description": "如果选择了“Custom”类型，请输入您的正则表达式。",
+          "type": "string",
+          "placeholder": "\\d+"
+        },
+        {
+          "key": "separator",
+          "label": "分隔符",
+          "description": "提取结果之间的分隔符（默认为换行符）。",
+          "type": "string",
+          "defaultValue": "\\n"
+        }
+      ],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.SwiftBiu.searchplus",
@@ -537,13 +3752,241 @@
         "zh": "选择文字并附带自定义关键字进行搜索（如：'苹果' + '官网'）。"
       },
       "icon": "plus.magnifyingglass",
-      "version": "1.2.0",
-      "type": "Local",
+      "version": "1.2.2",
+      "minAppVersion": null,
+      "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/SearchPlus.swiftbiux",
       "categoryId": "utilities",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "title": {
+            "en": "Search with Keyword",
+            "zh": "带关键字搜索"
+          },
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "search_engine",
+          "label": {
+            "en": "Search Engine",
+            "zh": "搜索引擎"
+          },
+          "type": "option",
+          "defaultValue": "https://www.bing.com/search?q={query}",
+          "options": [
+            {
+              "label": {
+                "en": "Bing",
+                "zh": "必应"
+              },
+              "value": "https://www.bing.com/search?q={query}"
+            },
+            {
+              "label": {
+                "en": "Google",
+                "zh": "谷歌"
+              },
+              "value": "https://www.google.com/search?q={query}"
+            },
+            {
+              "label": "DuckDuckGo",
+              "value": "https://duckduckgo.com/?q={query}"
+            },
+            {
+              "label": {
+                "en": "Baidu",
+                "zh": "百度"
+              },
+              "value": "https://www.baidu.com/s?wd={query}"
+            },
+            {
+              "label": "GitHub",
+              "value": "https://github.com/search?q={query}"
+            },
+            {
+              "label": "StackOverflow",
+              "value": "https://stackoverflow.com/search?q={query}"
+            },
+            {
+              "label": "YouTube",
+              "value": "https://www.youtube.com/results?search_query={query}"
+            },
+            {
+              "label": {
+                "en": "Zhihu",
+                "zh": "知乎"
+              },
+              "value": "https://www.zhihu.com/search?q={query}"
+            },
+            {
+              "label": {
+                "en": "Bilibili",
+                "zh": "哔哩哔哩"
+              },
+              "value": "https://search.bilibili.com/all?keyword={query}"
+            },
+            {
+              "label": {
+                "en": "Wikipedia",
+                "zh": "维基百科"
+              },
+              "value": "https://en.wikipedia.org/wiki/Special:Search?search={query}"
+            },
+            {
+              "label": "Reddit",
+              "value": "https://www.reddit.com/search/?q={query}"
+            },
+            {
+              "label": {
+                "en": "Xiaohongshu",
+                "zh": "小红书"
+              },
+              "value": "https://www.xiaohongshu.com/search_result?keyword={query}"
+            },
+            {
+              "label": {
+                "en": "Douyin",
+                "zh": "抖音"
+              },
+              "value": "https://www.douyin.com/search/{query}"
+            },
+            {
+              "label": "TikTok",
+              "value": "https://www.tiktok.com/search?q={query}"
+            },
+            {
+              "label": {
+                "en": "Custom",
+                "zh": "自定义"
+              },
+              "value": "custom"
+            }
+          ],
+          "group": "General"
+        },
+        {
+          "key": "custom_engine_url",
+          "label": {
+            "en": "Custom Engine URL",
+            "zh": "自定义引擎 URL"
+          },
+          "type": "string",
+          "placeholder": "https://example.com/search?q={query}",
+          "description": {
+            "en": "Used only if 'Custom' is selected. Use {query} as placeholder.",
+            "zh": "仅在选择“自定义”时生效。使用 {query} 作为占位符。"
+          },
+          "group": "General"
+        },
+        {
+          "key": "keyword",
+          "label": {
+            "en": "Keyword",
+            "zh": "关键字"
+          },
+          "type": "string",
+          "defaultValue": "官网",
+          "placeholder": "e.g. 官网",
+          "group": "Search"
+        },
+        {
+          "key": "keyword_position",
+          "label": {
+            "en": "Keyword Position",
+            "zh": "关键字位置"
+          },
+          "type": "option",
+          "defaultValue": "suffix",
+          "options": [
+            {
+              "label": {
+                "en": "Suffix (Text + Keyword)",
+                "zh": "后缀 (文字 + 关键字)"
+              },
+              "value": "suffix"
+            },
+            {
+              "label": {
+                "en": "Prefix (Keyword + Text)",
+                "zh": "前缀 (关键字 + 文字)"
+              },
+              "value": "prefix"
+            }
+          ],
+          "group": "Search"
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "www.bing.com",
+            "purpose": "Bing search queries"
+          },
+          {
+            "host": "www.google.com",
+            "purpose": "Google search queries"
+          },
+          {
+            "host": "duckduckgo.com",
+            "purpose": "DuckDuckGo search queries"
+          },
+          {
+            "host": "www.baidu.com",
+            "purpose": "Baidu search queries"
+          },
+          {
+            "host": "github.com",
+            "purpose": "GitHub code and repository search"
+          },
+          {
+            "host": "stackoverflow.com",
+            "purpose": "Stack Overflow technical search"
+          },
+          {
+            "host": "www.youtube.com",
+            "purpose": "YouTube video search"
+          },
+          {
+            "host": "www.zhihu.com",
+            "purpose": "Zhihu QA search"
+          },
+          {
+            "host": "search.bilibili.com",
+            "purpose": "Bilibili search"
+          },
+          {
+            "host": "en.wikipedia.org",
+            "purpose": "Wikipedia article lookup"
+          },
+          {
+            "host": "www.reddit.com",
+            "purpose": "Reddit community search"
+          },
+          {
+            "host": "www.xiaohongshu.com",
+            "purpose": "Xiaohongshu search"
+          },
+          {
+            "host": "www.douyin.com",
+            "purpose": "Douyin video search"
+          },
+          {
+            "host": "www.tiktok.com",
+            "purpose": "TikTok search"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.swiftbiu.sharetargets",
@@ -557,12 +4000,22 @@
       },
       "icon": "square.and.arrow.up",
       "version": "1.0.0",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "fileAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/ShareTargets.swiftbiux",
       "categoryId": "utilities",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "share",
+        "localFileRead",
+        "notifications"
+      ],
+      "actions": [],
+      "configuration": [],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.SwiftBiu.sluggenerator",
@@ -576,12 +4029,28 @@
       },
       "icon": "link",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/SlugGenerator.swiftbiux",
       "categoryId": "text-processing",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "clipboardWrite",
+        "notifications",
+        "paste"
+      ],
+      "actions": [
+        {
+          "title": "生成 Slug",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.SwiftBiu.textcleaner",
@@ -595,12 +4064,64 @@
       },
       "icon": "wand.and.stars",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/TextCleaner.swiftbiux",
       "categoryId": "text-processing",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "clipboardWrite",
+        "notifications",
+        "paste"
+      ],
+      "actions": [
+        {
+          "title": "清洗文本",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [
+        {
+          "key": "sortLines",
+          "label": "按行排序",
+          "description": "将所有行按字母顺序进行升序排序。",
+          "type": "boolean",
+          "defaultValue": true
+        },
+        {
+          "key": "trimLines",
+          "label": "去除首尾空格",
+          "description": "去除每一行开头和结尾的空白字符。",
+          "type": "boolean",
+          "defaultValue": true
+        },
+        {
+          "key": "removeEmptyLines",
+          "label": "去除空行",
+          "description": "移除内容为空的行。",
+          "type": "boolean",
+          "defaultValue": true
+        },
+        {
+          "key": "fullToHalf",
+          "label": "全角转半角",
+          "description": "将全角字母和数字转换为半角。",
+          "type": "boolean",
+          "defaultValue": true
+        },
+        {
+          "key": "deduplicate",
+          "label": "去除重复行",
+          "description": "移除重复的行（保留首次出现）。",
+          "type": "boolean",
+          "defaultValue": true
+        }
+      ],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.SwiftBiu.timestampconverter",
@@ -614,12 +4135,28 @@
       },
       "icon": "clock",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/TimestampConverter.swiftbiux",
       "categoryId": "text-processing",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "clipboardWrite",
+        "notifications",
+        "paste"
+      ],
+      "actions": [
+        {
+          "title": "时间戳转换",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.SwiftBiu.wordcount",
@@ -633,12 +4170,26 @@
       },
       "icon": "text.alignleft",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/WordCount.swiftbiux",
       "categoryId": "text-processing",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "notifications"
+      ],
+      "actions": [
+        {
+          "title": "统计字数",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [],
+      "network": null,
+      "ui": null
     },
     {
       "id": "com.swiftbiu.xai-chat",
@@ -652,12 +4203,146 @@
       },
       "icon": "extension",
       "version": "1.1.0",
+      "minAppVersion": null,
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/XAIChat.swiftbiux",
       "categoryId": "utilities",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "paste",
+        "notifications",
+        "ui"
+      ],
+      "actions": [
+        {
+          "id": "chatWithXAI",
+          "title": "Chat with xAI",
+          "description": "Send selected text to the configured xAI chat model and paste the response.",
+          "extensionKind": "textAction",
+          "script": "script.js",
+          "shortcut": "cmd+shift+g",
+          "ai": {
+            "allowedProviders": [
+              "xai-oauth",
+              "xai"
+            ],
+            "useCase": "chat",
+            "providerKey": "textProvider",
+            "modelKey": "textModel"
+          }
+        }
+      ],
+      "configuration": [
+        {
+          "key": "textProvider",
+          "label": "Text Provider",
+          "description": "Choose an xAI provider profile for chat models.",
+          "type": "option",
+          "required": true,
+          "defaultValue": "xai-oauth",
+          "options": [
+            {
+              "value": "xai-oauth",
+              "label": "xAI Login"
+            },
+            {
+              "value": "xai",
+              "label": "xAI API Key"
+            }
+          ]
+        },
+        {
+          "key": "textModel",
+          "label": "Text Model",
+          "description": "Choose the xAI text model for this action.",
+          "type": "option",
+          "required": true,
+          "defaultValue": "grok-4.3",
+          "options": [
+            {
+              "value": "grok-4.3",
+              "label": "Grok 4.3"
+            }
+          ]
+        },
+        {
+          "key": "systemPrompt",
+          "label": "System Prompt",
+          "description": "Instruction sent before the selected text.",
+          "type": "string",
+          "required": false,
+          "defaultValue": "You are a concise assistant. Answer in the user's language and keep the result practical."
+        },
+        {
+          "key": "temperature",
+          "label": "Temperature",
+          "description": "Sampling temperature passed to the model.",
+          "type": "string",
+          "required": false,
+          "defaultValue": "0.3"
+        },
+        {
+          "key": "enableXSearch",
+          "label": "Enable X Search",
+          "description": "Pass an x_search tool request when the selected xAI model supports it.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "false",
+          "options": [
+            {
+              "value": "false",
+              "label": "Off"
+            },
+            {
+              "value": "true",
+              "label": "On"
+            }
+          ]
+        },
+        {
+          "key": "enableAIResponseUI",
+          "label": "Use Floating Bubble",
+          "description": "Show chat responses in a native floating bubble UI instead of pasting directly.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "true",
+          "options": [
+            {
+              "value": "true",
+              "label": "On"
+            },
+            {
+              "value": "false",
+              "label": "Off"
+            }
+          ]
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "api.x.ai",
+            "purpose": "Send chat requests through the configured xAI provider.",
+            "data": [
+              "selectedText",
+              "options"
+            ],
+            "usesCredential": "xAI API Key or OAuth login token"
+          },
+          {
+            "host": "auth.x.ai",
+            "purpose": "Allow SwiftBiu to authorize xAI OAuth provider profiles.",
+            "data": [
+              "authorizationCode"
+            ],
+            "usesCredential": "xAI OAuth client credentials"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.swiftbiu.xai-image",
@@ -671,12 +4356,155 @@
       },
       "icon": "extension",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/XAIImage.swiftbiux",
       "categoryId": "utilities",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "clipboardWrite",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "id": "generateXAIImage",
+          "title": "Generate xAI Image",
+          "description": "Generate an image from selected text using the configured xAI image model.",
+          "extensionKind": "textAction",
+          "script": "script.js",
+          "shortcut": "cmd+shift+i",
+          "ai": {
+            "allowedProviders": [
+              "xai-oauth",
+              "xai"
+            ],
+            "useCase": "imageGeneration",
+            "providerKey": "imageProvider",
+            "modelKey": "imageModel"
+          }
+        }
+      ],
+      "configuration": [
+        {
+          "key": "imageProvider",
+          "label": "Image Provider",
+          "description": "Choose an xAI provider profile for image models.",
+          "type": "option",
+          "required": true,
+          "defaultValue": "xai-oauth",
+          "options": [
+            {
+              "value": "xai-oauth",
+              "label": "xAI Login"
+            },
+            {
+              "value": "xai",
+              "label": "xAI API Key"
+            }
+          ]
+        },
+        {
+          "key": "imageModel",
+          "label": "Image Model",
+          "description": "Choose the xAI image model for this action.",
+          "type": "option",
+          "required": true,
+          "defaultValue": "grok-imagine-image",
+          "options": [
+            {
+              "value": "grok-imagine-image",
+              "label": "Grok Imagine Image"
+            },
+            {
+              "value": "grok-imagine-image-quality",
+              "label": "Grok Imagine Image Quality"
+            }
+          ]
+        },
+        {
+          "key": "aspectRatio",
+          "label": "Aspect Ratio",
+          "description": "Aspect ratio passed to xAI image generation.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "1:1",
+          "options": [
+            {
+              "value": "1:1",
+              "label": "Square"
+            },
+            {
+              "value": "16:9",
+              "label": "Landscape"
+            },
+            {
+              "value": "9:16",
+              "label": "Portrait"
+            }
+          ]
+        },
+        {
+          "key": "resolution",
+          "label": "Resolution",
+          "description": "Resolution hint passed to xAI image generation.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "1k",
+          "options": [
+            {
+              "value": "1k",
+              "label": "1K"
+            },
+            {
+              "value": "2k",
+              "label": "2K"
+            }
+          ]
+        },
+        {
+          "key": "autoCopy",
+          "label": "Copy Result",
+          "description": "Copy the generated image to the clipboard after generation.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "true",
+          "options": [
+            {
+              "value": "true",
+              "label": "On"
+            },
+            {
+              "value": "false",
+              "label": "Off"
+            }
+          ]
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "api.x.ai",
+            "purpose": "Send image generation requests through the configured xAI provider.",
+            "data": [
+              "prompt",
+              "options"
+            ],
+            "usesCredential": "xAI API Key or OAuth login token"
+          },
+          {
+            "host": "auth.x.ai",
+            "purpose": "Allow SwiftBiu to authorize xAI OAuth provider profiles.",
+            "data": [
+              "authorizationCode"
+            ],
+            "usesCredential": "xAI OAuth client credentials"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.swiftbiu.xai-video",
@@ -690,12 +4518,159 @@
       },
       "icon": "extension",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/XAIVideo.swiftbiux",
       "categoryId": "utilities",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "paste",
+        "notifications"
+      ],
+      "actions": [
+        {
+          "id": "prepareXAIVideo",
+          "title": "Prepare xAI Video",
+          "description": "Use the configured xAI video model and prepare a video generation request.",
+          "extensionKind": "textAction",
+          "script": "script.js",
+          "shortcut": "cmd+shift+v",
+          "ai": {
+            "allowedProviders": [
+              "xai-oauth",
+              "xai"
+            ],
+            "useCase": "videoGeneration",
+            "providerKey": "videoProvider",
+            "modelKey": "videoModel"
+          }
+        }
+      ],
+      "configuration": [
+        {
+          "key": "videoProvider",
+          "label": "Video Provider",
+          "description": "Choose an xAI provider profile for video generation models.",
+          "type": "option",
+          "required": true,
+          "defaultValue": "xai-oauth",
+          "options": [
+            {
+              "value": "xai-oauth",
+              "label": "xAI Login"
+            },
+            {
+              "value": "xai",
+              "label": "xAI API Key"
+            }
+          ]
+        },
+        {
+          "key": "videoModel",
+          "label": "Video Model",
+          "description": "Choose the xAI Grok Imagine video model for this action.",
+          "type": "option",
+          "required": true,
+          "defaultValue": "grok-imagine-video",
+          "options": [
+            {
+              "value": "grok-imagine-video",
+              "label": "Grok Imagine Video"
+            },
+            {
+              "value": "grok-imagine-video-1.5-preview",
+              "label": "Grok Imagine Video 1.5 Preview"
+            }
+          ]
+        },
+        {
+          "key": "aspectRatio",
+          "label": "Aspect Ratio",
+          "description": "Aspect ratio passed to video generation.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "16:9",
+          "options": [
+            {
+              "value": "16:9",
+              "label": "Landscape"
+            },
+            {
+              "value": "9:16",
+              "label": "Portrait"
+            },
+            {
+              "value": "1:1",
+              "label": "Square"
+            }
+          ]
+        },
+        {
+          "key": "durationSeconds",
+          "label": "Duration Seconds",
+          "description": "Requested video duration in seconds.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "6",
+          "options": [
+            {
+              "value": "4",
+              "label": "4s"
+            },
+            {
+              "value": "6",
+              "label": "6s"
+            },
+            {
+              "value": "10",
+              "label": "10s"
+            }
+          ]
+        },
+        {
+          "key": "resolution",
+          "label": "Resolution",
+          "description": "Resolution hint passed to video generation.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "720p",
+          "options": [
+            {
+              "value": "480p",
+              "label": "480p"
+            },
+            {
+              "value": "720p",
+              "label": "720p"
+            }
+          ]
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "api.x.ai",
+            "purpose": "Send video generation requests through the configured xAI provider when the host bridge is available.",
+            "data": [
+              "prompt",
+              "options"
+            ],
+            "usesCredential": "xAI API Key or OAuth login token"
+          },
+          {
+            "host": "auth.x.ai",
+            "purpose": "Allow SwiftBiu to authorize xAI OAuth provider profiles.",
+            "data": [
+              "authorizationCode"
+            ],
+            "usesCredential": "xAI OAuth client credentials"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.swiftbiu.xai-voice",
@@ -709,12 +4684,269 @@
       },
       "icon": "extension",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Network",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/XAIVoice.swiftbiux",
       "categoryId": "utilities",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "network",
+        "paste",
+        "notifications",
+        "localFileRead"
+      ],
+      "actions": [
+        {
+          "id": "speakWithXAITTS",
+          "title": "Speak with xAI TTS",
+          "description": "Use the configured xAI TTS model for selected text.",
+          "extensionKind": "textAction",
+          "script": "script.js",
+          "shortcut": "cmd+shift+s",
+          "ai": {
+            "allowedProviders": [
+              "xai-oauth",
+              "xai"
+            ],
+            "useCase": "tts",
+            "providerKey": "ttsProvider",
+            "modelKey": "ttsModel"
+          }
+        },
+        {
+          "id": "transcribeWithXAISTT",
+          "title": "Transcribe with xAI STT",
+          "description": "Use the configured xAI speech-to-text model for selected audio files.",
+          "extensionKind": "fileAction",
+          "script": "script.js",
+          "ai": {
+            "allowedProviders": [
+              "xai-oauth",
+              "xai"
+            ],
+            "useCase": "stt",
+            "providerKey": "sttProvider",
+            "modelKey": "sttModel"
+          }
+        }
+      ],
+      "configuration": [
+        {
+          "key": "ttsProvider",
+          "label": "TTS Provider",
+          "description": "Choose an xAI provider profile for text-to-speech models.",
+          "type": "option",
+          "required": true,
+          "defaultValue": "xai-oauth",
+          "options": [
+            {
+              "value": "xai-oauth",
+              "label": "xAI Login"
+            },
+            {
+              "value": "xai",
+              "label": "xAI API Key"
+            }
+          ]
+        },
+        {
+          "key": "ttsModel",
+          "label": "TTS Model",
+          "description": "Choose the xAI text-to-speech model for this action.",
+          "type": "option",
+          "required": true,
+          "defaultValue": "xai-tts",
+          "options": [
+            {
+              "value": "xai-tts",
+              "label": "xAI TTS"
+            }
+          ]
+        },
+        {
+          "key": "voice",
+          "label": "Voice",
+          "description": "Voice identifier passed to text-to-speech.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "eve",
+          "options": [
+            {
+              "value": "eve",
+              "label": "Eve (Default)"
+            },
+            {
+              "value": "alloy",
+              "label": "Alloy"
+            },
+            {
+              "value": "echo",
+              "label": "Echo"
+            },
+            {
+              "value": "fable",
+              "label": "Fable"
+            },
+            {
+              "value": "onyx",
+              "label": "Onyx"
+            },
+            {
+              "value": "nova",
+              "label": "Nova"
+            },
+            {
+              "value": "shimmer",
+              "label": "Shimmer"
+            }
+          ]
+        },
+        {
+          "key": "ttsFormat",
+          "label": "TTS Format",
+          "description": "Requested text-to-speech audio format.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "mp3",
+          "options": [
+            {
+              "value": "mp3",
+              "label": "MP3"
+            },
+            {
+              "value": "wav",
+              "label": "WAV"
+            },
+            {
+              "value": "opus",
+              "label": "Opus"
+            }
+          ]
+        },
+        {
+          "key": "sttProvider",
+          "label": "STT Provider",
+          "description": "Choose an xAI provider profile for speech-to-text models.",
+          "type": "option",
+          "required": true,
+          "defaultValue": "xai-oauth",
+          "options": [
+            {
+              "value": "xai-oauth",
+              "label": "xAI Login"
+            },
+            {
+              "value": "xai",
+              "label": "xAI API Key"
+            }
+          ]
+        },
+        {
+          "key": "sttModel",
+          "label": "STT Model",
+          "description": "Choose the xAI speech-to-text model for this action.",
+          "type": "option",
+          "required": true,
+          "defaultValue": "grok-stt",
+          "options": [
+            {
+              "value": "grok-stt",
+              "label": "Grok STT"
+            }
+          ]
+        },
+        {
+          "key": "language",
+          "label": "Language",
+          "description": "Optional transcription language hint.",
+          "type": "option",
+          "required": false,
+          "defaultValue": "en",
+          "options": [
+            {
+              "value": "en",
+              "label": "en (English)"
+            },
+            {
+              "value": "zh",
+              "label": "zh (Chinese)"
+            },
+            {
+              "value": "es",
+              "label": "es (Spanish)"
+            },
+            {
+              "value": "fr",
+              "label": "fr (French)"
+            },
+            {
+              "value": "de",
+              "label": "de (German)"
+            },
+            {
+              "value": "it",
+              "label": "it (Italian)"
+            },
+            {
+              "value": "ja",
+              "label": "ja (Japanese)"
+            },
+            {
+              "value": "ko",
+              "label": "ko (Korean)"
+            },
+            {
+              "value": "pt",
+              "label": "pt (Portuguese)"
+            },
+            {
+              "value": "ru",
+              "label": "ru (Russian)"
+            },
+            {
+              "value": "tr",
+              "label": "tr (Turkish)"
+            },
+            {
+              "value": "pl",
+              "label": "pl (Polish)"
+            },
+            {
+              "value": "nl",
+              "label": "nl (Dutch)"
+            },
+            {
+              "value": "hi",
+              "label": "hi (Hindi)"
+            }
+          ]
+        }
+      ],
+      "network": {
+        "domains": [
+          {
+            "host": "api.x.ai",
+            "purpose": "Send voice requests through the configured xAI provider when the host bridge is available.",
+            "data": [
+              "selectedText",
+              "audioFile",
+              "options"
+            ],
+            "usesCredential": "xAI API Key or OAuth login token"
+          },
+          {
+            "host": "auth.x.ai",
+            "purpose": "Allow SwiftBiu to authorize xAI OAuth provider profiles.",
+            "data": [
+              "authorizationCode"
+            ],
+            "usesCredential": "xAI OAuth client credentials"
+          }
+        ]
+      },
+      "ui": null
     },
     {
       "id": "com.SwiftBiu.rmbconverter",
@@ -728,12 +4960,28 @@
       },
       "icon": "dollarsign.circle",
       "version": "1.0.1",
+      "minAppVersion": null,
       "type": "Local",
       "extensionKind": "textAction",
       "author": "SwiftBiu",
       "downloadUrl": "https://github.com/SwiftBiu/SwiftBiuX-Template/releases/download/beta-latest/cny.swiftbiux",
       "categoryId": "text-processing",
-      "requiredHost": null
+      "requiredHost": null,
+      "permissions": [
+        "clipboardWrite",
+        "notifications",
+        "paste"
+      ],
+      "actions": [
+        {
+          "title": "CNY",
+          "script": "script.js",
+          "extensionKind": "textAction"
+        }
+      ],
+      "configuration": [],
+      "network": null,
+      "ui": null
     }
   ]
 }

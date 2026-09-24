@@ -50,6 +50,8 @@ The AI should read `AI_SKILL.md` first, then load only the smallest matching ref
 
 See the full routing index in `ai/docs-index.json`.
 
+Official website pages are generated from `developer-modules/*.md`, not from `references/` and not from `SwiftBiuWeb/**/developer/**/index.html`. See `developer-modules/README.md`.
+
 ## Recommended workflow
 
 1. **Describe the idea**: input, transformation, and output.

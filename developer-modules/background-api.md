@@ -1,5 +1,7 @@
 # Background `SwiftBiu` API
 
+<!-- Canonical website source. Edit this file (and background-api.zh.md). Do not edit generated SwiftBiuWeb/**/developer/background-api/index.html. -->
+
 Standard Actions and Web App launchers run in the background `script.js` sandbox. This environment injects the global `SwiftBiu` object and its lowercase alias `swiftBiu`.
 
 > [!IMPORTANT]
@@ -50,10 +52,16 @@ When access is missing, request authorization immediately. Stop cleanly when the
 - `SwiftBiu.saveLocalFile(base64: String, filename: String)`: opens the native Save As panel.
 - `SwiftBiu.exportFile(base64: String, filename: String)`: backward-compatible alias for `saveLocalFile(...)`.
 
-## File Icons
+## File Icons and Local Image Processing
 
 - `SwiftBiu.extractFileIcon(path: String, options?: Object)`: extracts a file or app icon through the native host. Success returns `{ success, base64, fileName, width, height, format }`; failure returns `{ success: false, error }`. Requires `localFileRead`.
 - `SwiftBiu.setFileIcon(targetPath: String, iconPath: String, options?: Object)`: applies a custom Finder icon to a file, folder, or `.app`. Requires `localFileRead` and `localFileWrite`.
+- `SwiftBiu.convertImageToSVG(path: String, options?: Object)`: converts a local image to vector SVG on-device, returning `{ success, svg, format, width, height, colors, shapeCount, groupCount, objectCount, path, fileName }` or `{ success: false, error }`. Requires `localFileRead`. Options are `maxColors` (2–64, for the solid palette), `maxDimension` (64–1024), `minArea` (1–256), `curveMode` (`spline`, `polygon`, `pixel`), `layerMode` (`stacked`, `cutout`), `curveTolerance` (0.05–2 px), `cornerThreshold` (20–150 degrees), and `gradientMode` (`auto`, `off`; default `auto`); snake_case aliases are accepted. The engine preserves alpha and transparent holes, fits shared cubic boundaries, and merges accurately fitted linear/radial shading into SVG gradient fills. These use two stops and constant alpha; complex shading stays as solid regions. Pixel mode skips gradients. Save the returned `svg` separately with a file-write API.
+- `SwiftBiu.censorLocalImage(path: String, options?: Object)`: applies privacy censorship or blur to a local image, returning `{ success, outputPath?, error? }`. Requires `localFileRead`.
+
+SVG also accepts `groupMode: "objects" | "geometric"` (alias `group_mode`; API default `geometric`). Experimental object mode separates a likely canvas background, groups connected colors and unambiguous nearby small parts, and retains repeated instances inside collections. Containment supplies nested parts. It does not infer semantic classes or recover occluded geometry. Overlapping paint-order conflicts produce fragments with a shared `data-object` and `data-split="true"`. `objectCount` counts logical candidates once; `groupCount` counts all `data-kind` groups, including parts, collections, background and fragments. Both counts are zero in geometric mode.
+
+`paintMode` (alias `paint_mode`) accepts `faithful` (API default), `editable`, or `minimal`. Editable and Minimal progressively merge small adjacent solid-color regions only when their OKLab colors and alpha are close. Transparent holes and strongly contrasting details remain separate; pixel edge style skips this abstraction. The ImageToSVG plugin defaults to Editable. `minArea: 1` disables the separate area-only speckle filter, not perceptual paint merging; choose Faithful to keep previous paint detail. Fewer SVG shapes may make the rendered image less exact.
 
 For App Store compatibility, use these host APIs instead of shell, AppleScript, `sips`, `qlmanage`, or `osascript`.
 
@@ -72,6 +80,9 @@ For App Store compatibility, use these host APIs instead of shell, AppleScript, 
 - `SwiftBiu.showInteractiveImage(options, onRegenerate)`: creates an interactive image session and returns `sessionID`. Requires `notifications`.
 - `SwiftBiu.updateInteractiveImage(sessionID, options)`: updates an image session.
 - `SwiftBiu.failInteractiveImage(sessionID, message)`: fails an image session.
+
+For local previews, pass a file reference directly: `showImage` accepts a properly encoded `file://` URL; `showInteractiveImage` and `updateInteractiveImage` accept `{ filePath: "/path/to/image.png" }`. No `readLocalFile`/Base64 round trip is needed. Local paths additionally require `localFileRead` and must belong to this runtime’s selected files, registered transient files, or a user-authorized directory. Plugin IDs and image session IDs do not grant file access. `filePath` takes precedence over `imageSource`; pending placeholders still take precedence. Existing Base64 and HTTP image inputs remain supported. These methods belong to the background JavaScriptCore API.
+
 - `SwiftBiu.showVideo(source, position, context)`: displays a local or remote video card. Requires `notifications`.
 - `SwiftBiu.showInteractiveVideo(options, onRegenerate)`, `updateInteractiveVideo(...)`, `failInteractiveVideo(...)`: manage an in-place video generation session. Require `notifications`.
 - `SwiftBiu.showAudio(source, position, context)`: displays Base64, local, or remote audio. Requires `notifications`.
@@ -86,8 +97,9 @@ Use the loading indicator only for lightweight actions without their own interfa
 - `SwiftBiu.fetch(url, options, onSuccess, onError)`: callback-based request. Requires `network`.
 - `SwiftBiu.fetchStream(url, options, onEvent, onError)`: starts a stream and returns `streamID`. Requires `network`.
 - `SwiftBiu.cancelFetchStream(streamID: String)`: cancels an active stream.
-- `SwiftBiu.downloadRemoteFile(url, options, onSuccess, onError)`: downloads a remote file into transient local storage. Requires `network`.
+- `SwiftBiu.downloadRemoteFile(url, options, onSuccess, onError)`: downloads a remote file. Default is transient local storage; pass `destinationPath` or `directoryPath` to save permanently. Requires `network`; direct save also requires `localFileWrite`.
 - `SwiftBiu.materializeSelectedRemoteFiles(options, onSuccess, onError)`: downloads `context.selectedRemoteFiles` for the current action. Requires `network`.
+- `SwiftBiu.releaseTemporaryFile(path)`: deletes a transient file created by `downloadRemoteFile`.
 
 ## SwiftBiu-Managed AI Providers
 

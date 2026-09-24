@@ -3,7 +3,7 @@
   "name": "AI Rewriter",
   "author": "kweizh",
   "description": "Use preset prompt to rewrite the selected text by AI Compatible API",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "actions": [
     {
       "title": "OAIRewrite",
@@ -17,6 +17,20 @@
     "paste",
     "notifications"
   ],
+  "network": {
+    "domains": [
+      {
+        "host": "api.openai.com",
+        "purpose": "Send chat completion requests to the configured OpenAI compatible API.",
+        "data": [
+          "selectedText",
+          "model",
+          "promptTemplate"
+        ],
+        "usesCredential": "User-provided API key"
+      }
+    ]
+  },
   "configuration": [
     {
       "key": "apikey",

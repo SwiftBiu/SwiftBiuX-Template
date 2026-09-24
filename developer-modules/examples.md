@@ -5,14 +5,14 @@
 > - **Lite Converter**: The canonical Standard Action logic template.
 > - **Prettier Formatter**: The canonical Web App sandboxed UI template.
 
-## Examples
 
-Please check out and clone the official [SwiftBiu Plugin Development Template Repository (SwiftBiuX-Template)](https://github.com/SwiftBiu/SwiftBiuX-Template) to get the complete source code of the example plugins. Reading these real-world examples is the fastest way to understand the underlying concepts and best practices.
+### 6. Native Request Modes for Background Scripts
 
-Happy coding!
+> [!NOTE]
+> Background `script.js` currently has two native request styles: one-shot `fetch(...)` and incremental `fetchStream(...)`.
 
----
-
+Use `SwiftBiu.fetch(url, options, onSuccess, onError)` when the server returns a complete response in one shot:
+1. If your plugin already has its own visual container (`displayUI(...)`, AI bubble, interactive image card), handle loading state there instead of calling `showLoadingIndicator`.
 
 
 ---

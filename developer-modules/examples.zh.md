@@ -5,11 +5,12 @@
 > - **Lite 汇率换算器**: 学习纯逻辑后台 Standard Action 模式的最佳范式。
 > - **Prettier 代码格式化**: 学习具有前台 HTML Web 界面 Web App 动作模式的最佳范式。
 
-## 示例
 
-请查看并克隆官方的 [SwiftBiu 插件开发模板仓库 (SwiftBiuX-Template)](https://github.com/SwiftBiu/SwiftBiuX-Template) 以获取完整的示例插件源代码。阅读这些真实运行的代码是了解底层概念和最佳实践的最快方式。
+### 6. 后台脚本的两种原生请求模式
 
-祝您编码愉快！
+> [!NOTE]
+> 后台 `script.js` 当前有两种原生网络请求模式：一次性结果的 `fetch(...)`，以及增量回调的 `fetchStream(...)`。
+
 
 
 ---

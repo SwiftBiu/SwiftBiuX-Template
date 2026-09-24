@@ -201,12 +201,18 @@ files.forEach(file => {
                 description: toTranslatable(manifest.description),
                 icon: manifest.icon || 'extension',
                 version: manifest.version,
+                minAppVersion: manifest.minAppVersion || null,
                 type: type,
                 extensionKind: extensionKind,
                 author: manifest.author || 'Unknown',
                 downloadUrl: `${baseUrl}${file}.swiftbiux`,
                 categoryId: categoryId,
-                requiredHost: null // Initialize as null
+                requiredHost: null, // Initialize as null
+                permissions: Array.isArray(manifest.permissions) ? manifest.permissions : [],
+                actions: Array.isArray(manifest.actions) ? manifest.actions : [],
+                configuration: Array.isArray(manifest.configuration) ? manifest.configuration : [],
+                network: manifest.network || null,
+                ui: manifest.ui || null
             };
 
             // Add requiredHost for specific AI plugins

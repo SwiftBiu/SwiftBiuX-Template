@@ -2,13 +2,12 @@
 
 > [!NOTE]
 > **AI-Ready Quick Fact (System Entitlements)**
-> - **Keywords**: `localFileRead`, `localFileWrite`, `network`, `clipboardRead`, `clipboardWrite`, `paste`, `notifications`.
+> - **Keywords**: `localFileRead`, `localFileWrite`, `network`, `clipboardRead`, `clipboardWrite`, `paste`, `notifications`, `share`, `ui`, `runAppleScript`, `runShellScript`.
 > - **AppStore Sandbox Guidelines**: Apple restricts AppleScript and Shell execution inside the App Store build. Use host-mediated APIs (`SwiftBiu.readLocalFile`, `SwiftBiu.extractFileIcon`) to pass App Store review.
 
 ## Permissions (`permissions`)
 
-
-To ensure your plugin functions correctly, especially in the sandboxed App Store version of SwiftBiu, you must declare the permissions it needs in `manifest.json`.
+To ensure your plugin functions correctly, especially in the sandboxed App Store version of SwiftBiu, you must declare the permissions it needs in `manifest.json`:
 
 - `"network"`: Required for direct `fetch`/stream/download calls, remote media, and all SwiftBiu-managed `ai*` provider requests.
 - `"clipboardRead"`: Required for `SwiftBiu.getClipboard()`.
@@ -23,8 +22,6 @@ To ensure your plugin functions correctly, especially in the sandboxed App Store
 - `"runShellScript"`: Required for background or Web UI shell execution. ⚠️ **Do not use for App Store-compatible plugins.**
 
 Use the smallest set that matches the APIs the extension actually calls. Manifest AI metadata does not grant access by itself: native provider requests still require `network`, and presentation surfaces require their own `ui` or `notifications` permission.
-
-
 
 ---
 
